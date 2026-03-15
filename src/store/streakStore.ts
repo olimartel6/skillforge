@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../services/supabase';
 import { Badge, UserBadge } from '../utils/types';
 
@@ -10,11 +11,10 @@ interface StreakState {
   badges: Badge[];
   earnedBadges: UserBadge[];
   isLoading: boolean;
-  fetchStreak: (userId: string) => Promise<void>;
-  recordPractice: (userId: string) => Promise<void>;
-  checkAndUpdateStreak: (userId: string) => Promise<void>;
-  fetchBadges: (userId: string) => Promise<void>;
-  checkBadgeConditions: (userId: string, streak: number) => Promise<void>;
+  fetchStreak: () => Promise<void>;
+  recordPractice: () => Promise<void>;
+  checkAndUpdateStreak: () => Promise<void>;
+  fetchBadges: () => Promise<void>;
 }
 
 function getDateString(date: Date): string {
@@ -27,184 +27,117 @@ function getYesterday(): string {
   return getDateString(d);
 }
 
+async function persistStreak(data: any) {
+  await AsyncStorage.setItem('streak_data', JSON.stringify(data));
+}
+
 export const useStreakStore = create<StreakState>((set, get) => ({
   currentStreak: 0,
   longestStreak: 0,
-  freezeTokens: 0,
+  freezeTokens: 3,
   lastPracticeDate: null,
   badges: [],
   earnedBadges: [],
   isLoading: false,
 
-  fetchStreak: async (userId) => {
+  fetchStreak: async () => {
     set({ isLoading: true });
     try {
-      const { data, error } = await supabase
-        .from('streaks')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-
-      if (data) {
-        set({
-          currentStreak: data.current_streak,
-          longestStreak: data.longest_streak,
-          freezeTokens: data.freeze_tokens,
-          lastPracticeDate: data.last_practice_date,
-          isLoading: false,
-        });
+      const stored = await AsyncStorage.getItem('streak_data');
+      if (stored) {
+        set({ ...JSON.parse(stored), isLoading: false });
       } else {
-        // Create initial streak record
-        const { error: insertError } = await supabase
-          .from('streaks')
-          .insert({
-            user_id: userId,
-            current_streak: 0,
-            longest_streak: 0,
-            freeze_tokens: 3,
-            last_practice_date: null,
-          });
-        if (insertError) throw insertError;
-        set({ freezeTokens: 3, isLoading: false });
+        set({ currentStreak: 0, longestStreak: 0, freezeTokens: 3, lastPracticeDate: null, isLoading: false });
       }
-    } catch (error) {
-      console.error('Error fetching streak:', error);
+    } catch {
       set({ isLoading: false });
     }
   },
 
-  checkAndUpdateStreak: async (userId) => {
+  checkAndUpdateStreak: async () => {
     const state = get();
     if (!state.lastPracticeDate) return;
 
     const today = getDateString(new Date());
     const yesterday = getYesterday();
 
-    // Already practiced today — no action needed
     if (state.lastPracticeDate === today) return;
-
-    // Practiced yesterday — streak continues, nothing to do until they practice
     if (state.lastPracticeDate === yesterday) return;
 
-    // Missed yesterday (lastPracticeDate is older than yesterday)
     if (state.lastPracticeDate < yesterday) {
       if (state.freezeTokens > 0) {
-        // Use a freeze token to preserve streak
-        const newFreezeTokens = state.freezeTokens - 1;
-        const { error } = await supabase
-          .from('streaks')
-          .update({
-            freeze_tokens: newFreezeTokens,
-            last_practice_date: yesterday, // pretend they practiced yesterday
-          })
-          .eq('user_id', userId);
-
-        if (!error) {
-          set({
-            freezeTokens: newFreezeTokens,
-            lastPracticeDate: yesterday,
-          });
-        }
+        const updates = {
+          currentStreak: state.currentStreak,
+          longestStreak: state.longestStreak,
+          freezeTokens: state.freezeTokens - 1,
+          lastPracticeDate: yesterday,
+        };
+        set(updates);
+        await persistStreak(updates);
       } else {
-        // Reset streak
-        const { error } = await supabase
-          .from('streaks')
-          .update({ current_streak: 0 })
-          .eq('user_id', userId);
-
-        if (!error) {
-          set({ currentStreak: 0 });
-        }
+        const updates = {
+          currentStreak: 0,
+          longestStreak: state.longestStreak,
+          freezeTokens: 0,
+          lastPracticeDate: state.lastPracticeDate,
+        };
+        set(updates);
+        await persistStreak(updates);
       }
     }
   },
 
-  recordPractice: async (userId) => {
+  recordPractice: async () => {
     const today = getDateString(new Date());
     const state = get();
 
-    // Don't double-count same-day practice
     if (state.lastPracticeDate === today) return;
 
     const newStreak = state.currentStreak + 1;
     const newLongest = Math.max(newStreak, state.longestStreak);
 
-    try {
-      const { error } = await supabase
-        .from('streaks')
-        .update({
-          current_streak: newStreak,
-          longest_streak: newLongest,
-          last_practice_date: today,
-        })
-        .eq('user_id', userId);
+    const updates = {
+      currentStreak: newStreak,
+      longestStreak: newLongest,
+      freezeTokens: state.freezeTokens,
+      lastPracticeDate: today,
+    };
+    set(updates);
+    await persistStreak(updates);
 
-      if (error) throw error;
-
-      set({
-        currentStreak: newStreak,
-        longestStreak: newLongest,
-        lastPracticeDate: today,
-      });
-
-      // Check badge conditions
-      await get().checkBadgeConditions(userId, newStreak);
-    } catch (error) {
-      console.error('Error recording practice:', error);
-    }
-  },
-
-  checkBadgeConditions: async (userId, streak) => {
+    // Check badge conditions
     const { badges, earnedBadges } = get();
     const earnedIds = new Set(earnedBadges.map((eb) => eb.badge_id));
 
     for (const badge of badges) {
       if (earnedIds.has(badge.id)) continue;
-
-      let earned = false;
-      if (badge.condition_type === 'streak' && streak >= badge.condition_value) {
-        earned = true;
-      }
-
-      if (earned) {
-        const { error } = await supabase
-          .from('user_badges')
-          .insert({ user_id: userId, badge_id: badge.id });
-
-        if (!error) {
-          set((s) => ({
-            earnedBadges: [
-              ...s.earnedBadges,
-              { user_id: userId, badge_id: badge.id, earned_at: new Date().toISOString() },
-            ],
-          }));
-        }
+      if (badge.condition_type === 'streak' && newStreak >= badge.condition_value) {
+        const newEarned: UserBadge = {
+          user_id: 'local-user',
+          badge_id: badge.id,
+          earned_at: new Date().toISOString(),
+        };
+        const updatedEarned = [...get().earnedBadges, newEarned];
+        set({ earnedBadges: updatedEarned });
+        await AsyncStorage.setItem('earned_badges', JSON.stringify(updatedEarned));
       }
     }
   },
 
-  fetchBadges: async (userId) => {
+  fetchBadges: async () => {
     try {
-      const [badgesRes, earnedRes] = await Promise.all([
-        supabase.from('badges').select('*'),
-        supabase
-          .from('user_badges')
-          .select('*, badge:badges(*)')
-          .eq('user_id', userId),
-      ]);
-
-      if (badgesRes.error) throw badgesRes.error;
-      if (earnedRes.error) throw earnedRes.error;
+      // Badges catalog from Supabase (public)
+      const { data: badgesData } = await supabase.from('badges').select('*');
+      // Earned badges from local storage
+      const earnedStr = await AsyncStorage.getItem('earned_badges');
+      const earned: UserBadge[] = earnedStr ? JSON.parse(earnedStr) : [];
 
       set({
-        badges: (badgesRes.data ?? []) as Badge[],
-        earnedBadges: (earnedRes.data ?? []) as UserBadge[],
+        badges: (badgesData ?? []) as Badge[],
+        earnedBadges: earned,
       });
-    } catch (error) {
-      console.error('Error fetching badges:', error);
+    } catch {
+      set({ badges: [], earnedBadges: [] });
     }
   },
 }));
-

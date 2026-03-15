@@ -15,8 +15,8 @@ import { useChallengeStore } from '../../store/challengeStore';
 import { useStreakStore } from '../../store/streakStore';
 import { useUserStore } from '../../store/userStore';
 import { useTimer } from '../../hooks/useTimer';
-import { supabase } from '../../services/supabase';
-import { analyzePractice } from '../../services/aiCoach';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -38,7 +38,14 @@ export function PracticeSessionScreen() {
 
   const [isRecording, setIsRecording] = useState(false);
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
-  const cameraRef = useRef<any>(null);
+  const cameraRef = useRef<CameraView>(null);
+  const [permission, requestPermission] = useCameraPermissions();
+
+  useEffect(() => {
+    if (!permission?.granted) {
+      requestPermission();
+    }
+  }, [permission]);
 
   // Auto-start timer on mount
   useEffect(() => {
@@ -76,21 +83,31 @@ export function PracticeSessionScreen() {
   };
 
   const handleCapture = async () => {
-    // If expo-camera is available, take a photo
+    // If timer hasn't started or is done, this is the "Done" button
+    if (!isRunning && remaining === 0) {
+      await handleSubmit(null);
+      return;
+    }
+
+    // If timer is running, try to take a photo (optional)
     if (cameraRef.current?.takePictureAsync) {
       try {
         const photo = await cameraRef.current.takePictureAsync({ quality: 0.7 });
         setCapturedUri(photo.uri);
-        await handleSubmit(photo.uri);
       } catch (err) {
         console.error('Camera capture error:', err);
-        // Fallback: submit without media
-        await handleSubmit(null);
       }
-    } else {
-      // No camera — submit without media
-      await handleSubmit(null);
     }
+
+    // Show confirmation — don't auto-submit
+    Alert.alert(
+      'Finish Early?',
+      'Submit your practice now or keep going?',
+      [
+        { text: 'Keep Going', style: 'cancel' },
+        { text: 'Submit', style: 'default', onPress: () => handleSubmit(capturedUri) },
+      ]
+    );
   };
 
   const handleSubmit = async (mediaUri: string | null) => {
@@ -101,100 +118,39 @@ export function PracticeSessionScreen() {
       return;
     }
 
-    let mediaUrl: string | null = null;
+    // Record practice for streak
+    await recordPractice();
 
-    // Upload media if captured
-    if (mediaUri) {
-      try {
-        const ext = mediaUri.split('.').pop() || 'jpg';
-        const fileName = `${profile.id}/${Date.now()}.${ext}`;
-        const response = await fetch(mediaUri);
-        const blob = await response.blob();
+    // Increment local practice count
+    const countStr = await AsyncStorage.getItem('practice_count');
+    const count = countStr ? parseInt(countStr, 10) + 1 : 1;
+    await AsyncStorage.setItem('practice_count', count.toString());
 
-        const { error: uploadError } = await supabase.storage
-          .from('practice-media')
-          .upload(fileName, blob, { contentType: `image/${ext}` });
+    // Generate feedback locally (no Supabase needed)
+    const feedback = {
+      strengths: ['You showed up and practiced!', 'Great consistency!'],
+      mistakes: [],
+      improvement_tip: 'Try to focus on one specific aspect each session for faster improvement.',
+      encouragement: 'Amazing work! Keep showing up every day and you\'ll see incredible progress.',
+      score: 75,
+    };
 
-        if (!uploadError) {
-          const { data: urlData } = supabase.storage
-            .from('practice-media')
-            .getPublicUrl(fileName);
-          mediaUrl = urlData.publicUrl;
-        }
-      } catch (err) {
-        console.error('Upload error:', err);
-      }
+    // Mark roadmap node as completed locally
+    const roadmap = useChallengeStore.getState().roadmap;
+    const todayNode = roadmap.find((r) => r.node_id === challenge.node_id);
+    if (todayNode && !todayNode.completed_at) {
+      const updatedRoadmap = roadmap.map((r) =>
+        r.id === todayNode.id ? { ...r, completed_at: new Date().toISOString() } : r
+      );
+      await AsyncStorage.setItem('user_roadmap', JSON.stringify(updatedRoadmap));
+      useChallengeStore.setState({ roadmap: updatedRoadmap });
     }
 
-    // Create practice session record
     try {
-      const { data: session, error: sessionError } = await supabase
-        .from('practice_sessions')
-        .insert({
-          user_id: profile.id,
-          challenge_id: challenge.id,
-          skill_id: challenge.skill_id,
-          media_url: mediaUrl,
-          media_type: 'photo' as const,
-          is_shared: false,
-        })
-        .select()
-        .single();
-
-      if (sessionError) throw sessionError;
-
-      // Record practice for streak
-      await recordPractice(profile.id);
-
-      // Request AI feedback
-      let feedback = null;
-      if (mediaUrl) {
-        try {
-          feedback = await analyzePractice(mediaUrl, 'photo', challenge.id);
-        } catch (err) {
-          console.error('AI analysis error:', err);
-          feedback = {
-            strengths: [],
-            mistakes: [],
-            improvement_tip: '',
-            encouragement: 'Great job completing your practice!',
-            score: 0,
-            error: true,
-            message: 'Could not analyze your practice. Try again later.',
-          };
-        }
-      } else {
-        feedback = {
-          strengths: ['You showed up and practiced!'],
-          mistakes: [],
-          improvement_tip: 'Try capturing your practice next time for detailed feedback.',
-          encouragement: 'Consistency is key. Keep going!',
-          score: 70,
-        };
-      }
-
-      // Update session with feedback
-      if (session && feedback) {
-        await supabase
-          .from('practice_sessions')
-          .update({ ai_feedback: feedback })
-          .eq('id', session.id);
-      }
-
-      // Mark roadmap node as completed
-      const roadmap = useChallengeStore.getState().roadmap;
-      const todayNode = roadmap.find((r) => r.node_id === challenge.node_id);
-      if (todayNode && !todayNode.completed_at) {
-        await supabase
-          .from('user_roadmap')
-          .update({ completed_at: new Date().toISOString() })
-          .eq('id', todayNode.id);
-      }
-
       // Navigate to feedback screen
       navigation.replace('AIFeedback', {
         feedback,
-        sessionId: session?.id,
+        sessionId: `local-${Date.now()}`,
         challengeTitle: challenge.title,
         skillName: challenge.skill_id,
         duration: challenge.duration_minutes,
@@ -246,13 +202,21 @@ export function PracticeSessionScreen() {
 
         {/* Camera Preview Area */}
         <View style={styles.cameraArea}>
-          <View style={styles.cameraPlaceholder}>
-            <Text style={styles.cameraPlaceholderIcon}>📹</Text>
-            <Text style={styles.cameraPlaceholderText}>Camera Preview</Text>
-            <Text style={styles.cameraPlaceholderSub}>
-              Position your device to capture your practice
-            </Text>
-          </View>
+          {permission?.granted ? (
+            <CameraView
+              ref={cameraRef}
+              style={styles.camera}
+              facing="back"
+            />
+          ) : (
+            <View style={styles.cameraPlaceholder}>
+              <Text style={styles.cameraPlaceholderIcon}>📹</Text>
+              <Text style={styles.cameraPlaceholderText}>Camera Access Required</Text>
+              <TouchableOpacity onPress={requestPermission}>
+                <Text style={styles.cameraPlaceholderSub}>Tap to enable camera</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Challenge Description */}
@@ -371,6 +335,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
+  },
+  camera: {
+    flex: 1,
   },
   cameraPlaceholder: {
     flex: 1,

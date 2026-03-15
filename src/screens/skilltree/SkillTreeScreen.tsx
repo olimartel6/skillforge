@@ -12,6 +12,7 @@ import { GlassCard } from '../../components/GlassCard';
 import { AmbientGlow } from '../../components/AmbientGlow';
 import { colors, spacing, borderRadius, typography, glowShadow } from '../../utils/theme';
 import { SkillTreeNode, UserProgress, Skill, Tier } from '../../utils/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../services/supabase';
 import { useUserStore } from '../../store/userStore';
 
@@ -36,16 +37,18 @@ export function SkillTreeScreen() {
     const load = async () => {
       setLoading(true);
       try {
-        const [skillRes, nodesRes, progressRes] = await Promise.all([
+        const [skillRes, nodesRes] = await Promise.all([
           supabase.from('skills').select('*').eq('id', profile.selected_skill_id!).single(),
           supabase.from('skill_tree_nodes').select('*').eq('skill_id', profile.selected_skill_id!).order('order'),
-          supabase.from('user_progress').select('node_id').eq('user_id', profile.id),
         ]);
 
         if (skillRes.data) setSkill(skillRes.data as Skill);
         if (nodesRes.data) setNodes(nodesRes.data as SkillTreeNode[]);
-        if (progressRes.data) {
-          setProgress(new Set((progressRes.data as UserProgress[]).map((p) => p.node_id)));
+
+        // Load progress from local storage
+        const storedProgress = await AsyncStorage.getItem('user_progress');
+        if (storedProgress) {
+          setProgress(new Set(JSON.parse(storedProgress)));
         }
       } catch (err) {
         console.error('Error loading skill tree:', err);

@@ -13,27 +13,20 @@ import { Button } from '../../components/Button';
 import { AmbientGlow } from '../../components/AmbientGlow';
 import { colors, spacing, typography, borderRadius } from '../../utils/theme';
 import { UserRoadmap } from '../../utils/types';
-import { supabase } from '../../services/supabase';
-import { useUserStore } from '../../store/userStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function RoadmapPreviewScreen() {
   const navigation = useNavigation();
-  const { profile } = useUserStore();
   const [roadmap, setRoadmap] = useState<UserRoadmap[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!profile) return;
     (async () => {
-      const { data, error } = await supabase
-        .from('user_roadmap')
-        .select('*')
-        .eq('user_id', profile.id)
-        .order('day_number', { ascending: true });
-      if (!error && data) setRoadmap(data as UserRoadmap[]);
+      const stored = await AsyncStorage.getItem('user_roadmap');
+      if (stored) setRoadmap(JSON.parse(stored));
       setLoading(false);
     })();
-  }, [profile]);
+  }, []);
 
   const handleStart = () => {
     // RootNavigator will auto-redirect since onboarding is complete

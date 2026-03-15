@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.skillforge.app",
+      "bundleIdentifier": "com.olimartel6.skillforge2025",
       "buildNumber": "1",
       "infoPlist": {
         "NSCameraUsageDescription": "SkillForge needs camera access to record your practice sessions for AI feedback.",
@@ -26,7 +26,7 @@
       }
     },
     "android": {
-      "package": "com.skillforge.app",
+      "package": "com.olimartel6.skillforge2025",
       "adaptiveIcon": {
         "backgroundColor": "#0a0a0b",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -48,12 +48,6 @@
         "expo-camera",
         {
           "cameraPermission": "SkillForge needs camera access to record your practice sessions."
-        }
-      ],
-      [
-        "expo-av",
-        {
-          "microphonePermission": "SkillForge needs microphone access to record practice audio."
         }
       ],
       [

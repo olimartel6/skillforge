@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillForge Icon Generator</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    color: #eee;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 24px;
+  }
+  canvas {
+    width: 512px;
+    height: 512px;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  button {
+    padding: 14px 36px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #FF6B35, #FF3D00);
+    color: #fff;
+    letter-spacing: 1px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,107,53,0.4);
+  }
+</style>
+</head>
+<body>
+<canvas id="icon" width="1024" height="1024"></canvas>
+<button id="download">Download PNG</button>
+<script>
+(function () {
+  const canvas = document.getElementById('icon');
+  const ctx = canvas.getContext('2d');
+  const S = 1024;
+  const R = 220;
+
+  // --- Clipping mask: rounded square ---
+  function roundedRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h);
+    ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  }
+
+  ctx.save();
+  roundedRect(0, 0, S, S, R);
+  ctx.clip();
+
+  // --- Background gradient ---
+  const bg = ctx.createLinearGradient(0, 0, 0, S);
+  bg.addColorStop(0, '#0a0a0b');
+  bg.addColorStop(1, '#1a1a1b');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, S, S);
+
+  // --- Ambient glow: orange upper-right ---
+  const glowOrange = ctx.createRadialGradient(780, 180, 40, 780, 180, 480);
+  glowOrange.addColorStop(0, 'rgba(255,107,53,0.10)');
+  glowOrange.addColorStop(1, 'rgba(255,107,53,0)');
+  ctx.fillStyle = glowOrange;
+  ctx.fillRect(0, 0, S, S);
+
+  // --- Ambient glow: purple lower-left ---
+  const glowPurple = ctx.createRadialGradient(240, 840, 40, 240, 840, 480);
+  glowPurple.addColorStop(0, 'rgba(108,99,255,0.08)');
+  glowPurple.addColorStop(1, 'rgba(108,99,255,0)');
+  ctx.fillStyle = glowPurple;
+  ctx.fillRect(0, 0, S, S);
+
+  // --- Lightning bolt path (centered, ~500px tall) ---
+  // Bolt centered around (512, 430), top at ~180, bottom at ~680
+  function boltPath() {
+    ctx.beginPath();
+    // Top point
+    ctx.moveTo(540, 180);
+    // Right edge going down to the notch
+    ctx.lineTo(620, 180);
+    ctx.lineTo(520, 440);
+    // Jut right for the middle bar
+    ctx.lineTo(600, 440);
+    // Bottom point
+    ctx.lineTo(440, 700);
+    // Back up to the notch
+    ctx.lineTo(510, 480);
+    // Jut left
+    ctx.lineTo(430, 480);
+    ctx.closePath();
+  }
+
+  // --- Glow behind bolt ---
+  ctx.save();
+  ctx.shadowColor = 'rgba(255,107,53,0.55)';
+  ctx.shadowBlur = 80;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 10;
+  boltPath();
+  ctx.fillStyle = 'rgba(255,80,20,0.35)';
+  ctx.fill();
+  ctx.restore();
+
+  // Second softer, wider glow layer
+  ctx.save();
+  ctx.shadowColor = 'rgba(255,107,53,0.25)';
+  ctx.shadowBlur = 140;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  boltPath();
+  ctx.fillStyle = 'rgba(255,80,20,0.15)';
+  ctx.fill();
+  ctx.restore();
+
+  // --- Fill bolt with gradient ---
+  const boltGrad = ctx.createLinearGradient(440, 180, 600, 700);
+  boltGrad.addColorStop(0, '#FF6B35');
+  boltGrad.addColorStop(1, '#FF3D00');
+  boltPath();
+  ctx.fillStyle = boltGrad;
+  ctx.fill();
+
+  // --- Subtle highlight on bolt ---
+  ctx.save();
+  ctx.globalCompositeOperation = 'overlay';
+  const highlightGrad = ctx.createLinearGradient(460, 180, 580, 500);
+  highlightGrad.addColorStop(0, 'rgba(255,255,255,0.25)');
+  highlightGrad.addColorStop(0.5, 'rgba(255,255,255,0.05)');
+  highlightGrad.addColorStop(1, 'rgba(255,255,255,0)');
+  boltPath();
+  ctx.fillStyle = highlightGrad;
+  ctx.fill();
+  ctx.restore();
+
+  // --- "SF" monogram ---
+  ctx.save();
+  ctx.font = 'bold 120px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.letterSpacing = '20px';
+  ctx.fillStyle = 'rgba(255,255,255,0.92)';
+
+  // Subtle text shadow
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 16;
+  ctx.shadowOffsetY = 4;
+
+  // letterSpacing may not be supported everywhere; manually kern if needed
+  const text = 'S F';
+  ctx.fillText(text, S / 2 + 10, 750);
+  ctx.restore();
+
+  ctx.restore(); // end clip
+
+  // --- Download logic ---
+  function downloadIcon() {
+    const link = document.createElement('a');
+    link.download = 'icon.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+
+  document.getElementById('download').addEventListener('click', downloadIcon);
+
+  // Auto-trigger download after a brief delay to let the canvas render
+  setTimeout(downloadIcon, 500);
+})();
+</script>
+</body>
+</html>

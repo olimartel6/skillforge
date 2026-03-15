@@ -1,6 +1,6 @@
 import { create } from 'zustand';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../services/supabase';
-import { generateChallenge } from '../services/aiCoach';
 import { Challenge, UserRoadmap } from '../utils/types';
 
 interface ChallengeState {
@@ -8,8 +8,8 @@ interface ChallengeState {
   timerState: { remaining: number; isRunning: boolean; isPaused: boolean };
   roadmap: UserRoadmap[];
   isLoading: boolean;
-  fetchTodayChallenge: (userId: string, skillId: string) => Promise<void>;
-  fetchRoadmap: (userId: string) => Promise<void>;
+  fetchTodayChallenge: (skillId: string) => Promise<void>;
+  fetchRoadmap: () => Promise<void>;
   setTimerState: (state: Partial<ChallengeState['timerState']>) => void;
   resetTimer: () => void;
 }
@@ -20,79 +20,78 @@ export const useChallengeStore = create<ChallengeState>((set, get) => ({
   roadmap: [],
   isLoading: false,
 
-  fetchTodayChallenge: async (userId, skillId) => {
+  fetchTodayChallenge: async (skillId) => {
     set({ isLoading: true });
     try {
-      // Fetch or ensure roadmap is loaded
+      // Load roadmap from local storage
       let roadmap = get().roadmap;
       if (roadmap.length === 0) {
-        await get().fetchRoadmap(userId);
+        await get().fetchRoadmap();
         roadmap = get().roadmap;
       }
 
       if (roadmap.length === 0) {
-        set({ isLoading: false });
-        return;
-      }
-
-      // Determine today's day number based on roadmap creation date
-      const createdAt = new Date(roadmap[0].created_at);
-      const now = new Date();
-      const diffMs = now.getTime() - createdAt.getTime();
-      const dayNumber = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
-
-      // Find today's roadmap node
-      const todayNode = roadmap.find((r) => r.day_number === dayNumber);
-      if (!todayNode) {
-        // If we've exceeded the roadmap length, use the last node
-        const lastNode = roadmap[roadmap.length - 1];
-        set({ isLoading: false });
-        // Try to get an existing challenge for this node
-        const { data: existing } = await supabase
-          .from('challenges')
+        // No roadmap yet — fetch a random challenge from Supabase for this skill
+        const { data: nodes } = await supabase
+          .from('skill_tree_nodes')
           .select('*')
-          .eq('node_id', lastNode.node_id)
           .eq('skill_id', skillId)
-          .limit(1)
-          .single();
+          .order('order')
+          .limit(1);
 
-        if (existing) {
-          set({ currentChallenge: existing as Challenge });
+        if (nodes && nodes.length > 0) {
+          const { data: challenge } = await supabase
+            .from('challenges')
+            .select('*')
+            .eq('skill_id', skillId)
+            .eq('node_id', nodes[0].id)
+            .limit(1)
+            .maybeSingle();
+
+          if (challenge) {
+            set({ currentChallenge: challenge as Challenge, isLoading: false });
+            return;
+          }
         }
-        return;
-      }
 
-      // Check if a challenge already exists for today's node
-      const { data: existingChallenge } = await supabase
-        .from('challenges')
-        .select('*')
-        .eq('node_id', todayNode.node_id)
-        .eq('skill_id', skillId)
-        .limit(1)
-        .single();
-
-      if (existingChallenge) {
+        // Create a default challenge
         set({
-          currentChallenge: existingChallenge as Challenge,
-          timerState: {
-            remaining: (existingChallenge.duration_minutes || 5) * 60,
-            isRunning: false,
-            isPaused: false,
+          currentChallenge: {
+            id: 'default',
+            skill_id: skillId,
+            node_id: '',
+            title: 'Free Practice',
+            description: 'Practice your skill for 5 minutes. Focus on the fundamentals and have fun!',
+            difficulty: 'beginner',
+            duration_minutes: 5,
+            is_generated: false,
+            tips: ['Focus on the basics', 'Take your time', 'Have fun!'],
           },
           isLoading: false,
         });
         return;
       }
 
-      // Generate a new challenge via AI
-      const challenge = await generateChallenge(skillId, todayNode.node_id, 'intermediate');
+      // Determine today's day number
+      const createdAt = new Date(roadmap[0].created_at);
+      const now = new Date();
+      const diffMs = now.getTime() - createdAt.getTime();
+      const dayNumber = Math.min(Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1, 30);
+
+      const todayNode = roadmap.find((r) => r.day_number === dayNumber) || roadmap[0];
+
       set({
-        currentChallenge: challenge,
-        timerState: {
-          remaining: (challenge.duration_minutes || 5) * 60,
-          isRunning: false,
-          isPaused: false,
+        currentChallenge: {
+          id: todayNode.id,
+          skill_id: skillId,
+          node_id: todayNode.node_id,
+          title: todayNode.challenge_title,
+          description: todayNode.challenge_description,
+          difficulty: 'beginner',
+          duration_minutes: 5,
+          is_generated: true,
         },
+        timerState: { remaining: 300, isRunning: false, isPaused: false },
         isLoading: false,
       });
     } catch (error) {
@@ -101,18 +100,14 @@ export const useChallengeStore = create<ChallengeState>((set, get) => ({
     }
   },
 
-  fetchRoadmap: async (userId) => {
+  fetchRoadmap: async () => {
     try {
-      const { data, error } = await supabase
-        .from('user_roadmap')
-        .select('*')
-        .eq('user_id', userId)
-        .order('day_number', { ascending: true });
-
-      if (error) throw error;
-      set({ roadmap: (data ?? []) as UserRoadmap[] });
-    } catch (error) {
-      console.error('Error fetching roadmap:', error);
+      const stored = await AsyncStorage.getItem('user_roadmap');
+      if (stored) {
+        set({ roadmap: JSON.parse(stored) as UserRoadmap[] });
+      }
+    } catch {
+      // Roadmap not available yet
     }
   },
 

@@ -15,7 +15,8 @@ import { AmbientGlow } from '../../components/AmbientGlow';
 import { colors, spacing, typography } from '../../utils/theme';
 import { Goal } from '../../utils/types';
 import { useUserStore } from '../../store/userStore';
-import { generateRoadmap } from '../../services/aiCoach';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../../services/supabase';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'GoalSelection'>;
@@ -43,7 +44,31 @@ export function GoalSelectionScreen() {
     setLoading(true);
     try {
       await completeOnboarding(skillId, level as any, selected);
-      await generateRoadmap(skillId, level, selected, profile.id);
+
+      // Generate a simple local roadmap from skill tree nodes
+      const { data: nodes } = await supabase
+        .from('skill_tree_nodes')
+        .select('*')
+        .eq('skill_id', skillId)
+        .order('order');
+
+      if (nodes && nodes.length > 0) {
+        const roadmap = Array.from({ length: 30 }, (_, i) => {
+          const node = nodes[i % nodes.length];
+          return {
+            id: `day-${i + 1}`,
+            user_id: 'local-user',
+            day_number: i + 1,
+            node_id: node.id,
+            challenge_title: `Day ${i + 1}: ${node.name} Practice`,
+            challenge_description: `Practice ${node.name} for 5 minutes. Focus on building your skills step by step.`,
+            completed_at: null,
+            created_at: new Date().toISOString(),
+          };
+        });
+        await AsyncStorage.setItem('user_roadmap', JSON.stringify(roadmap));
+      }
+
       navigation.navigate('RoadmapPreview', { skillId, level, goal: selected });
     } catch (e: any) {
       setError(e.message || 'Failed to generate roadmap');

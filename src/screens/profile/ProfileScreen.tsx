@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlassCard } from '../../components/GlassCard';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../services/supabase';
 import { useUserStore } from '../../store/userStore';
 import { useStreakStore } from '../../store/streakStore';
@@ -30,19 +31,17 @@ export function ProfileScreen() {
   const [skillName, setSkillName] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!profile?.id) return;
+    if (!profile) return;
 
-    fetchStreak(profile.id);
+    fetchStreak();
 
     const load = async () => {
       try {
-        const { count } = await supabase
-          .from('practice_sessions')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', profile.id);
+        // Practice count from local storage
+        const stored = await AsyncStorage.getItem('practice_count');
+        setPracticeCount(stored ? parseInt(stored, 10) : 0);
 
-        setPracticeCount(count || 0);
-
+        // Skill name from Supabase (public data)
         if (profile.selected_skill_id) {
           const { data } = await supabase
             .from('skills')
@@ -57,7 +56,7 @@ export function ProfileScreen() {
     };
 
     load();
-  }, [profile?.id, profile?.selected_skill_id]);
+  }, [profile?.selected_skill_id]);
 
   const handleSignOut = async () => {
     try {

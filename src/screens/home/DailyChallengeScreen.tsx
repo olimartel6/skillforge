@@ -50,11 +50,11 @@ export function DailyChallengeScreen() {
     const userId = profile.id;
     const skillId = profile.selected_skill_id;
 
-    fetchStreak(userId);
-    checkAndUpdateStreak(userId);
-    fetchBadges(userId);
+    fetchStreak();
+    checkAndUpdateStreak();
+    fetchBadges();
     if (skillId) {
-      fetchTodayChallenge(userId, skillId);
+      fetchTodayChallenge(skillId);
     }
   }, [profile?.id, profile?.selected_skill_id]);
 

@@ -11,7 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { GlassCard } from '../../components/GlassCard';
 import { AmbientGlow } from '../../components/AmbientGlow';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
-import { supabase } from '../../services/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUserStore } from '../../store/userStore';
 import { useStreakStore } from '../../store/streakStore';
 
@@ -22,26 +22,17 @@ export function StreakDashboardScreen() {
   const [totalMinutes, setTotalMinutes] = useState(0);
 
   useEffect(() => {
-    if (!profile?.id) return;
+    fetchStreak();
 
-    fetchStreak(profile.id);
-
+    // Load practice count from local storage
     const loadMinutes = async () => {
       try {
-        const { count } = await supabase
-          .from('practice_sessions')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', profile.id);
-
-        // Each session is ~5 min by default
-        setTotalMinutes((count || 0) * 5);
-      } catch (err) {
-        console.error('Error fetching total minutes:', err);
-      }
+        const stored = await AsyncStorage.getItem('practice_count');
+        setTotalMinutes((stored ? parseInt(stored, 10) : 0) * 5);
+      } catch {}
     };
-
     loadMinutes();
-  }, [profile?.id]);
+  }, []);
 
   return (
     <View style={styles.root}>
