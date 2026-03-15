@@ -11,15 +11,15 @@ type SkillCategory = 'visual_arts' | 'music' | 'communication' | 'performance' |
 
 function getSkillCategory(skillName: string): SkillCategory {
   const lower = (skillName || '').toLowerCase();
-  if (lower.includes('draw') || lower.includes('paint') || lower.includes('sketch') || lower.includes('watercolor') || lower.includes('illustration'))
+  if (lower.includes('draw') || lower.includes('paint') || lower.includes('callig'))
     return 'visual_arts';
-  if (lower.includes('guitar') || lower.includes('piano') || lower.includes('music') || lower.includes('sing') || lower.includes('drum') || lower.includes('violin'))
+  if (lower.includes('guitar') || lower.includes('piano') || lower.includes('sing') || lower.includes('beatbox'))
     return 'music';
-  if (lower.includes('speak') || lower.includes('present') || lower.includes('writing') || lower.includes('debate') || lower.includes('storytell'))
+  if (lower.includes('speak') || lower.includes('writing') || lower.includes('storytell') || lower.includes('language') || lower.includes('pronunciat'))
     return 'communication';
-  if (lower.includes('act') || lower.includes('danc') || lower.includes('improv') || lower.includes('theater') || lower.includes('comedy'))
+  if (lower.includes('act') || lower.includes('danc') || lower.includes('comedy') || lower.includes('magic'))
     return 'performance';
-  if (lower.includes('photo') || lower.includes('video') || lower.includes('edit') || lower.includes('design') || lower.includes('animation'))
+  if (lower.includes('photo') || lower.includes('video') || lower.includes('edit') || lower.includes('animation') || lower.includes('3d') || lower.includes('film'))
     return 'digital';
   return 'general';
 }
@@ -218,48 +218,63 @@ const communicationQuestions: Record<string, GameQuestion[]> = {
 const performanceQuestions: Record<string, GameQuestion[]> = {
   multiple_choice: [
     { type: 'multiple_choice', prompt: 'What is "blocking" in theater?', options: ['Forgetting your lines', 'The planned movement of actors on stage', 'A vocal warm-up', 'A type of stage lighting'], correctAnswer: 'The planned movement of actors on stage', difficulty: 'easy' },
-    { type: 'multiple_choice', prompt: 'What is the Meisner technique?', options: ['A dance style', 'An acting technique focused on living truthfully', 'A vocal projection method', 'A stage design approach'], correctAnswer: 'An acting technique focused on living truthfully', difficulty: 'medium' },
-    { type: 'multiple_choice', prompt: 'What does "upstage" mean?', options: ['To improve your performance', 'The area at the back of the stage', 'To memorize your lines', 'The front of the stage'], correctAnswer: 'The area at the back of the stage', difficulty: 'easy' },
-    { type: 'multiple_choice', prompt: 'What is "breaking the fourth wall"?', options: ['Damaging the set', 'Acknowledging the audience directly', 'Exiting through stage left', 'A lighting technique'], correctAnswer: 'Acknowledging the audience directly', difficulty: 'easy' },
+    { type: 'multiple_choice', prompt: 'What is the key principle of misdirection in magic?', options: ['Moving very fast', 'Directing the audience\'s attention away from the secret move', 'Using very large props', 'Speaking loudly'], correctAnswer: 'Directing the audience\'s attention away from the secret move', difficulty: 'easy' },
+    { type: 'multiple_choice', prompt: 'What is a "force" in card magic?', options: ['Bending the cards', 'Making someone pick a specific card while they think it\'s free choice', 'Throwing cards at the audience', 'Stacking the deck visibly'], correctAnswer: 'Making someone pick a specific card while they think it\'s free choice', difficulty: 'easy' },
+    { type: 'multiple_choice', prompt: 'What is a "double lift" in card magic?', options: ['Lifting two cards as one', 'Picking up the deck twice', 'A card throwing technique', 'Lifting the table'], correctAnswer: 'Lifting two cards as one', difficulty: 'medium' },
+    { type: 'multiple_choice', prompt: 'What is "palming" in magic?', options: ['Slapping the table', 'Secretly hiding an object in your hand', 'Showing both hands empty', 'A card shuffling technique'], correctAnswer: 'Secretly hiding an object in your hand', difficulty: 'easy' },
+    { type: 'multiple_choice', prompt: 'What is "patter" in magic?', options: ['The sound effects used', 'The scripted talk that accompanies a trick', 'A shuffling technique', 'The applause from the audience'], correctAnswer: 'The scripted talk that accompanies a trick', difficulty: 'easy' },
+    { type: 'multiple_choice', prompt: 'Who is considered the father of modern magic?', options: ['David Copperfield', 'Jean Eugène Robert-Houdin', 'Harry Houdini', 'Penn Jillette'], correctAnswer: 'Jean Eugène Robert-Houdin', difficulty: 'hard' },
+    { type: 'multiple_choice', prompt: 'What is a "sleight" in magic?', options: ['A type of wand', 'A skillful hand movement to create an illusion', 'A magic word', 'A type of card deck'], correctAnswer: 'A skillful hand movement to create an illusion', difficulty: 'easy' },
+    { type: 'multiple_choice', prompt: 'What is the "French Drop" in coin magic?', options: ['Dropping a coin on purpose', 'A fake transfer where the coin stays in the original hand', 'Flipping a coin in the air', 'A French magic society'], correctAnswer: 'A fake transfer where the coin stays in the original hand', difficulty: 'medium' },
+    { type: 'multiple_choice', prompt: 'What does "angles" mean in magic?', options: ['The shape of cards', 'The positions from which the secret can be seen', 'The way you bow', 'A type of trick'], correctAnswer: 'The positions from which the secret can be seen', difficulty: 'medium' },
     { type: 'multiple_choice', prompt: 'In improv, what does "yes, and..." mean?', options: ['Agree then change the subject', 'Accept and build upon what your partner offers', 'Say yes to everything literally', 'End the scene quickly'], correctAnswer: 'Accept and build upon what your partner offers', difficulty: 'easy' },
-    { type: 'multiple_choice', prompt: 'What is a "monologue"?', options: ['A conversation between two people', 'A long speech by one character', 'Background music in a scene', 'A dance solo'], correctAnswer: 'A long speech by one character', difficulty: 'easy' },
   ],
   true_false: [
-    { type: 'true_false', prompt: 'Method acting involves fully immersing yourself in a character.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
-    { type: 'true_false', prompt: 'Stage left is to the audience\'s left.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'medium' },
-    { type: 'true_false', prompt: 'Warming up your voice before a performance is unnecessary.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'easy' },
-    { type: 'true_false', prompt: 'Improvisation requires no skills or practice.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'easy' },
+    { type: 'true_false', prompt: 'A magician should never reveal the secret behind a trick.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
+    { type: 'true_false', prompt: 'Misdirection only works with fast hand movements.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'easy' },
+    { type: 'true_false', prompt: 'Harry Houdini was famous for escape tricks.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
+    { type: 'true_false', prompt: 'You should always repeat the same trick twice for the same audience.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'easy' },
+    { type: 'true_false', prompt: 'Presentation and storytelling are more important than the secret in magic.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'medium' },
+    { type: 'true_false', prompt: 'Palming requires months of practice to do smoothly.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
   ],
   match_pairs: [
-    { type: 'match_pairs', prompt: 'Match the stage direction with its position', options: ['Downstage', 'Closest to audience', 'Upstage', 'Farthest from audience', 'Stage left', 'Actor\'s left side', 'Stage right', 'Actor\'s right side'], correctAnswer: ['Downstage:Closest to audience', 'Upstage:Farthest from audience', 'Stage left:Actor\'s left side', 'Stage right:Actor\'s right side'], difficulty: 'easy' },
+    { type: 'match_pairs', prompt: 'Match the magic technique with its description', options: ['Palming', 'Hiding object in hand', 'Misdirection', 'Directing attention away', 'Force', 'Controlling spectator choice', 'Double lift', 'Lifting two cards as one'], correctAnswer: ['Palming:Hiding object in hand', 'Misdirection:Directing attention away', 'Force:Controlling spectator choice', 'Double lift:Lifting two cards as one'], difficulty: 'easy' },
+    { type: 'match_pairs', prompt: 'Match the famous magician with their specialty', options: ['Houdini', 'Escape arts', 'David Blaine', 'Street magic', 'Penn & Teller', 'Comedy magic', 'Dai Vernon', 'Close-up card magic'], correctAnswer: ['Houdini:Escape arts', 'David Blaine:Street magic', 'Penn & Teller:Comedy magic', 'Dai Vernon:Close-up card magic'], difficulty: 'medium' },
   ],
   speed_sort: [
-    { type: 'speed_sort', prompt: 'Order the rehearsal process', options: ['Read-through', 'Blocking', 'Working rehearsals', 'Run-throughs', 'Dress rehearsal'], correctAnswer: ['Read-through', 'Blocking', 'Working rehearsals', 'Run-throughs', 'Dress rehearsal'], difficulty: 'medium' },
+    { type: 'speed_sort', prompt: 'Order the steps of performing a magic trick', options: ['Setup/preparation', 'Patter/introduction', 'The secret move', 'The reveal/climax', 'Audience reaction'], correctAnswer: ['Setup/preparation', 'Patter/introduction', 'The secret move', 'The reveal/climax', 'Audience reaction'], difficulty: 'medium' },
+    { type: 'speed_sort', prompt: 'Order card magic skills from beginner to advanced', options: ['Basic spreads', 'Simple forces', 'Double lift', 'False shuffles', 'One-hand cuts'], correctAnswer: ['Basic spreads', 'Simple forces', 'Double lift', 'False shuffles', 'One-hand cuts'], difficulty: 'medium' },
   ],
   fill_gap: [
-    { type: 'fill_gap', prompt: 'The technique of speaking to the audience while other characters cannot hear is called an ___.', options: ['Aside', 'Monologue', 'Epilogue', 'Prologue'], correctAnswer: 'Aside', difficulty: 'medium' },
+    { type: 'fill_gap', prompt: 'The technique of secretly hiding a coin in your hand is called ___.', options: ['Palming', 'Forcing', 'Flashing', 'Ditching'], correctAnswer: 'Palming', difficulty: 'easy' },
+    { type: 'fill_gap', prompt: 'When the audience accidentally sees the secret, it\'s called a ___.', options: ['Flash', 'Break', 'Snap', 'Leak'], correctAnswer: 'Flash', difficulty: 'medium' },
   ],
   swipe_judge: [
-    { type: 'swipe_judge', prompt: 'Turning your back to the audience while delivering a key line.', options: ['Good technique', 'Bad technique'], correctAnswer: 'Bad technique', difficulty: 'easy' },
-    { type: 'swipe_judge', prompt: 'Using breath control to project your voice without straining.', options: ['Good technique', 'Bad technique'], correctAnswer: 'Good technique', difficulty: 'easy' },
+    { type: 'swipe_judge', prompt: 'Performing the same trick twice for the same audience.', options: ['Good technique', 'Bad technique'], correctAnswer: 'Bad technique', difficulty: 'easy' },
+    { type: 'swipe_judge', prompt: 'Practicing sleights in front of a mirror before performing.', options: ['Good technique', 'Bad technique'], correctAnswer: 'Good technique', difficulty: 'easy' },
+    { type: 'swipe_judge', prompt: 'Telling the audience what you\'re going to do before you do it.', options: ['Good technique', 'Bad technique'], correctAnswer: 'Bad technique', difficulty: 'easy' },
+    { type: 'swipe_judge', prompt: 'Using patter to build suspense and misdirect.', options: ['Good technique', 'Bad technique'], correctAnswer: 'Good technique', difficulty: 'easy' },
+    { type: 'swipe_judge', prompt: 'Revealing the secret of your trick to impress the audience.', options: ['Good technique', 'Bad technique'], correctAnswer: 'Bad technique', difficulty: 'easy' },
   ],
   memory_cards: [
-    { type: 'memory_cards', prompt: 'Match theater terms', options: ['Blocking', 'Blocking', 'Aside', 'Aside', 'Cue', 'Cue', 'Wings', 'Wings', 'Props', 'Props', 'Improv', 'Improv'], correctAnswer: ['Blocking', 'Aside', 'Cue', 'Wings', 'Props', 'Improv'], difficulty: 'medium' },
+    { type: 'memory_cards', prompt: 'Match magic terms', options: ['Palming', 'Palming', 'Force', 'Force', 'Sleight', 'Sleight', 'Patter', 'Patter', 'Flash', 'Flash', 'Misdirection', 'Misdirection'], correctAnswer: ['Palming', 'Force', 'Sleight', 'Patter', 'Flash', 'Misdirection'], difficulty: 'medium' },
   ],
   drag_label: [
-    { type: 'drag_label', prompt: 'Label the areas of a stage', options: ['Downstage', 'Upstage', 'Wings', 'Backstage'], correctAnswer: ['Downstage', 'Upstage', 'Wings', 'Backstage'], difficulty: 'easy' },
+    { type: 'drag_label', prompt: 'Label the parts of a card trick routine', options: ['Setup', 'Presentation', 'Climax', 'Clean-up'], correctAnswer: ['Setup', 'Presentation', 'Climax', 'Clean-up'], difficulty: 'easy' },
   ],
   spot_difference: [
-    { type: 'spot_difference', prompt: 'Which acting advice is incorrect?', options: ['React genuinely to your scene partner rather than waiting for your cue', 'Always plan your exact facial expressions in advance for every line'], correctAnswer: 'Always plan your exact facial expressions in advance for every line', difficulty: 'medium' },
+    { type: 'spot_difference', prompt: 'Which magic advice is wrong?', options: ['Practice your sleights until they become natural and smooth', 'Always tell the audience exactly how the trick works to build trust'], correctAnswer: 'Always tell the audience exactly how the trick works to build trust', difficulty: 'easy' },
+    { type: 'spot_difference', prompt: 'Which magic principle is incorrect?', options: ['Misdirection works by controlling where the audience looks', 'The faster you move your hands, the less likely anyone will notice the secret move'], correctAnswer: 'The faster you move your hands, the less likely anyone will notice the secret move', difficulty: 'medium' },
   ],
   timed_challenge: [
-    { type: 'timed_challenge', prompt: 'Select all acting techniques', options: ['Stanislavski method', 'Meisner technique', 'Method acting', 'Watercolor blending', 'Cross-hatching', 'Perspective drawing'], correctAnswer: ['Stanislavski method', 'Meisner technique', 'Method acting'], difficulty: 'medium' },
+    { type: 'timed_challenge', prompt: 'Select all magic sleight techniques', options: ['Double lift', 'French drop', 'Classic palm', 'Watercolor wash', 'Vibrato', 'Color grading'], correctAnswer: ['Double lift', 'French drop', 'Classic palm'], difficulty: 'medium' },
   ],
   listen_pick: [
-    { type: 'listen_pick', prompt: 'Which describes "projection" in acting?', options: ['Speaking loudly enough to be heard by the whole audience', 'Reading from a script on stage', 'Whispering for dramatic effect', 'Using a microphone at all times'], correctAnswer: 'Speaking loudly enough to be heard by the whole audience', difficulty: 'easy' },
+    { type: 'listen_pick', prompt: 'What is a "gimmick" in magic?', options: ['A secret device that helps create the illusion', 'The magician\'s stage name', 'A type of card deck', 'The patter script'], correctAnswer: 'A secret device that helps create the illusion', difficulty: 'easy' },
+    { type: 'listen_pick', prompt: 'What is "ditching" in magic?', options: ['Secretly getting rid of an object after the trick', 'Canceling a performance', 'Dropping a prop on stage', 'Changing your act last minute'], correctAnswer: 'Secretly getting rid of an object after the trick', difficulty: 'medium' },
   ],
   before_after: [
-    { type: 'before_after', prompt: 'Which is the better improv response to "We\'re lost in the jungle"?', options: ['No we\'re not, we\'re in a mall.', 'Yes, and I think I hear a waterfall nearby - maybe we can find a path!'], correctAnswer: 'Yes, and I think I hear a waterfall nearby - maybe we can find a path!', difficulty: 'easy' },
+    { type: 'before_after', prompt: 'Which is better patter for a card trick?', options: ['Pick a card, any card. OK now I\'ll find it.', 'I had a dream last night where one card kept appearing everywhere. Let me show you... pick any card and let\'s see if fate agrees.'], correctAnswer: 'I had a dream last night where one card kept appearing everywhere. Let me show you... pick any card and let\'s see if fate agrees.', difficulty: 'easy' },
   ],
 };
 

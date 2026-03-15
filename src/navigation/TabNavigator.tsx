@@ -87,7 +87,7 @@ const TAB_ICONS: Record<string, { default: string; active: string }> = {
 
 function TabIcon({ label, active }: { label: string; active: boolean }) {
   const scaleAnim = useRef(new Animated.Value(active ? 1 : 0.85)).current;
-  const opacityAnim = useRef(new Animated.Value(active ? 1 : 0.4)).current;
+  const opacityAnim = useRef(new Animated.Value(active ? 1 : 0.7)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -98,7 +98,7 @@ function TabIcon({ label, active }: { label: string; active: boolean }) {
         useNativeDriver: true,
       }),
       Animated.timing(opacityAnim, {
-        toValue: active ? 1 : 0.4,
+        toValue: active ? 1 : 0.7,
         duration: 200,
         useNativeDriver: true,
       }),
@@ -131,7 +131,7 @@ function TabIcon({ label, active }: { label: string; active: boolean }) {
         <Ionicons
           name={active ? icon.active as any : icon.default as any}
           size={22}
-          color={active ? colors.primary : 'rgba(255,255,255,0.35)'}
+          color={active ? colors.primary : 'rgba(255,255,255,0.6)'}
         />
       </View>
 
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   tabLabel: {
     fontSize: 10,
     fontWeight: '500',
-    color: 'rgba(255, 255, 255, 0.3)',
+    color: 'rgba(255, 255, 255, 0.55)',
     marginTop: 2,
     letterSpacing: 0.3,
   },

@@ -142,22 +142,22 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
 
   const renderGame = () => {
     if (!question) return null;
-    const props = { question, onAnswer: handleAnswer, skillName, key: gameKey };
+    const gameProps = { question, onAnswer: handleAnswer, skillName };
 
     switch (question.type) {
-      case 'multiple_choice': return <MultipleChoiceGame {...props} />;
-      case 'true_false': return <TrueFalseGame {...props} />;
-      case 'match_pairs': return <MatchPairsGame {...props} />;
-      case 'speed_sort': return <SpeedSortGame {...props} />;
-      case 'fill_gap': return <FillGapGame {...props} />;
-      case 'swipe_judge': return <SwipeJudgeGame {...props} />;
-      case 'memory_cards': return <MemoryCardsGame {...props} />;
-      case 'drag_label': return <DragLabelGame {...props} />;
-      case 'spot_difference': return <SpotDifferenceGame {...props} />;
-      case 'timed_challenge': return <TimedChallengeGame {...props} />;
-      case 'listen_pick': return <ListenPickGame {...props} />;
-      case 'before_after': return <BeforeAfterGame {...props} />;
-      default: return <MultipleChoiceGame {...props} />;
+      case 'multiple_choice': return <MultipleChoiceGame key={gameKey} {...gameProps} />;
+      case 'true_false': return <TrueFalseGame key={gameKey} {...gameProps} />;
+      case 'match_pairs': return <MatchPairsGame key={gameKey} {...gameProps} />;
+      case 'speed_sort': return <SpeedSortGame key={gameKey} {...gameProps} />;
+      case 'fill_gap': return <FillGapGame key={gameKey} {...gameProps} />;
+      case 'swipe_judge': return <SwipeJudgeGame key={gameKey} {...gameProps} />;
+      case 'memory_cards': return <MemoryCardsGame key={gameKey} {...gameProps} />;
+      case 'drag_label': return <DragLabelGame key={gameKey} {...gameProps} />;
+      case 'spot_difference': return <SpotDifferenceGame key={gameKey} {...gameProps} />;
+      case 'timed_challenge': return <TimedChallengeGame key={gameKey} {...gameProps} />;
+      case 'listen_pick': return <ListenPickGame key={gameKey} {...gameProps} />;
+      case 'before_after': return <BeforeAfterGame key={gameKey} {...gameProps} />;
+      default: return <MultipleChoiceGame key={gameKey} {...gameProps} />;
     }
   };
 
