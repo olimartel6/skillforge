@@ -8,6 +8,7 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AmbientGlow } from '../../components/AmbientGlow';
@@ -26,6 +27,54 @@ export function GamesHomeScreen({ navigation }: { navigation: any }) {
     useGameStore();
   const profile = useUserStore((s) => s.profile);
   const [skillName, setSkillName] = useState('General');
+
+  const isPremium = profile?.premium_expires_at
+    ? new Date(profile.premium_expires_at) > new Date()
+    : false;
+
+  if (!isPremium) {
+    return (
+      <SafeAreaView style={styles.screen} edges={['top']}>
+        <AmbientGlow color={colors.secondary} size={300} opacity={0.08} top="30%" left="50%" />
+        <View style={styles.paywallContainer}>
+          <LinearGradient
+            colors={[colors.secondary, colors.secondaryDark]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.paywallIcon}
+          >
+            <Text style={{ fontSize: 40 }}>🎮</Text>
+          </LinearGradient>
+          <Text style={styles.paywallTitle}>Unlock Mini-Games</Text>
+          <Text style={styles.paywallSubtitle}>
+            12 types of interactive games to master your skill faster.{'\n'}Quiz, memory, sorting, swiping and more.
+          </Text>
+          <View style={styles.paywallFeatures}>
+            {['12 game types', 'XP & leveling system', 'Combo bonuses', '24 lessons per skill'].map((f) => (
+              <View key={f} style={styles.paywallFeatureRow}>
+                <Ionicons name="checkmark-circle" size={18} color={colors.success} />
+                <Text style={styles.paywallFeatureText}>{f}</Text>
+              </View>
+            ))}
+          </View>
+          <TouchableOpacity
+            style={styles.paywallButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('ProfileTab', { screen: 'Subscription' })}
+          >
+            <LinearGradient
+              colors={[colors.primary, colors.primaryDark]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.paywallButtonGradient}
+            >
+              <Text style={styles.paywallButtonText}>Go Premium — $6.99/mo</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -252,4 +301,71 @@ const styles = StyleSheet.create({
   lessonLabel: { ...typography.caption, color: colors.textSecondary, marginTop: spacing.xs },
   currentLabel: { color: colors.primary, fontWeight: '700' },
   bottomSpacer: { height: 100 },
+
+  // Paywall
+  paywallContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: spacing['4xl'],
+  },
+  paywallIcon: {
+    width: 88,
+    height: 88,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing['2xl'],
+    shadowColor: colors.secondary,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  paywallTitle: {
+    ...typography.h1,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
+    textAlign: 'center',
+  },
+  paywallSubtitle: {
+    ...typography.body,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: spacing['3xl'],
+  },
+  paywallFeatures: {
+    alignSelf: 'stretch',
+    gap: spacing.md,
+    marginBottom: spacing['4xl'],
+  },
+  paywallFeatureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  paywallFeatureText: {
+    ...typography.body,
+    color: colors.textPrimary,
+  },
+  paywallButton: {
+    alignSelf: 'stretch',
+  },
+  paywallButtonGradient: {
+    padding: 16,
+    borderRadius: borderRadius.lg,
+    alignItems: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  paywallButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
 });
