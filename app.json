@@ -5,30 +5,76 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "scheme": "skillforge",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0a0a0b"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.skillforge.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "SkillForge needs camera access to record your practice sessions for AI feedback.",
+        "NSMicrophoneUsageDescription": "SkillForge needs microphone access to record audio during practice sessions.",
+        "NSPhotoLibraryUsageDescription": "SkillForge needs photo library access to save your practice photos."
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.skillforge.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#0a0a0b",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-secure-store",
-      "expo-font"
-    ]
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "SkillForge needs camera access to record your practice sessions."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "SkillForge needs microphone access to record practice audio."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#FF6B35"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "SkillForge needs photo library access to save practice photos."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": ""
+      }
+    },
+    "owner": "olimartel6"
   }
 }
