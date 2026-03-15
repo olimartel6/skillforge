@@ -39,100 +39,106 @@ function AvatarCircle({ username }: { username: string }) {
   );
 }
 
+const FAKE_POSTS: CommunityPost[] = [
+  {
+    id: 'fp1', user_id: 'u1', challenge_id: 'c1', skill_id: 's1',
+    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
+    created_at: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
+    user: { id: 'u1', username: 'Maya', avatar_url: null },
+    skill: { name: 'Drawing', icon: '✏️' },
+    like_count: 47, comment_count: 12, is_liked: false,
+  },
+  {
+    id: 'fp2', user_id: 'u2', challenge_id: 'c2', skill_id: 's2',
+    media_url: null, media_type: 'video', ai_feedback: null, is_shared: true,
+    created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+    user: { id: 'u2', username: 'Jake', avatar_url: null },
+    skill: { name: 'Guitar', icon: '🎸' },
+    like_count: 23, comment_count: 5, is_liked: true,
+  },
+  {
+    id: 'fp3', user_id: 'u3', challenge_id: 'c3', skill_id: 's3',
+    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
+    created_at: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
+    user: { id: 'u3', username: 'Sofia', avatar_url: null },
+    skill: { name: 'Magic Tricks', icon: '🪄' },
+    like_count: 89, comment_count: 21, is_liked: false,
+  },
+  {
+    id: 'fp4', user_id: 'u4', challenge_id: 'c4', skill_id: 's4',
+    media_url: null, media_type: 'video', ai_feedback: null, is_shared: true,
+    created_at: new Date(Date.now() - 1000 * 60 * 300).toISOString(),
+    user: { id: 'u4', username: 'Leo', avatar_url: null },
+    skill: { name: 'Beatboxing', icon: '🥁' },
+    like_count: 156, comment_count: 34, is_liked: true,
+  },
+  {
+    id: 'fp5', user_id: 'u5', challenge_id: 'c5', skill_id: 's5',
+    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
+    created_at: new Date(Date.now() - 1000 * 60 * 420).toISOString(),
+    user: { id: 'u5', username: 'Aria', avatar_url: null },
+    skill: { name: 'Dance', icon: '💃' },
+    like_count: 212, comment_count: 45, is_liked: false,
+  },
+  {
+    id: 'fp6', user_id: 'u6', challenge_id: 'c6', skill_id: 's6',
+    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
+    created_at: new Date(Date.now() - 1000 * 60 * 600).toISOString(),
+    user: { id: 'u6', username: 'Marcus', avatar_url: null },
+    skill: { name: 'Photography', icon: '📸' },
+    like_count: 78, comment_count: 9, is_liked: false,
+  },
+  {
+    id: 'fp7', user_id: 'u7', challenge_id: 'c7', skill_id: 's7',
+    media_url: null, media_type: 'video', ai_feedback: null, is_shared: true,
+    created_at: new Date(Date.now() - 1000 * 60 * 800).toISOString(),
+    user: { id: 'u7', username: 'Zara', avatar_url: null },
+    skill: { name: 'Singing', icon: '🎤' },
+    like_count: 341, comment_count: 67, is_liked: true,
+  },
+  {
+    id: 'fp8', user_id: 'u8', challenge_id: 'c8', skill_id: 's8',
+    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
+    created_at: new Date(Date.now() - 1000 * 60 * 1000).toISOString(),
+    user: { id: 'u8', username: 'Kai', avatar_url: null },
+    skill: { name: 'Stand-up Comedy', icon: '😂' },
+    like_count: 534, comment_count: 89, is_liked: false,
+  },
+  {
+    id: 'fp9', user_id: 'u9', challenge_id: 'c9', skill_id: 's9',
+    media_url: null, media_type: 'video', ai_feedback: null, is_shared: true,
+    created_at: new Date(Date.now() - 1000 * 60 * 1200).toISOString(),
+    user: { id: 'u9', username: 'Nina', avatar_url: null },
+    skill: { name: 'Piano', icon: '🎹' },
+    like_count: 167, comment_count: 28, is_liked: false,
+  },
+  {
+    id: 'fp10', user_id: 'u10', challenge_id: 'c10', skill_id: 's10',
+    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
+    created_at: new Date(Date.now() - 1000 * 60 * 1440).toISOString(),
+    user: { id: 'u10', username: 'Alex', avatar_url: null },
+    skill: { name: 'Calligraphy', icon: '🖊️' },
+    like_count: 92, comment_count: 14, is_liked: true,
+  },
+];
+
 export function FeedScreen() {
   const navigation = useNavigation<any>();
   const profile = useUserStore((s) => s.profile);
-  const [posts, setPosts] = useState<CommunityPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [posts, setPosts] = useState<CommunityPost[]>(FAKE_POSTS);
+  const [loading, setLoading] = useState(false);
 
-  const fetchPosts = useCallback(async (offset: number = 0) => {
-    if (!profile?.id) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('practice_sessions')
-        .select(`
-          *,
-          user:users!user_id(id, username, avatar_url),
-          skill:skills!skill_id(name, icon)
-        `)
-        .eq('is_shared', true)
-        .order('created_at', { ascending: false })
-        .range(offset, offset + PAGE_SIZE - 1);
-
-      if (error) throw error;
-
-      const enriched: CommunityPost[] = await Promise.all(
-        (data || []).map(async (session: any) => {
-          const [likesRes, commentsRes, likedRes] = await Promise.all([
-            supabase.from('likes').select('*', { count: 'exact', head: true }).eq('practice_id', session.id),
-            supabase.from('comments').select('*', { count: 'exact', head: true }).eq('practice_id', session.id),
-            supabase.from('likes').select('id').eq('practice_id', session.id).eq('user_id', profile.id).maybeSingle(),
-          ]);
-
-          return {
-            ...session,
-            user: session.user,
-            skill: session.skill,
-            like_count: likesRes.count || 0,
-            comment_count: commentsRes.count || 0,
-            is_liked: !!likedRes.data,
-          };
-        })
-      );
-
-      if (offset === 0) {
-        setPosts(enriched);
-      } else {
-        setPosts((prev) => [...prev, ...enriched]);
-      }
-      setHasMore(enriched.length === PAGE_SIZE);
-    } catch (err) {
-      console.error('Error fetching feed:', err);
-    }
-  }, [profile?.id]);
-
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      await fetchPosts(0);
-      setLoading(false);
-    };
-    load();
-  }, [fetchPosts]);
-
-  const loadMore = async () => {
-    if (loadingMore || !hasMore) return;
-    setLoadingMore(true);
-    await fetchPosts(posts.length);
-    setLoadingMore(false);
-  };
-
-  const toggleLike = async (post: CommunityPost) => {
-    if (!profile?.id) return;
-
-    const prevPosts = posts;
-    const newPosts = posts.map((p) => {
-      if (p.id !== post.id) return p;
-      return {
-        ...p,
-        is_liked: !p.is_liked,
-        like_count: p.is_liked ? p.like_count - 1 : p.like_count + 1,
-      };
-    });
-    setPosts(newPosts);
-
-    try {
-      if (post.is_liked) {
-        await supabase.from('likes').delete().eq('practice_id', post.id).eq('user_id', profile.id);
-      } else {
-        await supabase.from('likes').insert({ practice_id: post.id, user_id: profile.id });
-      }
-    } catch (err) {
-      setPosts(prevPosts);
-    }
+  const toggleLike = (post: CommunityPost) => {
+    setPosts((prev) =>
+      prev.map((p) => {
+        if (p.id !== post.id) return p;
+        return {
+          ...p,
+          is_liked: !p.is_liked,
+          like_count: p.is_liked ? p.like_count - 1 : p.like_count + 1,
+        };
+      })
+    );
   };
 
   const renderPost = ({ item }: { item: CommunityPost }) => (
@@ -147,7 +153,7 @@ export function FeedScreen() {
         <View style={styles.postHeaderText}>
           <Text style={styles.postUsername}>{item.user?.username || 'User'}</Text>
           <Text style={styles.postMeta}>
-            {item.skill?.icon} {item.skill?.name}
+            Day {Math.floor(Math.random() * 28) + 1} · {item.skill?.icon} {item.skill?.name} · <Text style={{ color: colors.primary }}>🔥 {Math.floor(Math.random() * 25) + 3}</Text>
           </Text>
         </View>
         <Text style={styles.postTime}>{timeAgo(item.created_at)}</Text>
@@ -204,10 +210,8 @@ export function FeedScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.5}
           ListFooterComponent={
-            loadingMore ? (
+            false ? (
               <ActivityIndicator color={colors.primary} style={styles.footer} />
             ) : null
           }
