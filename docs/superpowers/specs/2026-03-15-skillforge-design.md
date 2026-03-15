@@ -51,7 +51,7 @@ Benefits: serverless, scales automatically, AI key stays server-side, single eco
 - `selected_skill_id` (uuid, FK to skills)
 - `skill_level` (enum: beginner, intermediate, advanced)
 - `goal` (enum: creativity, learn_faster, discipline)
-- `is_premium` (boolean, default false)
+- `premium_expires_at` (timestamptz, nullable) — null = free tier; set by RevenueCat webhook
 - `onboarding_complete` (boolean, default false)
 - `created_at` (timestamptz)
 
@@ -86,6 +86,7 @@ Benefits: serverless, scales automatically, AI key stays server-side, single eco
 - `id` (uuid, PK)
 - `user_id` (uuid, FK to users)
 - `challenge_id` (uuid, FK to challenges)
+- `skill_id` (uuid, FK to skills) — denormalized for fast feed/filter queries
 - `media_url` (text, nullable)
 - `media_type` (enum: photo, video, audio)
 - `ai_feedback` (jsonb) — structured feedback from Claude
@@ -138,6 +139,17 @@ Benefits: serverless, scales automatically, AI key stays server-side, single eco
 - `text` (text)
 - `created_at` (timestamptz)
 
+### user_roadmap
+- `id` (uuid, PK)
+- `user_id` (uuid, FK to users)
+- `day_number` (integer, 1–30)
+- `node_id` (uuid, FK to skill_tree_nodes)
+- `challenge_title` (text)
+- `challenge_description` (text)
+- `completed_at` (timestamptz, nullable)
+- `created_at` (timestamptz)
+- UNIQUE: (user_id, day_number)
+
 ## Supabase Edge Functions
 
 ### generate-challenge
@@ -149,9 +161,13 @@ Benefits: serverless, scales automatically, AI key stays server-side, single eco
 
 ### analyze-practice
 - **Input:** `{ media_url, media_type, challenge_id }`
-- **Logic:** Download media from Supabase Storage. Send to Claude Vision API (claude-sonnet-4-6 for speed/cost balance). For audio, transcribe first then analyze.
+- **Logic:** Download media from Supabase Storage.
+  - **Photo:** Send directly to Claude Vision API (claude-sonnet-4-6).
+  - **Video:** Extract 3–5 key frames at even intervals (max 30s recording). Send frames as multi-image input to Claude Vision.
+  - **Audio:** All audio-centric skills (guitar, singing, etc.) require the user to record **video** (so Claude can see hand position, posture, etc.). Pure audio-only is not supported in MVP — the UI always records video for these skills.
 - **Claude prompt:** "Analyze this {media_type} of a student practicing: '{challenge_description}'. Return JSON: { strengths: string[], mistakes: string[], improvement_tip: string, encouragement: string, score: number (1-10) }"
 - **Output:** `{ strengths[], mistakes[], improvement_tip, encouragement, score }`
+- **Error handling:** If Claude API fails, return a graceful fallback: `{ error: true, message: "Feedback unavailable — your practice is still saved. We'll retry shortly." }`. Client shows a retry button.
 
 ### generate-roadmap
 - **Input:** `{ skill_id, skill_level, goal }`
@@ -160,12 +176,20 @@ Benefits: serverless, scales automatically, AI key stays server-side, single eco
 
 All functions read the Claude API key from Supabase secrets (`ANTHROPIC_API_KEY`). Never exposed to client.
 
+## Auth Flow & Conditional Routing
+
+- **WelcomeScreen** embeds auth (email/password form + Apple/Google sign-in buttons)
+- On app launch, check auth state:
+  - **Not authenticated** → WelcomeScreen (onboarding stack)
+  - **Authenticated + not onboarded** → SkillSelectionScreen (skip welcome)
+  - **Authenticated + onboarded** → Main App (tabs)
+
 ## Navigation Structure
 
 ```
 Root Navigator (Stack)
 ├── Onboarding Flow (Stack) — shown once
-│   ├── WelcomeScreen
+│   ├── WelcomeScreen (includes auth)
 │   ├── SkillSelectionScreen
 │   ├── LevelSelectionScreen
 │   ├── GoalSelectionScreen
@@ -247,9 +271,10 @@ src/
 - **Font:** Inter (weights: 200, 300, 400, 500, 600, 700, 800, 900)
 
 ### Glass Effect
+Design intent (CSS shown for reference — in RN use `expo-blur` BlurView + semi-transparent overlay):
 ```css
 background: rgba(255, 255, 255, 0.04);
-backdrop-filter: blur(20px);
+backdrop-filter: blur(20px);  /* → expo-blur BlurView intensity={20} */
 border: 1px solid rgba(255, 255, 255, 0.06);
 border-radius: 16px;
 ```
@@ -257,10 +282,15 @@ border-radius: 16px;
 ### Glass Strong (selected/active states)
 ```css
 background: rgba(255, 255, 255, 0.07);
-backdrop-filter: blur(40px);
+backdrop-filter: blur(40px);  /* → expo-blur BlurView intensity={40} */
 border: 1px solid rgba(255, 255, 255, 0.1);
 border-radius: 20px;
 ```
+
+### RN Library Mapping
+- `backdrop-filter: blur()` → `expo-blur` (BlurView)
+- `linear-gradient()` → `expo-linear-gradient`
+- `box-shadow` → `react-native-shadow-2` or platform shadow props (shadowColor/shadowOffset/shadowRadius on iOS, elevation on Android)
 
 ### Ambient Glow
 Radial gradients behind key elements (streak counter, logo, hero cards) using accent colors at 8-12% opacity.
@@ -301,7 +331,8 @@ box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
 - **Row Level Security (RLS)** on all tables — users can only read/write their own data; community posts readable by all authenticated users
 - **Claude API key** stored as Supabase secret — never in client code
 - **Media uploads** to Supabase Storage with per-user folder structure (`{user_id}/practices/{filename}`) and RLS policies
-- **RevenueCat** webhook to Supabase Edge Function validates subscriptions server-side
+- **RevenueCat** webhook to Supabase Edge Function validates subscriptions server-side — updates `premium_expires_at` on every event (purchase, renewal, cancellation, refund, billing retry failure)
+- **Premium gating** enforced server-side: RLS policies check `premium_expires_at > now()` for premium-only operations (community sharing, unlimited skills). Client-side gating is for UX only, not security.
 
 ## AI Integration Flow
 
@@ -345,7 +376,7 @@ App needs today's challenge
 
 Using Expo Notifications for local scheduling:
 - Default reminder: "Your 5-minute practice is waiting" at 8PM
-- Adaptive: if user usually practices at a different time, shift reminder to 30 min before
+- Adaptive: compute preferred practice time from average `created_at` hour of last 7 practice sessions; shift reminder to 30 min before that time
 - Streak at risk: "Don't break your 12-day streak! Practice now" at 9PM if not practiced
 - Badge earned: immediate local notification
 
@@ -364,6 +395,14 @@ Each of the 20+ skills has a 3-tier tree with 3 nodes per tier (9 nodes total):
 - Advanced: Improvisation → Song Writing → Performance
 
 Nodes unlock after completing a streak threshold (e.g., 3-day streak unlocks next node).
+
+## Streak Rules
+
+- **What counts:** A user must complete a practice session (submit media + receive AI feedback) to count as a practice day.
+- **Timezone:** Uses the device's local timezone. The "day" resets at midnight local time.
+- **Reset window:** If `last_practice_date` is not yesterday (local time), streak resets to 0 — unless a freeze token is consumed.
+- **Freeze tokens:** Automatically consumed if the user misses exactly 1 day. Missing 2+ consecutive days resets the streak even with tokens remaining. Premium users receive 2 tokens/month (on billing cycle renewal via RevenueCat webhook).
+- **Streak check:** Runs on app open and before displaying the home screen.
 
 ## Screens Summary
 
@@ -385,3 +424,10 @@ Nodes unlock after completing a streak threshold (e.g., 3-day streak unlocks nex
 | 14 | Profile | User profile + settings |
 | 15 | Settings | Notifications, account |
 | 16 | Subscription | Premium upgrade (RevenueCat) |
+
+## Offline & Caching
+
+- **On app open:** Cache current challenge, streak data, and user profile to AsyncStorage
+- **Offline read:** User can view their streak, last challenge, and badges without network
+- **Offline write:** Practice sessions queue locally and sync when connectivity returns
+- **Feed:** Cached last 20 posts for offline browsing
