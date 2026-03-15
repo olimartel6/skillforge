@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { BlurView } from 'expo-blur';
@@ -16,6 +17,9 @@ import { BadgesScreen } from '../screens/stats/BadgesScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { SettingsScreen } from '../screens/profile/SettingsScreen';
 import { SubscriptionScreen } from '../screens/profile/SubscriptionScreen';
+import { GamesHomeScreen } from '../screens/games/GamesHomeScreen';
+import { GameSessionScreen } from '../screens/games/GameSessionScreen';
+import { GameResultScreen } from '../screens/games/GameResultScreen';
 
 // Stacks
 const HomeStack = createNativeStackNavigator();
@@ -26,6 +30,17 @@ function HomeNavigator() {
       <HomeStack.Screen name="PracticeSession" component={PracticeSessionScreen} />
       <HomeStack.Screen name="AIFeedback" component={AIFeedbackScreen} />
     </HomeStack.Navigator>
+  );
+}
+
+const GamesStack = createNativeStackNavigator();
+function GamesNavigator() {
+  return (
+    <GamesStack.Navigator screenOptions={{ headerShown: false }}>
+      <GamesStack.Screen name="GamesHome" component={GamesHomeScreen} />
+      <GamesStack.Screen name="GameSession" component={GameSessionScreen} />
+      <GamesStack.Screen name="GameResult" component={GameResultScreen} />
+    </GamesStack.Navigator>
   );
 }
 
@@ -62,11 +77,12 @@ function ProfileNavigator() {
 
 // Premium Tab Icon
 const TAB_ICONS: Record<string, { default: string; active: string }> = {
-  Home: { default: '🏠', active: '🏠' },
-  Tree: { default: '🌳', active: '🌳' },
-  Community: { default: '👥', active: '👥' },
-  Stats: { default: '📊', active: '📊' },
-  Profile: { default: '👤', active: '👤' },
+  Home: { default: 'home-outline', active: 'home' },
+  Games: { default: 'game-controller-outline', active: 'game-controller' },
+  Tree: { default: 'git-branch-outline', active: 'git-branch' },
+  Community: { default: 'people-outline', active: 'people' },
+  Stats: { default: 'flame-outline', active: 'flame' },
+  Profile: { default: 'person-outline', active: 'person' },
 };
 
 function TabIcon({ label, active }: { label: string; active: boolean }) {
@@ -112,7 +128,11 @@ function TabIcon({ label, active }: { label: string; active: boolean }) {
 
       {/* Icon */}
       <View style={[styles.iconCircle, active && styles.iconCircleActive]}>
-        <Text style={styles.iconEmoji}>{active ? icon.active : icon.default}</Text>
+        <Ionicons
+          name={active ? icon.active as any : icon.default as any}
+          size={22}
+          color={active ? colors.primary : 'rgba(255,255,255,0.35)'}
+        />
       </View>
 
       {/* Active indicator dot */}
@@ -166,6 +186,11 @@ export function TabNavigator() {
         name="HomeTab"
         component={HomeNavigator}
         options={{ tabBarIcon: ({ focused }) => <TabIcon label="Home" active={focused} /> }}
+      />
+      <Tab.Screen
+        name="GamesTab"
+        component={GamesNavigator}
+        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Games" active={focused} /> }}
       />
       <Tab.Screen
         name="TreeTab"
@@ -244,9 +269,6 @@ const styles = StyleSheet.create({
   },
   iconCircleActive: {
     backgroundColor: 'rgba(255, 107, 53, 0.08)',
-  },
-  iconEmoji: {
-    fontSize: 20,
   },
 
   // Active dot indicator
