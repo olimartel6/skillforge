@@ -1,16 +1,173 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../../utils/theme';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Dimensions,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { GlassCard } from '../../components/GlassCard';
+import { Button } from '../../components/Button';
+import { AmbientGlow } from '../../components/AmbientGlow';
+import { colors, spacing, typography } from '../../utils/theme';
+import { Skill } from '../../utils/types';
+import { supabase } from '../../services/supabase';
+import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
+
+type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'SkillSelection'>;
+
+const INITIAL_VISIBLE = 9;
+const CARD_GAP = spacing.sm;
+const SCREEN_PADDING = spacing.xl;
+const CARD_WIDTH =
+  (Dimensions.get('window').width - SCREEN_PADDING * 2 - CARD_GAP * 2) / 3;
 
 export function SkillSelectionScreen() {
+  const navigation = useNavigation<Nav>();
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from('skills')
+        .select('*')
+        .order('name');
+      if (!error && data) setSkills(data as Skill[]);
+      setLoading(false);
+    })();
+  }, []);
+
+  const visibleSkills = showAll ? skills : skills.slice(0, INITIAL_VISIBLE);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Skill Selection</Text>
-    </View>
+    <SafeAreaView style={styles.safe}>
+      <AmbientGlow color={colors.primary} size={250} top="5%" left="70%" opacity={0.08} />
+
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.step}>STEP 1 OF 3</Text>
+        <Text style={styles.heading}>What will you master?</Text>
+
+        {loading ? (
+          <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />
+        ) : (
+          <View style={styles.grid}>
+            {visibleSkills.map((skill) => {
+              const selected = skill.id === selectedId;
+              return (
+                <TouchableOpacity
+                  key={skill.id}
+                  activeOpacity={0.8}
+                  onPress={() => setSelectedId(skill.id)}
+                >
+                  <GlassCard
+                    strong={selected}
+                    glowColor={selected ? colors.primary : undefined}
+                    style={[styles.card, selected && styles.cardSelected]}
+                  >
+                    <Text style={styles.cardIcon}>{skill.icon}</Text>
+                    <Text
+                      style={[styles.cardName, selected && styles.cardNameSelected]}
+                      numberOfLines={2}
+                    >
+                      {skill.name}
+                    </Text>
+                  </GlassCard>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
+
+        {!showAll && skills.length > INITIAL_VISIBLE && (
+          <TouchableOpacity onPress={() => setShowAll(true)} activeOpacity={0.7}>
+            <Text style={styles.seeAll}>See all {skills.length}+ skills →</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
+
+      <View style={styles.footer}>
+        <Button
+          title="Continue"
+          onPress={() => {
+            if (selectedId) navigation.navigate('LevelSelection', { skillId: selectedId });
+          }}
+          disabled={!selectedId}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' },
-  text: { color: colors.textPrimary, fontSize: 18 },
+  safe: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  scroll: {
+    paddingHorizontal: SCREEN_PADDING,
+    paddingTop: spacing['3xl'],
+    paddingBottom: 100,
+  },
+  step: {
+    ...typography.label,
+    color: colors.primary,
+    marginBottom: spacing.sm,
+  },
+  heading: {
+    ...typography.h2,
+    color: colors.textPrimary,
+    marginBottom: spacing.xl,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: CARD_GAP,
+  },
+  card: {
+    width: CARD_WIDTH,
+    paddingVertical: spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardSelected: {},
+  cardIcon: {
+    fontSize: 28,
+    marginBottom: spacing.xs,
+  },
+  cardName: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
+  cardNameSelected: {
+    color: colors.textPrimary,
+  },
+  seeAll: {
+    color: colors.secondary,
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: spacing.xl,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: SCREEN_PADDING,
+    paddingBottom: spacing['4xl'],
+    paddingTop: spacing.lg,
+    backgroundColor: colors.background,
+  },
 });
