@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Animated, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../utils/theme';
@@ -185,12 +186,48 @@ export function TabNavigator() {
       <Tab.Screen
         name="HomeTab"
         component={HomeNavigator}
-        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Home" active={focused} /> }}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'DailyChallenge';
+          const hideOnScreens = ['PracticeSession', 'AIFeedback'];
+          return {
+            tabBarIcon: ({ focused }) => <TabIcon label="Home" active={focused} />,
+            tabBarStyle: hideOnScreens.includes(routeName)
+              ? { display: 'none' as const }
+              : {
+                  position: 'absolute' as const,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: Platform.OS === 'ios' ? 88 : 70,
+                  backgroundColor: 'transparent',
+                  borderTopWidth: 0,
+                  elevation: 0,
+                },
+          };
+        }}
       />
       <Tab.Screen
         name="GamesTab"
         component={GamesNavigator}
-        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Games" active={focused} /> }}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'GamesHome';
+          const hideOnScreens = ['GameSession', 'GameResult'];
+          return {
+            tabBarIcon: ({ focused }) => <TabIcon label="Games" active={focused} />,
+            tabBarStyle: hideOnScreens.includes(routeName)
+              ? { display: 'none' as const }
+              : {
+                  position: 'absolute' as const,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: Platform.OS === 'ios' ? 88 : 70,
+                  backgroundColor: 'transparent',
+                  borderTopWidth: 0,
+                  elevation: 0,
+                },
+          };
+        }}
       />
       <Tab.Screen
         name="TreeTab"
