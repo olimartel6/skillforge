@@ -18,6 +18,7 @@ import { BadgesScreen } from '../screens/stats/BadgesScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { SettingsScreen } from '../screens/profile/SettingsScreen';
 import { SubscriptionScreen } from '../screens/profile/SubscriptionScreen';
+import { ChangeSkillScreen } from '../screens/profile/ChangeSkillScreen';
 import { GamesHomeScreen } from '../screens/games/GamesHomeScreen';
 import { GameSessionScreen } from '../screens/games/GameSessionScreen';
 import { GameResultScreen } from '../screens/games/GameResultScreen';
@@ -72,6 +73,7 @@ function ProfileNavigator() {
       <ProfileStack.Screen name="Profile" component={ProfileScreen} />
       <ProfileStack.Screen name="Settings" component={SettingsScreen} />
       <ProfileStack.Screen name="Subscription" component={SubscriptionScreen} />
+      <ProfileStack.Screen name="ChangeSkill" component={ChangeSkillScreen} />
     </ProfileStack.Navigator>
   );
 }

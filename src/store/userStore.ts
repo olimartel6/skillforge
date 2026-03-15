@@ -2,6 +2,14 @@ import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, SkillLevel, Goal } from '../utils/types';
 
+interface SkillProgress {
+  roadmap: any[];
+  streakData: any;
+  earnedBadges: any[];
+  practiceCount: number;
+  gameData: any;
+}
+
 interface UserState {
   profile: User | null;
   isOnboarded: boolean;
@@ -9,6 +17,7 @@ interface UserState {
   initialize: () => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<void>;
   completeOnboarding: (skillId: string, level: SkillLevel, goal: Goal) => Promise<void>;
+  changeSkill: (newSkillId: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -23,6 +32,36 @@ const DEFAULT_USER: User = {
   onboarding_complete: false,
   created_at: new Date().toISOString(),
 };
+
+// Keys that hold per-skill progress
+const PROGRESS_KEYS = ['user_roadmap', 'streak_data', 'earned_badges', 'practice_count', 'game_store'];
+
+async function saveCurrentSkillProgress(skillId: string) {
+  const progress: Record<string, string | null> = {};
+  for (const key of PROGRESS_KEYS) {
+    progress[key] = await AsyncStorage.getItem(key);
+  }
+  await AsyncStorage.setItem(`skill_progress_${skillId}`, JSON.stringify(progress));
+}
+
+async function loadSkillProgress(skillId: string) {
+  const stored = await AsyncStorage.getItem(`skill_progress_${skillId}`);
+  if (stored) {
+    const progress = JSON.parse(stored) as Record<string, string | null>;
+    for (const key of PROGRESS_KEYS) {
+      if (progress[key]) {
+        await AsyncStorage.setItem(key, progress[key]!);
+      } else {
+        await AsyncStorage.removeItem(key);
+      }
+    }
+  } else {
+    // New skill — clear progress keys
+    for (const key of PROGRESS_KEYS) {
+      await AsyncStorage.removeItem(key);
+    }
+  }
+}
 
 export const useUserStore = create<UserState>((set, get) => ({
   profile: null,
@@ -73,6 +112,27 @@ export const useUserStore = create<UserState>((set, get) => ({
     };
 
     set({ profile: updated, isOnboarded: true });
+    await AsyncStorage.setItem('user_profile', JSON.stringify(updated));
+  },
+
+  changeSkill: async (newSkillId) => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    // Save current skill progress
+    if (profile.selected_skill_id) {
+      await saveCurrentSkillProgress(profile.selected_skill_id);
+    }
+
+    // Load new skill progress (or clear if new)
+    await loadSkillProgress(newSkillId);
+
+    // Update profile
+    const updated: User = {
+      ...profile,
+      selected_skill_id: newSkillId,
+    };
+    set({ profile: updated });
     await AsyncStorage.setItem('user_profile', JSON.stringify(updated));
   },
 

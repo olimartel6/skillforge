@@ -109,6 +109,16 @@ export function ProfileScreen() {
           <View style={styles.menu}>
             <TouchableOpacity
               activeOpacity={0.8}
+              onPress={() => navigation.navigate('ChangeSkill')}
+            >
+              <GlassCard style={styles.menuItem}>
+                <Text style={styles.menuText}>Change Skill</Text>
+                <Text style={styles.chevron}>›</Text>
+              </GlassCard>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
               onPress={() => navigation.navigate('Settings')}
             >
               <GlassCard style={styles.menuItem}>
