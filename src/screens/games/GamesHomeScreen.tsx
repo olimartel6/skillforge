@@ -20,6 +20,134 @@ import { colors, spacing, typography, borderRadius, glowShadow } from '../../uti
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const BUBBLE_SIZE = 64;
 const PATH_AMPLITUDE = 50;
+
+const SKILL_LESSONS: Record<string, { title: string; icon: string }[]> = {
+  'Magic Tricks': [
+    { title: 'Magic Basics', icon: '🪄' },
+    { title: 'Card Fundamentals', icon: '🃏' },
+    { title: 'Coin Tricks', icon: '🪙' },
+    { title: 'Misdirection', icon: '👀' },
+    { title: 'The Double Lift', icon: '🃏' },
+    { title: 'Palming', icon: '✋' },
+    { title: 'Forces', icon: '🎯' },
+    { title: 'Rope Magic', icon: '🪢' },
+    { title: 'Patter & Story', icon: '🎭' },
+    { title: 'Card Controls', icon: '🃏' },
+    { title: 'Sleight of Hand', icon: '🤲' },
+    { title: 'Mind Reading', icon: '🧠' },
+    { title: 'Stage Presence', icon: '🎪' },
+    { title: 'False Shuffles', icon: '🔀' },
+    { title: 'Vanishes', icon: '💨' },
+    { title: 'Productions', icon: '✨' },
+    { title: 'Levitation', icon: '🕊️' },
+    { title: 'Escape Tricks', icon: '🔓' },
+    { title: 'Close-Up Magic', icon: '🔍' },
+    { title: 'Audience Work', icon: '👥' },
+    { title: 'Combo Routines', icon: '🔗' },
+    { title: 'Street Magic', icon: '🏙️' },
+    { title: 'Full Routine', icon: '🎩' },
+    { title: 'Master Performance', icon: '🏆' },
+  ],
+  'Drawing': [
+    { title: 'Line Basics', icon: '✏️' },
+    { title: 'Shapes & Forms', icon: '⬡' },
+    { title: 'Light & Shadow', icon: '🌗' },
+    { title: 'Proportions', icon: '📐' },
+    { title: 'Texture', icon: '🪨' },
+    { title: 'Perspective', icon: '🏗️' },
+    { title: 'Faces', icon: '😊' },
+    { title: 'Hands & Feet', icon: '✋' },
+    { title: 'Body Anatomy', icon: '🦴' },
+    { title: 'Gesture Drawing', icon: '💃' },
+    { title: 'Composition', icon: '🖼️' },
+    { title: 'Color Theory', icon: '🎨' },
+    { title: 'Ink & Pen', icon: '🖊️' },
+    { title: 'Digital Lines', icon: '💻' },
+    { title: 'Environments', icon: '🏞️' },
+    { title: 'Animals', icon: '🐾' },
+    { title: 'Clothing', icon: '👕' },
+    { title: 'Expressions', icon: '😤' },
+    { title: 'Character Design', icon: '🧑‍🎨' },
+    { title: 'Action Poses', icon: '🏃' },
+    { title: 'Backgrounds', icon: '🌄' },
+    { title: 'Storyboarding', icon: '🎬' },
+    { title: 'Style Dev', icon: '⭐' },
+    { title: 'Portfolio Piece', icon: '🏆' },
+  ],
+  'Guitar': [
+    { title: 'Holding Guitar', icon: '🎸' },
+    { title: 'Open Chords', icon: '🎵' },
+    { title: 'Strumming', icon: '🤚' },
+    { title: 'Finger Exercises', icon: '🖐️' },
+    { title: 'Power Chords', icon: '⚡' },
+    { title: 'Reading Tabs', icon: '📋' },
+    { title: 'Barre Chords', icon: '💪' },
+    { title: 'Minor Scale', icon: '🎼' },
+    { title: 'Major Scale', icon: '🎶' },
+    { title: 'Pentatonic', icon: '✨' },
+    { title: 'Fingerpicking', icon: '🤌' },
+    { title: 'Hammer-Ons', icon: '🔨' },
+    { title: 'Pull-Offs', icon: '🪝' },
+    { title: 'Bends & Slides', icon: '〰️' },
+    { title: 'Blues Licks', icon: '🎷' },
+    { title: 'Rhythm Patterns', icon: '🥁' },
+    { title: 'Song Structure', icon: '📝' },
+    { title: 'Improvisation', icon: '🎤' },
+    { title: 'Chord Melody', icon: '🎹' },
+    { title: 'Acoustic Style', icon: '🪵' },
+    { title: 'Electric Tone', icon: '🔊' },
+    { title: 'Song Writing', icon: '✍️' },
+    { title: 'Performance', icon: '🎪' },
+    { title: 'Master Jam', icon: '🏆' },
+  ],
+  'Piano': [
+    { title: 'Keyboard Layout', icon: '🎹' },
+    { title: 'Basic Scales', icon: '🎵' },
+    { title: 'Simple Chords', icon: '🎶' },
+    { title: 'Hand Position', icon: '✋' },
+    { title: 'Right Hand', icon: '👉' },
+    { title: 'Left Hand', icon: '👈' },
+    { title: 'Both Hands', icon: '🙌' },
+    { title: 'Chord Inversions', icon: '🔄' },
+    { title: 'Arpeggios', icon: '✨' },
+    { title: 'Sight Reading', icon: '📖' },
+    { title: 'Dynamics', icon: '📢' },
+    { title: 'Pedal Technique', icon: '🦶' },
+    { title: 'Major Keys', icon: '☀️' },
+    { title: 'Minor Keys', icon: '🌙' },
+    { title: 'Blues Piano', icon: '🎷' },
+    { title: 'Pop Patterns', icon: '🎤' },
+    { title: 'Classical Intro', icon: '🎻' },
+    { title: 'Jazz Voicings', icon: '🎺' },
+    { title: 'Improvisation', icon: '💫' },
+    { title: 'Accompaniment', icon: '🤝' },
+    { title: 'Song Learning', icon: '📝' },
+    { title: 'Composition', icon: '✍️' },
+    { title: 'Performance', icon: '🎪' },
+    { title: 'Master Recital', icon: '🏆' },
+  ],
+  'Singing': [
+    { title: 'Breathing', icon: '🌬️' }, { title: 'Pitch Basics', icon: '🎵' }, { title: 'Vocal Range', icon: '📊' }, { title: 'Warm-Ups', icon: '🔥' }, { title: 'Vowel Shapes', icon: '👄' }, { title: 'Head Voice', icon: '☁️' }, { title: 'Chest Voice', icon: '💪' }, { title: 'Mix Voice', icon: '🔄' }, { title: 'Vibrato', icon: '〰️' }, { title: 'Dynamics', icon: '📢' }, { title: 'Runs & Riffs', icon: '✨' }, { title: 'Harmonizing', icon: '🎶' }, { title: 'Ear Training', icon: '👂' }, { title: 'Pop Style', icon: '🎤' }, { title: 'R&B Style', icon: '💜' }, { title: 'Rock Style', icon: '🤘' }, { title: 'Stage Movement', icon: '💃' }, { title: 'Mic Technique', icon: '🎙️' }, { title: 'Song Interp.', icon: '📖' }, { title: 'Emotion', icon: '😭' }, { title: 'Recording', icon: '🎧' }, { title: 'Duets', icon: '🤝' }, { title: 'Performance', icon: '🎪' }, { title: 'Master Show', icon: '🏆' },
+  ],
+  'Public Speaking': [
+    { title: 'Confidence', icon: '💪' }, { title: 'Eye Contact', icon: '👁️' }, { title: 'Voice Power', icon: '📢' }, { title: 'Body Language', icon: '🧍' }, { title: 'Storytelling', icon: '📖' }, { title: 'Opening Hooks', icon: '🪝' }, { title: 'Structure', icon: '🏗️' }, { title: 'Pausing', icon: '⏸️' }, { title: 'Audience Read', icon: '👥' }, { title: 'Improvisation', icon: '💡' }, { title: 'Humor', icon: '😂' }, { title: 'Persuasion', icon: '🎯' }, { title: 'Data Storytelling', icon: '📊' }, { title: 'Q&A Handling', icon: '❓' }, { title: 'Debate', icon: '⚔️' }, { title: 'Pitch Perfect', icon: '💰' }, { title: 'TED-Style', icon: '🎤' }, { title: 'Panel Talks', icon: '🪑' }, { title: 'Keynote Build', icon: '🖥️' }, { title: 'Crisis Comms', icon: '🚨' }, { title: 'Virtual Talks', icon: '💻' }, { title: 'Workshops', icon: '🧑‍🏫' }, { title: 'Full Speech', icon: '🎪' }, { title: 'Master Orator', icon: '🏆' },
+  ],
+  'Photography': [
+    { title: 'Camera Basics', icon: '📷' }, { title: 'Composition', icon: '🖼️' }, { title: 'Rule of Thirds', icon: '📐' }, { title: 'Natural Light', icon: '☀️' }, { title: 'Focus', icon: '🔍' }, { title: 'Exposure', icon: '💡' }, { title: 'Aperture', icon: '⭕' }, { title: 'Shutter Speed', icon: '⚡' }, { title: 'ISO', icon: '🌙' }, { title: 'Color Theory', icon: '🎨' }, { title: 'Portraits', icon: '🧑' }, { title: 'Landscapes', icon: '🏞️' }, { title: 'Street', icon: '🏙️' }, { title: 'Macro', icon: '🔬' }, { title: 'Golden Hour', icon: '🌅' }, { title: 'Night Photo', icon: '🌃' }, { title: 'Editing Basics', icon: '🖥️' }, { title: 'Color Grading', icon: '🎬' }, { title: 'Black & White', icon: '⬛' }, { title: 'Mobile Photo', icon: '📱' }, { title: 'Storytelling', icon: '📖' }, { title: 'Series Work', icon: '📸' }, { title: 'Portfolio', icon: '🗂️' }, { title: 'Master Shot', icon: '🏆' },
+  ],
+  'Dance': [
+    { title: 'Rhythm Feel', icon: '🎵' }, { title: 'Basic Steps', icon: '👟' }, { title: 'Body Isolation', icon: '🧍' }, { title: 'Footwork', icon: '🦶' }, { title: 'Arm Movement', icon: '💪' }, { title: 'Hip-Hop Basics', icon: '🕺' }, { title: 'Pop & Lock', icon: '🤖' }, { title: 'Wave Motion', icon: '🌊' }, { title: 'Floor Work', icon: '🤸' }, { title: 'Turns & Spins', icon: '🔄' }, { title: 'Partner Basics', icon: '🤝' }, { title: 'Choreography', icon: '📋' }, { title: 'Musicality', icon: '🎶' }, { title: 'Freestyle', icon: '🔥' }, { title: 'Battle Moves', icon: '⚔️' }, { title: 'Latin Basics', icon: '💃' }, { title: 'Contemporary', icon: '🩰' }, { title: 'Street Style', icon: '🏙️' }, { title: 'Stage Presence', icon: '✨' }, { title: 'Transitions', icon: '🔗' }, { title: 'Group Sync', icon: '👥' }, { title: 'Video Dance', icon: '📹' }, { title: 'Full Routine', icon: '🎪' }, { title: 'Master Perf.', icon: '🏆' },
+  ],
+  'Stand-up Comedy': [
+    { title: 'What\'s Funny', icon: '😂' }, { title: 'Joke Structure', icon: '🏗️' }, { title: 'Setup/Punch', icon: '🥊' }, { title: 'Timing', icon: '⏱️' }, { title: 'Personal Stories', icon: '📖' }, { title: 'Crowd Reading', icon: '👥' }, { title: 'Callbacks', icon: '🔄' }, { title: 'Physical Comedy', icon: '🤡' }, { title: 'Misdirection', icon: '👀' }, { title: 'Tags', icon: '🏷️' }, { title: 'Act-Outs', icon: '🎭' }, { title: 'Dark Humor', icon: '🌑' }, { title: 'Wordplay', icon: '📝' }, { title: 'Improv Skills', icon: '💡' }, { title: 'Hecklers', icon: '🗣️' }, { title: '5-Min Set', icon: '⏱️' }, { title: 'Transitions', icon: '🔗' }, { title: 'Opening Strong', icon: '💥' }, { title: 'Closing Strong', icon: '🎆' }, { title: 'Recording Sets', icon: '📹' }, { title: 'Open Mics', icon: '🎤' }, { title: 'Writing Daily', icon: '✍️' }, { title: 'Full 15 Min', icon: '🎪' }, { title: 'Master Comic', icon: '🏆' },
+  ],
+};
+
+const DEFAULT_LESSONS = Array.from({ length: 24 }, (_, i) => ({
+  title: `Lesson ${i + 1}`,
+  icon: '📚',
+}));
+
 const TOTAL_LESSONS = 24;
 
 export function GamesHomeScreen({ navigation }: { navigation: any }) {
@@ -100,12 +228,13 @@ export function GamesHomeScreen({ navigation }: { navigation: any }) {
 
   const dailyProgress = Math.min(dailyXp / dailyXpGoal, 1);
 
-  const lessons = Array.from({ length: TOTAL_LESSONS }, (_, i) => {
+  const skillLessons = SKILL_LESSONS[skillName] || DEFAULT_LESSONS;
+  const lessons = skillLessons.map((lesson, i) => {
     const num = i + 1;
     const completed = completedLessons.includes(num);
     const isCurrent = num === currentLesson;
     const locked = num > currentLesson;
-    return { num, completed, isCurrent, locked };
+    return { num, completed, isCurrent, locked, title: lesson.title, icon: lesson.icon };
   });
 
   const handleLessonPress = (lessonNum: number) => {
@@ -195,7 +324,7 @@ export function GamesHomeScreen({ navigation }: { navigation: any }) {
                       colors={[colors.primary, colors.primaryDark]}
                       style={[styles.bubble, styles.currentBubble, glowShadow(colors.primary)]}
                     >
-                      <Text style={styles.bubbleNumber}>{lesson.num}</Text>
+                      <Text style={styles.bubbleIcon}>{lesson.icon}</Text>
                     </LinearGradient>
                   </Animated.View>
                 ) : lesson.completed ? (
@@ -203,25 +332,25 @@ export function GamesHomeScreen({ navigation }: { navigation: any }) {
                     colors={[colors.success, colors.successDark]}
                     style={[styles.bubble, glowShadow(colors.success)]}
                   >
-                    <Text style={styles.checkmark}>&#10003;</Text>
+                    <Text style={styles.bubbleIcon}>{lesson.icon}</Text>
                   </LinearGradient>
                 ) : (
                   <View style={[styles.bubble, styles.lockedBubble]}>
-                    <Text style={styles.lockedNumber}>{lesson.num}</Text>
+                    <Text style={[styles.bubbleIcon, { opacity: 0.3 }]}>{lesson.icon}</Text>
                   </View>
                 )}
 
-                {/* Label */}
-                {(lesson.isCurrent || lesson.completed) && (
-                  <Text
-                    style={[
-                      styles.lessonLabel,
-                      lesson.isCurrent && styles.currentLabel,
-                    ]}
-                  >
-                    Lesson {lesson.num}
-                  </Text>
-                )}
+                {/* Lesson title */}
+                <Text
+                  style={[
+                    styles.lessonLabel,
+                    lesson.isCurrent && styles.currentLabel,
+                    lesson.locked && { color: colors.textMuted },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {lesson.title}
+                </Text>
               </TouchableOpacity>
             </View>
           );
@@ -295,6 +424,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.08)',
     borderStyle: 'dashed',
   },
+  bubbleIcon: { fontSize: 26 },
   bubbleNumber: { color: '#fff', fontWeight: '800', fontSize: 18 },
   checkmark: { color: '#fff', fontSize: 24, fontWeight: '700' },
   lockedNumber: { color: colors.textMuted, fontWeight: '700', fontSize: 16 },
