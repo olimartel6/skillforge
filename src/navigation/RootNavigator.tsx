@@ -4,24 +4,16 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { OnboardingNavigator } from './OnboardingNavigator';
 import { TabNavigator } from './TabNavigator';
 import { useUserStore } from '../store/userStore';
-import { supabase } from '../services/supabase';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { colors } from '../utils/theme';
 
 const Stack = createNativeStackNavigator();
 
 export function RootNavigator() {
-  const { isAuthenticated, isOnboarded, isLoading, fetchProfile, setAuth } = useUserStore();
+  const { isOnboarded, isLoading, initialize } = useUserStore();
 
   useEffect(() => {
-    fetchProfile();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setAuth(!!session);
-      if (session) fetchProfile();
-    });
-
-    return () => subscription.unsubscribe();
+    initialize();
   }, []);
 
   if (isLoading) {
@@ -35,10 +27,8 @@ export function RootNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!isAuthenticated || !isOnboarded ? (
-          <Stack.Screen name="Onboarding">
-            {() => <OnboardingNavigator skipWelcome={isAuthenticated && !isOnboarded} />}
-          </Stack.Screen>
+        {!isOnboarded ? (
+          <Stack.Screen name="Onboarding" component={OnboardingNavigator} />
         ) : (
           <Stack.Screen name="Main" component={TabNavigator} />
         )}

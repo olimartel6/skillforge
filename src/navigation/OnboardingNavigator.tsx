@@ -16,10 +16,9 @@ export type OnboardingStackParamList = {
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
 
-export function OnboardingNavigator({ skipWelcome = false }: { skipWelcome?: boolean }) {
+export function OnboardingNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName={skipWelcome ? 'SkillSelection' : 'Welcome'}
       screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
     >
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
