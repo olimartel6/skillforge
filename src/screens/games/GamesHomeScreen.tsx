@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { AmbientGlow } from '../../components/AmbientGlow';
 import { GlassCard } from '../../components/GlassCard';
 import { useGameStore } from '../../store/gameStore';
 import { useUserStore } from '../../store/userStore';
+import { supabase } from '../../services/supabase';
 import { colors, spacing, typography, borderRadius, glowShadow } from '../../utils/theme';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const BUBBLE_SIZE = 64;
@@ -24,13 +25,20 @@ export function GamesHomeScreen({ navigation }: { navigation: any }) {
   const { xp, dailyXp, dailyXpGoal, level, completedLessons, currentLesson, initialize } =
     useGameStore();
   const profile = useUserStore((s) => s.profile);
-  const skillName = profile?.selected_skill_id || 'General';
+  const [skillName, setSkillName] = useState('General');
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     initialize();
-  }, [initialize]);
+    // Load actual skill name from Supabase
+    if (profile?.selected_skill_id) {
+      supabase.from('skills').select('name').eq('id', profile.selected_skill_id).single()
+        .then(({ data }) => {
+          if (data) setSkillName(data.name);
+        });
+    }
+  }, [profile?.selected_skill_id]);
 
   useEffect(() => {
     Animated.loop(
