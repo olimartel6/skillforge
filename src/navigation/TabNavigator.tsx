@@ -1,7 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../utils/theme';
 import { DailyChallengeScreen } from '../screens/home/DailyChallengeScreen';
 import { PracticeSessionScreen } from '../screens/home/PracticeSessionScreen';
@@ -15,6 +17,7 @@ import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { SettingsScreen } from '../screens/profile/SettingsScreen';
 import { SubscriptionScreen } from '../screens/profile/SubscriptionScreen';
 
+// Stacks
 const HomeStack = createNativeStackNavigator();
 function HomeNavigator() {
   return (
@@ -57,12 +60,78 @@ function ProfileNavigator() {
   );
 }
 
+// Premium Tab Icon
+const TAB_ICONS: Record<string, { default: string; active: string }> = {
+  Home: { default: '🏠', active: '🏠' },
+  Tree: { default: '🌳', active: '🌳' },
+  Community: { default: '👥', active: '👥' },
+  Stats: { default: '📊', active: '📊' },
+  Profile: { default: '👤', active: '👤' },
+};
+
 function TabIcon({ label, active }: { label: string; active: boolean }) {
+  const scaleAnim = useRef(new Animated.Value(active ? 1 : 0.85)).current;
+  const opacityAnim = useRef(new Animated.Value(active ? 1 : 0.4)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: active ? 1 : 0.85,
+        friction: 5,
+        tension: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: active ? 1 : 0.4,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [active]);
+
+  const icon = TAB_ICONS[label] || { default: '•', active: '•' };
+
   return (
-    <View style={tabStyles.iconContainer}>
-      {active && <View style={tabStyles.indicator} />}
-      <Text style={[tabStyles.label, active && tabStyles.labelActive]}>{label}</Text>
-    </View>
+    <Animated.View
+      style={[
+        styles.tabIconContainer,
+        { transform: [{ scale: scaleAnim }], opacity: opacityAnim },
+      ]}
+    >
+      {/* Active glow */}
+      {active && (
+        <View style={styles.activeGlow}>
+          <LinearGradient
+            colors={[colors.primary + '30', 'transparent']}
+            style={styles.glowGradient}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+          />
+        </View>
+      )}
+
+      {/* Icon */}
+      <View style={[styles.iconCircle, active && styles.iconCircleActive]}>
+        <Text style={styles.iconEmoji}>{active ? icon.active : icon.default}</Text>
+      </View>
+
+      {/* Active indicator dot */}
+      {active && (
+        <View style={styles.activeDot}>
+          <LinearGradient
+            colors={[colors.primary, colors.primaryDark]}
+            style={styles.dotGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        </View>
+      )}
+
+      {/* Label */}
+      <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>
+        {label}
+      </Text>
+    </Animated.View>
   );
 }
 
@@ -73,33 +142,137 @@ export function TabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: 'rgba(255,255,255,0.04)',
-          height: 80,
-          paddingBottom: 20,
-          paddingTop: 8,
-        },
         tabBarShowLabel: false,
+        tabBarStyle: {
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: Platform.OS === 'ios' ? 88 : 70,
+          backgroundColor: 'transparent',
+          borderTopWidth: 0,
+          elevation: 0,
+        },
+        tabBarBackground: () => (
+          <View style={styles.tabBarBg}>
+            <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+            <View style={styles.tabBarOverlay} />
+            <View style={styles.tabBarTopBorder} />
+          </View>
+        ),
       }}
     >
-      <Tab.Screen name="HomeTab" component={HomeNavigator}
-        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Home" active={focused} /> }} />
-      <Tab.Screen name="TreeTab" component={SkillTreeScreen}
-        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Tree" active={focused} /> }} />
-      <Tab.Screen name="CommunityTab" component={CommunityNavigator}
-        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Community" active={focused} /> }} />
-      <Tab.Screen name="StatsTab" component={StatsNavigator}
-        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Stats" active={focused} /> }} />
-      <Tab.Screen name="ProfileTab" component={ProfileNavigator}
-        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Profile" active={focused} /> }} />
+      <Tab.Screen
+        name="HomeTab"
+        component={HomeNavigator}
+        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Home" active={focused} /> }}
+      />
+      <Tab.Screen
+        name="TreeTab"
+        component={SkillTreeScreen}
+        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Tree" active={focused} /> }}
+      />
+      <Tab.Screen
+        name="CommunityTab"
+        component={CommunityNavigator}
+        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Community" active={focused} /> }}
+      />
+      <Tab.Screen
+        name="StatsTab"
+        component={StatsNavigator}
+        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Stats" active={focused} /> }}
+      />
+      <Tab.Screen
+        name="ProfileTab"
+        component={ProfileNavigator}
+        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Profile" active={focused} /> }}
+      />
     </Tab.Navigator>
   );
 }
 
-const tabStyles = StyleSheet.create({
-  iconContainer: { alignItems: 'center', gap: 4 },
-  indicator: { width: 20, height: 3, borderRadius: 1.5, backgroundColor: colors.primary },
-  label: { fontSize: 10, color: colors.textDark, fontWeight: '500' },
-  labelActive: { color: colors.primary, fontWeight: '600' },
+const styles = StyleSheet.create({
+  // Tab bar background
+  tabBarBg: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+  },
+  tabBarOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(10, 10, 11, 0.75)',
+  },
+  tabBarTopBorder: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    right: 20,
+    height: 0.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  },
+
+  // Tab icon
+  tabIconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 8,
+    width: 64,
+  },
+
+  // Active glow behind icon
+  activeGlow: {
+    position: 'absolute',
+    top: -4,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    overflow: 'hidden',
+  },
+  glowGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 24,
+  },
+
+  // Icon circle
+  iconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+  },
+  iconCircleActive: {
+    backgroundColor: 'rgba(255, 107, 53, 0.08)',
+  },
+  iconEmoji: {
+    fontSize: 20,
+  },
+
+  // Active dot indicator
+  activeDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    marginTop: 3,
+    overflow: 'hidden',
+  },
+  dotGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 2.5,
+  },
+
+  // Label
+  tabLabel: {
+    fontSize: 10,
+    fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.3)',
+    marginTop: 2,
+    letterSpacing: 0.3,
+  },
+  tabLabelActive: {
+    color: colors.primary,
+    fontWeight: '600',
+  },
 });
