@@ -350,20 +350,111 @@ function getDifficultyForLesson(lessonNumber: number): 'easy' | 'medium' | 'hard
   return 'hard';
 }
 
+// ──────────────── LESSON-SPECIFIC QUESTIONS ────────────────
+// Each lesson topic maps to focused questions about that specific subject
+
+const LESSON_QUESTIONS: Record<string, Record<string, GameQuestion[]>> = {
+  'Magic Tricks': {
+    'Magic Basics': [
+      { type: 'multiple_choice', prompt: 'What is the #1 rule of magic?', options: ['Move fast', 'Never reveal the secret', 'Use expensive props', 'Wear a cape'], correctAnswer: 'Never reveal the secret', difficulty: 'easy' },
+      { type: 'true_false', prompt: 'Magic is mostly about speed of hands.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'What are the 3 parts of any magic trick?', options: ['Setup, Performance, Applause', 'The Pledge, The Turn, The Prestige', 'Shuffle, Cut, Deal', 'Intro, Middle, End'], correctAnswer: 'The Pledge, The Turn, The Prestige', difficulty: 'medium' },
+      { type: 'swipe_judge', prompt: 'Practicing in front of a mirror before performing.', options: ['Good practice', 'Bad practice'], correctAnswer: 'Good practice', difficulty: 'easy' },
+      { type: 'true_false', prompt: 'You should always tell the audience what you\'re about to do.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'What is a "gimmick" in magic?', options: ['A joke you tell', 'A secret device that helps the trick', 'Your stage outfit', 'A type of card'], correctAnswer: 'A secret device that helps the trick', difficulty: 'easy' },
+      { type: 'fill_gap', prompt: 'The story a magician tells during a trick is called ___.', options: ['Patter', 'Script', 'Lyrics', 'Plot'], correctAnswer: 'Patter', difficulty: 'easy' },
+      { type: 'before_after', prompt: 'Which intro is better for a magic show?', options: ['I\'m going to do a trick now.', 'Have you ever had a moment where the impossible became real? Watch closely...'], correctAnswer: 'Have you ever had a moment where the impossible became real? Watch closely...', difficulty: 'easy' },
+    ],
+    'Card Fundamentals': [
+      { type: 'multiple_choice', prompt: 'How many cards are in a standard deck?', options: ['48', '50', '52', '54'], correctAnswer: '52', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'What are the 4 suits in a deck?', options: ['Hearts, Diamonds, Clubs, Spades', 'Hearts, Stars, Moons, Suns', 'Red, Blue, Green, Yellow', 'Aces, Kings, Queens, Jacks'], correctAnswer: 'Hearts, Diamonds, Clubs, Spades', difficulty: 'easy' },
+      { type: 'true_false', prompt: 'A "bridge" is a way to shuffle cards by bending them.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'What is a "spread" in card magic?', options: ['Throwing cards everywhere', 'Fanning cards face-up on a table', 'Cutting the deck', 'Dealing to players'], correctAnswer: 'Fanning cards face-up on a table', difficulty: 'easy' },
+      { type: 'fill_gap', prompt: 'The top card of the deck is important because most ___ start there.', options: ['Controls', 'Shuffles', 'Bets', 'Games'], correctAnswer: 'Controls', difficulty: 'medium' },
+      { type: 'swipe_judge', prompt: 'Bending someone else\'s cards without permission.', options: ['Good practice', 'Bad practice'], correctAnswer: 'Bad practice', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'What is a "key card"?', options: ['The most expensive card', 'A card you secretly know the position of', 'The Ace of Spades', 'A card with a mark'], correctAnswer: 'A card you secretly know the position of', difficulty: 'medium' },
+      { type: 'true_false', prompt: 'You should always use a brand new deck for performances.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'easy' },
+    ],
+    'Coin Tricks': [
+      { type: 'multiple_choice', prompt: 'What is the "French Drop"?', options: ['Dropping a French coin', 'A fake transfer where the coin stays hidden', 'Flipping a coin in the air', 'A coin vanish using a table'], correctAnswer: 'A fake transfer where the coin stays hidden', difficulty: 'easy' },
+      { type: 'true_false', prompt: 'Larger coins are easier for beginners to palm.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'What size coin is most popular for magic?', options: ['Dime', 'Quarter', 'Half Dollar', 'Penny'], correctAnswer: 'Half Dollar', difficulty: 'medium' },
+      { type: 'fill_gap', prompt: 'Hiding a coin in the curl of your fingers is called ___ palm.', options: ['Classic', 'French', 'English', 'Finger'], correctAnswer: 'Classic', difficulty: 'medium' },
+      { type: 'swipe_judge', prompt: 'Looking at your hand where the coin is hidden.', options: ['Good practice', 'Bad practice'], correctAnswer: 'Bad practice', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'Where should you look during a coin vanish?', options: ['At the hand the audience thinks holds the coin', 'At the hand secretly holding the coin', 'At the floor', 'At the ceiling'], correctAnswer: 'At the hand the audience thinks holds the coin', difficulty: 'easy' },
+      { type: 'true_false', prompt: 'The "Muscle Pass" launches a coin from your palm using muscle tension.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'hard' },
+      { type: 'before_after', prompt: 'Which coin vanish presentation is better?', options: ['Watch, I\'ll make this coin disappear. *does move*', 'Hold out your hand... feel the weight of the coin... now slowly close your fingers... open them. It\'s gone.'], correctAnswer: 'Hold out your hand... feel the weight of the coin... now slowly close your fingers... open them. It\'s gone.', difficulty: 'medium' },
+    ],
+    'Misdirection': [
+      { type: 'multiple_choice', prompt: 'What is misdirection?', options: ['Moving really fast', 'Controlling where the audience looks', 'Using smoke and mirrors', 'Talking very loudly'], correctAnswer: 'Controlling where the audience looks', difficulty: 'easy' },
+      { type: 'true_false', prompt: 'People naturally look where you look.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'Which is the strongest form of misdirection?', options: ['Loud noises', 'Natural attention management', 'Bright lights', 'Confusing patter'], correctAnswer: 'Natural attention management', difficulty: 'medium' },
+      { type: 'swipe_judge', prompt: 'Saying "don\'t look at my left hand" during a trick.', options: ['Good misdirection', 'Bad misdirection'], correctAnswer: 'Bad misdirection', difficulty: 'easy' },
+      { type: 'fill_gap', prompt: 'The moment when the secret move happens is called the ___ moment.', options: ['Off-beat', 'High-beat', 'Secret', 'Silent'], correctAnswer: 'Off-beat', difficulty: 'medium' },
+      { type: 'multiple_choice', prompt: 'When should you do the secret move?', options: ['When everyone is watching closely', 'During a moment of relaxation or laughter', 'At the very beginning', 'Never — use gimmicks instead'], correctAnswer: 'During a moment of relaxation or laughter', difficulty: 'medium' },
+      { type: 'true_false', prompt: 'Humor is a powerful misdirection tool.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
+      { type: 'before_after', prompt: 'Which uses better misdirection?', options: ['*Stares at hands while doing the move*', '*Makes a joke, audience laughs, does the move during the laugh*'], correctAnswer: '*Makes a joke, audience laughs, does the move during the laugh*', difficulty: 'easy' },
+    ],
+    'The Double Lift': [
+      { type: 'multiple_choice', prompt: 'What is a double lift?', options: ['Picking up the whole deck', 'Lifting two cards as if they were one', 'Lifting a card with two hands', 'Flipping the deck over twice'], correctAnswer: 'Lifting two cards as if they were one', difficulty: 'easy' },
+      { type: 'true_false', prompt: 'The double lift is one of the most important sleights in card magic.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'How do you prepare for a double lift?', options: ['Get a "break" above the top two cards', 'Bend the whole deck', 'Lick your fingers', 'Shake the deck'], correctAnswer: 'Get a "break" above the top two cards', difficulty: 'medium' },
+      { type: 'fill_gap', prompt: 'A small gap held by your pinky between cards is called a ___.', options: ['Break', 'Split', 'Gap', 'Hold'], correctAnswer: 'Break', difficulty: 'easy' },
+      { type: 'swipe_judge', prompt: 'Practicing the double lift at the same speed as turning a single card.', options: ['Good practice', 'Bad practice'], correctAnswer: 'Good practice', difficulty: 'easy' },
+      { type: 'true_false', prompt: 'A double lift should look exactly like turning one card over.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'What famous trick relies heavily on the double lift?', options: ['Ambitious Card routine', 'Cup and Balls', 'Rope Cut', 'Coin Vanish'], correctAnswer: 'Ambitious Card routine', difficulty: 'medium' },
+      { type: 'swipe_judge', prompt: 'Lifting the cards at a different speed than a normal single flip.', options: ['Good technique', 'Bad technique'], correctAnswer: 'Bad technique', difficulty: 'easy' },
+    ],
+    'Palming': [
+      { type: 'multiple_choice', prompt: 'What is palming?', options: ['Clapping your hands', 'Secretly hiding an object in your hand', 'Showing both hands empty', 'A type of card cut'], correctAnswer: 'Secretly hiding an object in your hand', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'Which palm hides a card in the center of your palm?', options: ['Classic palm', 'Finger palm', 'Gambler\'s cop', 'Tenkai palm'], correctAnswer: 'Classic palm', difficulty: 'medium' },
+      { type: 'true_false', prompt: 'Your hand should look tense and closed when palming.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'easy' },
+      { type: 'fill_gap', prompt: 'The ___ palm holds the card using just the fingers, not the palm itself.', options: ['Finger', 'Classic', 'Back', 'Side'], correctAnswer: 'Finger', difficulty: 'medium' },
+      { type: 'swipe_judge', prompt: 'Keeping your palming hand in a natural position at your side.', options: ['Good technique', 'Bad technique'], correctAnswer: 'Good technique', difficulty: 'easy' },
+      { type: 'swipe_judge', prompt: 'Squeezing the card tightly so it doesn\'t fall.', options: ['Good technique', 'Bad technique'], correctAnswer: 'Bad technique', difficulty: 'easy' },
+      { type: 'true_false', prompt: 'You should practice palming while watching TV to build muscle memory.', options: ['True', 'False'], correctAnswer: 'True', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'What should your palming hand look like?', options: ['Completely flat and open', 'Clenched in a fist', 'Naturally relaxed, slightly curved', 'Pointing at something'], correctAnswer: 'Naturally relaxed, slightly curved', difficulty: 'easy' },
+    ],
+    'Forces': [
+      { type: 'multiple_choice', prompt: 'What is a "force" in magic?', options: ['Making someone pick a specific card while they feel free', 'Pushing someone to volunteer', 'Bending a card with force', 'Using physical strength in tricks'], correctAnswer: 'Making someone pick a specific card while they feel free', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'What is the "Hindu Shuffle Force"?', options: ['A force using a Hindu prayer', 'Running packets off the deck, stopping when told', 'A force invented in India', 'Spreading cards on a Hindu rug'], correctAnswer: 'Running packets off the deck, stopping when told', difficulty: 'medium' },
+      { type: 'true_false', prompt: 'The Classic Force requires no skill — anyone can do it.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'easy' },
+      { type: 'fill_gap', prompt: 'The simplest force is the ___ force, where you just ask them to say "stop".', options: ['Riffle', 'Classic', 'Hindu', 'Slip'], correctAnswer: 'Riffle', difficulty: 'medium' },
+      { type: 'swipe_judge', prompt: 'Having a backup plan if the force fails.', options: ['Good practice', 'Bad practice'], correctAnswer: 'Good practice', difficulty: 'easy' },
+      { type: 'multiple_choice', prompt: 'What makes a force convincing?', options: ['Going very fast', 'Making the spectator truly feel they had a free choice', 'Using multiple decks', 'Telling them which card to pick'], correctAnswer: 'Making the spectator truly feel they had a free choice', difficulty: 'easy' },
+      { type: 'true_false', prompt: 'If a force fails, you should tell the audience and try again.', options: ['True', 'False'], correctAnswer: 'False', difficulty: 'easy' },
+      { type: 'before_after', prompt: 'Which force presentation is better?', options: ['Pick this card. No, this one. Take it.', 'Fan through the cards... whenever you feel like it, touch any card that calls to you.'], correctAnswer: 'Fan through the cards... whenever you feel like it, touch any card that calls to you.', difficulty: 'easy' },
+    ],
+  },
+};
+
 export function getQuestionsForLesson(
   skillName: string,
   lessonNumber: number,
   count: number,
 ): GameQuestion[] {
+  // First, try to get lesson-specific questions
+  const skillLessons = LESSON_QUESTIONS[skillName];
+  if (skillLessons) {
+    // Get lesson title from the SKILL_LESSONS mapping (imported concept)
+    const lessonTitles = Object.keys(skillLessons);
+    const lessonIdx = Math.min(lessonNumber - 1, lessonTitles.length - 1);
+    const lessonTitle = lessonTitles[lessonIdx];
+    const lessonQs = skillLessons[lessonTitle];
+
+    if (lessonQs && lessonQs.length > 0) {
+      return shuffle([...lessonQs]).slice(0, count);
+    }
+  }
+
+  // Fallback: use category-based questions (for skills without lesson-specific content)
   const category = getSkillCategory(skillName);
   const bank = allBanks[category];
   const maxDifficulty = getDifficultyForLesson(lessonNumber);
   const difficultyOrder = ['easy', 'medium', 'hard'] as const;
   const maxIdx = difficultyOrder.indexOf(maxDifficulty);
 
-  // Select which game types to include for this lesson — vary by lesson number
   const typesForLesson = shuffle(GAME_TYPES).slice(0, Math.min(count, GAME_TYPES.length));
-
   const questions: GameQuestion[] = [];
 
   for (const gameType of typesForLesson) {
@@ -371,17 +462,13 @@ export function getQuestionsForLesson(
     const filtered = typeQuestions.filter(
       (q) => difficultyOrder.indexOf(q.difficulty) <= maxIdx,
     );
-
     if (filtered.length > 0) {
-      // Pick one, seeded loosely by lesson number
       const idx = (lessonNumber + questions.length) % filtered.length;
       questions.push({ ...filtered[idx] });
     }
-
     if (questions.length >= count) break;
   }
 
-  // If we don't have enough, fill from multiple_choice and true_false
   const fillers = [
     ...(bank.multiple_choice || []),
     ...(bank.true_false || []),
