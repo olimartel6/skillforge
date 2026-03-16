@@ -11,16 +11,20 @@ type SkillCategory = 'visual_arts' | 'music' | 'communication' | 'performance' |
 
 function getSkillCategory(skillName: string): SkillCategory {
   const lower = (skillName || '').toLowerCase();
-  if (lower.includes('draw') || lower.includes('paint') || lower.includes('callig'))
+  if (lower.includes('draw') || lower.includes('paint') || lower.includes('callig') || lower.includes('fashion'))
     return 'visual_arts';
   if (lower.includes('guitar') || lower.includes('piano') || lower.includes('sing') || lower.includes('beatbox'))
     return 'music';
-  if (lower.includes('speak') || lower.includes('writing') || lower.includes('storytell') || lower.includes('language') || lower.includes('pronunciat'))
+  if (lower.includes('speak') || lower.includes('writing') || lower.includes('storytell') || lower.includes('language') || lower.includes('pronunciat') || lower.includes('podcast'))
     return 'communication';
   if (lower.includes('act') || lower.includes('danc') || lower.includes('comedy') || lower.includes('magic'))
     return 'performance';
-  if (lower.includes('photo') || lower.includes('video') || lower.includes('edit') || lower.includes('animation') || lower.includes('3d') || lower.includes('film'))
+  if (lower.includes('photo') || lower.includes('video') || lower.includes('edit') || lower.includes('animation') || lower.includes('3d') || lower.includes('film') || lower.includes('coding'))
     return 'digital';
+  if (lower.includes('trading') || lower.includes('business') || lower.includes('marketing'))
+    return 'general';
+  if (lower.includes('cook') || lower.includes('fitness') || lower.includes('meditation') || lower.includes('chess'))
+    return 'general';
   return 'general';
 }
 
