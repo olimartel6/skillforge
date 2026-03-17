@@ -45,7 +45,7 @@ export function WelcomeScreen() {
         <View style={styles.cta}>
           <Button
             title="Begin Your Journey"
-            onPress={() => navigation.navigate('SkillSelection')}
+            onPress={() => navigation.navigate('ProfileSetup')}
           />
         </View>
       </View>

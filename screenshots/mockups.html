@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SkillForge — Marketing Mockups</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #111; color: #fff; padding: 40px; display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; }
+  .phone {
+    width: 280px; min-height: 600px; border-radius: 40px; overflow: hidden;
+    border: 3px solid #222; position: relative; flex-shrink: 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 100px rgba(255,107,53,0.05);
+    background: #0a0a0b;
+  }
+  .phone::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 28px; background: #000; border-radius: 0 0 16px 16px; z-index: 10;
+  }
+  .screen { padding: 48px 20px 20px; min-height: 600px; position: relative; overflow: hidden; }
+  .label { text-align: center; color: #666; font-size: 12px; margin-top: 12px; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* Common */
+  .glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; }
+  .glass-strong { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; }
+  .btn-primary { background: linear-gradient(135deg, #FF6B35, #FF3D00); border-radius: 14px; padding: 14px; text-align: center; font-weight: 700; font-size: 15px; color: #fff; box-shadow: 0 8px 24px rgba(255,107,53,0.3); }
+  .glow-orange { box-shadow: 0 6px 24px rgba(255,107,53,0.2); }
+  .glow-purple { box-shadow: 0 6px 24px rgba(108,99,255,0.2); }
+  .tag { font-size: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.12); display: inline-block; }
+
+  /* Tab bar */
+  .tabbar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 72px;
+    background: rgba(10,10,11,0.85); backdrop-filter: blur(20px);
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: space-around; padding: 0 8px;
+  }
+  .tab { text-align: center; font-size: 9px; color: rgba(255,255,255,0.35); font-weight: 500; }
+  .tab.active { color: #FF6B35; }
+  .tab .dot { width: 4px; height: 4px; border-radius: 2px; background: #FF6B35; margin: 3px auto 0; }
+  .tab-icon { font-size: 18px; margin-bottom: 2px; }
+
+  /* Ambient */
+  .amb { position: absolute; border-radius: 50%; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<!-- 1. HOME / DAILY CHALLENGE -->
+<div>
+<div class="phone">
+  <div class="screen">
+    <div class="amb" style="width:200px;height:200px;top:40px;right:-40px;background:radial-gradient(circle,rgba(255,107,53,0.1),transparent 70%)"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <div>
+        <div style="font-size:12px;color:#555">Good morning</div>
+        <div style="font-size:20px;font-weight:800">Day 12</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.15)">
+        <span style="font-size:14px">🔥</span>
+        <span style="font-weight:800;color:#FF6B35;font-size:15px">12</span>
+      </div>
+    </div>
+
+    <!-- Challenge card -->
+    <div style="border-radius:20px;overflow:hidden;margin-bottom:18px;box-shadow:0 12px 36px rgba(255,107,53,0.12)">
+      <div style="background:linear-gradient(135deg,#FF6B35,#FF3D00,#E62E00);padding:24px 20px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-15px;right:-15px;width:90px;height:90px;border-radius:45px;background:rgba(255,255,255,0.08)"></div>
+        <div style="position:absolute;bottom:-20px;right:30px;width:60px;height:60px;border-radius:30px;background:rgba(255,255,255,0.05)"></div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;opacity:0.7;font-weight:600;margin-bottom:10px">Today's Challenge</div>
+        <div style="font-size:17px;font-weight:800;line-height:1.3;margin-bottom:14px">Master the French Drop coin vanish</div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <span class="tag">⏱ 5 min</span>
+          <span class="tag">🪄 Magic</span>
+          <span class="tag">🪙 Coins</span>
+        </div>
+        <div style="background:#fff;color:#FF3D00;padding:13px;border-radius:12px;text-align:center;font-weight:800;font-size:15px">START PRACTICE</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div style="display:flex;gap:8px;margin-bottom:18px">
+      <div class="glass" style="flex:1;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#FF6B35">12</div>
+        <div style="font-size:9px;color:#555;margin-top:2px">Streak</div>
+      </div>
+      <div class="glass" style="flex:1;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#6C63FF">4</div>
+        <div style="font-size:9px;color:#555;margin-top:2px">Unlocked</div>
+      </div>
+      <div class="glass" style="flex:1;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#34D399">3</div>
+        <div style="font-size:9px;color:#555;margin-top:2px">Badges</div>
+      </div>
+    </div>
+
+    <!-- Recent -->
+    <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Recent</div>
+    <div class="glass" style="padding:12px 14px;display:flex;align-items:center;gap:12px">
+      <div style="width:40px;height:40px;border-radius:12px;background:rgba(108,99,255,0.1);display:flex;align-items:center;justify-content:center;font-size:18px">🪄</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600">Card force practice</div>
+        <div style="font-size:10px;color:#444">Yesterday · 5:00</div>
+      </div>
+      <div style="font-size:10px;color:#34D399;font-weight:600">✓</div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab active"><div class="tab-icon">🏠</div>Home<div class="dot"></div></div>
+      <div class="tab"><div class="tab-icon">🎮</div>Games</div>
+      <div class="tab"><div class="tab-icon">🌳</div>Tree</div>
+      <div class="tab"><div class="tab-icon">👥</div>Social</div>
+      <div class="tab"><div class="tab-icon">👤</div>Profile</div>
+    </div>
+  </div>
+</div>
+<div class="label">Home</div>
+</div>
+
+<!-- 2. GAMES / MINI-JEUX -->
+<div>
+<div class="phone">
+  <div class="screen">
+    <div class="amb" style="width:180px;height:180px;top:30px;left:-30px;background:radial-gradient(circle,rgba(108,99,255,0.08),transparent 70%)"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div>
+        <div style="font-size:20px;font-weight:800">Games</div>
+        <div style="font-size:11px;color:#555">Magic Tricks</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="background:rgba(108,99,255,0.1);padding:6px 12px;border-radius:12px;font-size:11px;font-weight:700;color:#6C63FF">Lv 3</div>
+        <div style="font-size:12px;font-weight:700;color:#FF6B35">450 XP</div>
+      </div>
+    </div>
+
+    <!-- Daily progress -->
+    <div style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#555;margin-bottom:4px">
+        <span>DAILY GOAL</span><span>75/100 XP</span>
+      </div>
+      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden">
+        <div style="width:75%;height:100%;background:linear-gradient(90deg,#FF6B35,#FF3D00);border-radius:2px"></div>
+      </div>
+    </div>
+
+    <!-- Lesson bubbles path -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding-bottom:80px">
+      <!-- Lesson 1 - completed -->
+      <div style="display:flex;flex-direction:column;align-items:center;margin-left:-30px">
+        <div style="width:56px;height:56px;border-radius:28px;background:linear-gradient(135deg,#34D399,#059669);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 16px rgba(52,211,153,0.2)">🪄</div>
+        <div style="font-size:9px;color:#34D399;margin-top:4px;font-weight:600">Magic Basics</div>
+      </div>
+      <div style="width:2px;height:16px;background:linear-gradient(#34D399,#FF6B35);margin:-8px 0"></div>
+
+      <!-- Lesson 2 - completed -->
+      <div style="display:flex;flex-direction:column;align-items:center;margin-left:40px">
+        <div style="width:56px;height:56px;border-radius:28px;background:linear-gradient(135deg,#34D399,#059669);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 16px rgba(52,211,153,0.2)">🃏</div>
+        <div style="font-size:9px;color:#34D399;margin-top:4px;font-weight:600">Card Fundamentals</div>
+      </div>
+      <div style="width:2px;height:16px;background:linear-gradient(#34D399,#FF6B35);margin:-8px 0"></div>
+
+      <!-- Lesson 3 - current (pulsing) -->
+      <div style="display:flex;flex-direction:column;align-items:center;margin-left:-20px">
+        <div style="width:60px;height:60px;border-radius:30px;background:linear-gradient(135deg,#FF6B35,#FF3D00);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 6px 24px rgba(255,107,53,0.3);border:2px solid rgba(255,255,255,0.15)">🪙</div>
+        <div style="font-size:9px;color:#FF6B35;margin-top:4px;font-weight:700">Coin Tricks</div>
+      </div>
+      <div style="width:2px;height:16px;background:rgba(255,255,255,0.06);margin:-8px 0"></div>
+
+      <!-- Lesson 4 - locked -->
+      <div style="display:flex;flex-direction:column;align-items:center;margin-left:50px">
+        <div style="width:56px;height:56px;border-radius:28px;border:2px dashed rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;opacity:0.3">👀</div>
+        <div style="font-size:9px;color:#444;margin-top:4px">Misdirection</div>
+      </div>
+      <div style="width:2px;height:16px;background:rgba(255,255,255,0.04);margin:-8px 0"></div>
+
+      <!-- Lesson 5 - locked -->
+      <div style="display:flex;flex-direction:column;align-items:center;margin-left:-10px">
+        <div style="width:56px;height:56px;border-radius:28px;border:2px dashed rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;opacity:0.3">🃏</div>
+        <div style="font-size:9px;color:#444;margin-top:4px">The Double Lift</div>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab"><div class="tab-icon">🏠</div>Home</div>
+      <div class="tab active"><div class="tab-icon">🎮</div>Games<div class="dot"></div></div>
+      <div class="tab"><div class="tab-icon">🌳</div>Tree</div>
+      <div class="tab"><div class="tab-icon">👥</div>Social</div>
+      <div class="tab"><div class="tab-icon">👤</div>Profile</div>
+    </div>
+  </div>
+</div>
+<div class="label">Mini-Games</div>
+</div>
+
+<!-- 3. GAME SESSION -->
+<div>
+<div class="phone">
+  <div class="screen" style="padding-top:44px">
+    <!-- Progress bar -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <div style="font-size:14px;color:#555">✕</div>
+      <div style="flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden">
+        <div style="width:60%;height:100%;background:linear-gradient(90deg,#FF6B35,#FF3D00);border-radius:3px"></div>
+      </div>
+      <div style="display:flex;gap:3px">
+        <span style="color:#EF4444;font-size:13px">♥</span>
+        <span style="color:#EF4444;font-size:13px">♥</span>
+        <span style="color:rgba(255,255,255,0.15);font-size:13px">♥</span>
+      </div>
+    </div>
+
+    <!-- Combo -->
+    <div style="text-align:center;margin-bottom:8px">
+      <span style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;color:#FF6B35">🔥 x3 Combo</span>
+    </div>
+
+    <!-- Question -->
+    <div style="text-align:center;margin-bottom:28px;padding:0 10px">
+      <div style="font-size:18px;font-weight:800;line-height:1.4;margin-bottom:6px">What is the "French Drop"?</div>
+      <div style="font-size:12px;color:#555">Choose the correct answer</div>
+    </div>
+
+    <!-- Options -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="glass" style="padding:16px;display:flex;align-items:center;gap:12px">
+        <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#888">A</div>
+        <div style="font-size:13px;color:#ccc">Dropping a French coin</div>
+      </div>
+      <div class="glass-strong" style="padding:16px;display:flex;align-items:center;gap:12px;border-color:rgba(52,211,153,0.3);box-shadow:0 4px 16px rgba(52,211,153,0.15)">
+        <div style="width:28px;height:28px;border-radius:8px;background:rgba(52,211,153,0.15);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#34D399">B</div>
+        <div style="font-size:13px;color:#34D399;font-weight:600">A fake transfer where the coin stays hidden ✓</div>
+      </div>
+      <div class="glass" style="padding:16px;display:flex;align-items:center;gap:12px">
+        <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#888">C</div>
+        <div style="font-size:13px;color:#ccc">Flipping a coin in the air</div>
+      </div>
+      <div class="glass" style="padding:16px;display:flex;align-items:center;gap:12px">
+        <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#888">D</div>
+        <div style="font-size:13px;color:#ccc">A coin vanish using a table</div>
+      </div>
+    </div>
+
+    <!-- XP popup -->
+    <div style="text-align:center;margin-top:20px">
+      <span style="font-size:18px;font-weight:900;color:#FF6B35">+20 XP</span>
+    </div>
+  </div>
+</div>
+<div class="label">Quiz Game</div>
+</div>
+
+<!-- 4. AI FEEDBACK -->
+<div>
+<div class="phone">
+  <div class="screen">
+    <div class="amb" style="width:180px;height:180px;top:20px;left:50%;transform:translateX(-50%);background:radial-gradient(circle,rgba(52,211,153,0.08),transparent 70%)"></div>
+
+    <div style="text-align:center;margin-bottom:22px">
+      <div style="width:50px;height:50px;margin:0 auto 10px;border-radius:14px;background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(108,99,255,0.15));display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid rgba(52,211,153,0.2)">✨</div>
+      <div style="font-size:20px;font-weight:800">Practice Complete</div>
+      <div style="font-size:11px;color:#444;margin-top:3px">Day 12 · Magic Tricks · 5:00</div>
+    </div>
+
+    <!-- Strengths -->
+    <div style="border-radius:14px;padding:14px;margin-bottom:8px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.1)">
+      <div style="font-size:10px;font-weight:700;color:#34D399;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Strengths</div>
+      <div style="font-size:12px;color:#aaa;line-height:1.5">Good hand positioning. The coin transfer motion looks natural and smooth.</div>
+    </div>
+
+    <!-- Improve -->
+    <div style="border-radius:14px;padding:14px;margin-bottom:8px;background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.1)">
+      <div style="font-size:10px;font-weight:700;color:#FF6B35;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">To Improve</div>
+      <div style="font-size:12px;color:#aaa;line-height:1.5">Your eyes glanced at the hidden hand. Always look where you want the audience to look.</div>
+    </div>
+
+    <!-- Pro Tip -->
+    <div style="border-radius:14px;padding:14px;margin-bottom:8px;background:rgba(108,99,255,0.06);border:1px solid rgba(108,99,255,0.1)">
+      <div style="font-size:10px;font-weight:700;color:#6C63FF;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Pro Tip</div>
+      <div style="font-size:12px;color:#aaa;line-height:1.5">Practice the French Drop while talking to someone — misdirection is about attention, not speed.</div>
+    </div>
+
+    <!-- Encouragement -->
+    <div style="border-radius:14px;padding:12px;margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);text-align:center">
+      <div style="font-size:12px;color:#666">🎉 <span style="color:#888">12 days strong. You're becoming a real magician!</span></div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <div class="glass" style="flex:1;padding:13px;text-align:center;font-weight:600;font-size:13px;color:#888">Save</div>
+      <div style="flex:1;padding:13px;text-align:center;font-weight:700;font-size:13px;background:linear-gradient(135deg,#6C63FF,#4F46E5);border-radius:14px;box-shadow:0 6px 20px rgba(108,99,255,0.2)">Share</div>
+    </div>
+  </div>
+</div>
+<div class="label">AI Feedback</div>
+</div>
+
+<!-- 5. COMMUNITY -->
+<div>
+<div class="phone">
+  <div class="screen">
+    <div style="font-size:20px;font-weight:800;margin-bottom:16px">Community</div>
+
+    <!-- Post 1 -->
+    <div style="border-radius:18px;overflow:hidden;margin-bottom:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05)">
+      <div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:18px;background:linear-gradient(135deg,#6C63FF,#4F46E5);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">S</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Sofia</div>
+          <div style="font-size:10px;color:#444">Day 18 · 🪄 Magic · <span style="color:#FF6B35">🔥 18</span></div>
+        </div>
+        <div style="font-size:10px;color:#333">2h</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.02);height:140px;display:flex;align-items:center;justify-content:center">
+        <div style="text-align:center;color:#333"><div style="font-size:32px;margin-bottom:4px">🪄✨</div><div style="font-size:10px">Card trick practice</div></div>
+      </div>
+      <div style="padding:12px 14px;display:flex;gap:16px">
+        <span style="font-size:12px;color:#555">❤️ <b>89</b></span>
+        <span style="font-size:12px;color:#555">💬 <b>21</b></span>
+      </div>
+    </div>
+
+    <!-- Post 2 -->
+    <div style="border-radius:18px;overflow:hidden;margin-bottom:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05)">
+      <div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:18px;background:linear-gradient(135deg,#FF6B35,#FF3D00);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">L</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Leo</div>
+          <div style="font-size:10px;color:#444">Day 24 · 📈 Trading · <span style="color:#FF6B35">🔥 24</span></div>
+        </div>
+        <div style="font-size:10px;color:#333">5h</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.02);height:100px;display:flex;align-items:center;justify-content:center">
+        <div style="text-align:center;color:#333"><div style="font-size:32px;margin-bottom:4px">📊📈</div><div style="font-size:10px">Chart analysis session</div></div>
+      </div>
+      <div style="padding:12px 14px;display:flex;gap:16px">
+        <span style="font-size:12px;color:#555">❤️ <b>156</b></span>
+        <span style="font-size:12px;color:#555">💬 <b>34</b></span>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab"><div class="tab-icon">🏠</div>Home</div>
+      <div class="tab"><div class="tab-icon">🎮</div>Games</div>
+      <div class="tab"><div class="tab-icon">🌳</div>Tree</div>
+      <div class="tab active"><div class="tab-icon">👥</div>Social<div class="dot"></div></div>
+      <div class="tab"><div class="tab-icon">👤</div>Profile</div>
+    </div>
+  </div>
+</div>
+<div class="label">Community</div>
+</div>
+
+<!-- 6. SKILL TREE -->
+<div>
+<div class="phone">
+  <div class="screen">
+    <div class="amb" style="width:200px;height:200px;top:60px;right:-40px;background:radial-gradient(circle,rgba(255,107,53,0.06),transparent 70%)"></div>
+
+    <div style="font-size:20px;font-weight:800;margin-bottom:2px">🪄 Magic Tricks</div>
+    <div style="font-size:11px;color:#444;margin-bottom:24px">4 of 9 nodes unlocked</div>
+
+    <!-- Basics -->
+    <div style="margin-bottom:22px">
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:#34D399;font-weight:600;margin-bottom:10px">Basics</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:58px;height:58px;border-radius:16px;background:linear-gradient(135deg,#FF6B35,#FF3D00);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,107,53,0.2)">
+          <div style="font-size:18px">🃏</div><div style="font-size:7px;font-weight:700;margin-top:1px">Cards</div>
+        </div>
+        <div style="width:16px;height:2px;background:linear-gradient(90deg,#FF6B35,#6C63FF);border-radius:1px"></div>
+        <div style="width:58px;height:58px;border-radius:16px;background:linear-gradient(135deg,#FF6B35,#FF3D00);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,107,53,0.2)">
+          <div style="font-size:18px">🪙</div><div style="font-size:7px;font-weight:700;margin-top:1px">Coins</div>
+        </div>
+        <div style="width:16px;height:2px;background:linear-gradient(90deg,#FF6B35,#6C63FF);border-radius:1px"></div>
+        <div style="width:58px;height:58px;border-radius:16px;background:linear-gradient(135deg,#6C63FF,#4F46E5);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(108,99,255,0.2)">
+          <div style="font-size:18px">👀</div><div style="font-size:7px;font-weight:700;margin-top:1px">Misdirect</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Intermediate -->
+    <div style="margin-bottom:22px">
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:#6C63FF;font-weight:600;margin-bottom:10px">Intermediate</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:58px;height:58px;border-radius:16px;background:linear-gradient(135deg,#34D399,#059669);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(52,211,153,0.2)">
+          <div style="font-size:18px">✋</div><div style="font-size:7px;font-weight:700;margin-top:1px">Sleights</div>
+        </div>
+        <div style="width:16px;height:2px;background:rgba(255,255,255,0.06)"></div>
+        <div style="width:58px;height:58px;border-radius:16px;border:2px dashed rgba(255,255,255,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:18px;opacity:0.2">🪢</div><div style="font-size:7px;color:#333;margin-top:1px">Rope</div>
+        </div>
+        <div style="width:16px;height:2px;background:rgba(255,255,255,0.06)"></div>
+        <div style="width:58px;height:58px;border-radius:16px;border:2px dashed rgba(255,255,255,0.1);display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:18px;opacity:0.2">🧠</div><div style="font-size:7px;color:#333;margin-top:1px">Mental</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced -->
+    <div>
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:#333;font-weight:600;margin-bottom:10px">Advanced · Locked</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:58px;height:58px;border-radius:16px;border:2px dashed rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0.3">
+          <div style="font-size:18px">🎪</div><div style="font-size:7px;color:#333;margin-top:1px">Stage</div>
+        </div>
+        <div style="width:16px;height:2px;background:rgba(255,255,255,0.03)"></div>
+        <div style="width:58px;height:58px;border-radius:16px;border:2px dashed rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0.3">
+          <div style="font-size:18px">🎩</div><div style="font-size:7px;color:#333;margin-top:1px">Routine</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab"><div class="tab-icon">🏠</div>Home</div>
+      <div class="tab"><div class="tab-icon">🎮</div>Games</div>
+      <div class="tab active"><div class="tab-icon">🌳</div>Tree<div class="dot"></div></div>
+      <div class="tab"><div class="tab-icon">👥</div>Social</div>
+      <div class="tab"><div class="tab-icon">👤</div>Profile</div>
+    </div>
+  </div>
+</div>
+<div class="label">Skill Tree</div>
+</div>
+
+</body>
+</html>
