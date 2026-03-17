@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { useGameStore } from '../../store/gameStore';
 import { getQuestionsForLesson, getLessonGameCount } from '../../utils/gameQuestions';
 import type { GameQuestion } from '../../utils/gameQuestions';
@@ -36,24 +38,33 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
     useGameStore();
 
   const gameCount = getLessonGameCount(lessonNumber);
-  const [questions] = useState<GameQuestion[]>(() =>
+
+  // Queue: initial questions + missed ones get re-added at the end
+  const [queue, setQueue] = useState<GameQuestion[]>(() =>
     getQuestionsForLesson(skillName, lessonNumber, gameCount),
   );
+  const totalOriginal = useRef(gameCount);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
+  const [mistakeCount, setMistakeCount] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const [sessionMaxCombo, setSessionMaxCombo] = useState(0);
-  const [gameOver, setGameOver] = useState(false);
   const [startTime] = useState(Date.now());
 
-  // Feedback flash
+  // Feedback banner state (Duolingo-style)
+  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [feedbackCorrect, setFeedbackCorrect] = useState(true);
+  const [feedbackAnswer, setFeedbackAnswer] = useState('');
+  const feedbackSlide = useRef(new Animated.Value(200)).current;
+
+  // Flash + XP popup
   const flashOpacity = useRef(new Animated.Value(0)).current;
   const flashColor = useRef('transparent');
   const xpPopAnim = useRef(new Animated.Value(0)).current;
   const xpPopValue = useRef(0);
   const [showXpPop, setShowXpPop] = useState(false);
-  // Key to force re-mount game components between questions
   const [gameKey, setGameKey] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     resetLives();
@@ -63,8 +74,8 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
   const showFlash = (color: string) => {
     flashColor.current = color;
     Animated.sequence([
-      Animated.timing(flashOpacity, { toValue: 0.3, duration: 100, useNativeDriver: true }),
-      Animated.timing(flashOpacity, { toValue: 0, duration: 400, useNativeDriver: true }),
+      Animated.timing(flashOpacity, { toValue: 0.25, duration: 80, useNativeDriver: true }),
+      Animated.timing(flashOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
     ]).start();
   };
 
@@ -72,14 +83,57 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
     xpPopValue.current = amount;
     setShowXpPop(true);
     xpPopAnim.setValue(1);
-    Animated.timing(xpPopAnim, { toValue: 0, duration: 1000, useNativeDriver: true }).start(() => {
+    Animated.timing(xpPopAnim, { toValue: 0, duration: 1200, useNativeDriver: true }).start(() => {
       setShowXpPop(false);
     });
   };
 
+  const showFeedbackBanner = (correct: boolean, answer: string) => {
+    setFeedbackCorrect(correct);
+    setFeedbackAnswer(answer);
+    setFeedbackVisible(true);
+    feedbackSlide.setValue(200);
+    Animated.spring(feedbackSlide, {
+      toValue: 0,
+      friction: 8,
+      tension: 100,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const hideFeedbackAndAdvance = () => {
+    setFeedbackVisible(false);
+    setIsTransitioning(false);
+
+    // Check if lesson is complete
+    if (currentIdx + 1 >= queue.length) {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      navigation.replace('GameResult', {
+        xpEarned,
+        correctCount,
+        totalCount: totalOriginal.current,
+        maxCombo: sessionMaxCombo,
+        lessonNumber,
+        elapsed,
+        mistakeCount,
+      });
+    } else {
+      setCurrentIdx((prev) => prev + 1);
+      setGameKey((prev) => prev + 1);
+    }
+  };
+
   const handleAnswer = useCallback(
     async (correct: boolean) => {
+      if (isTransitioning) return;
+      setIsTransitioning(true);
+
+      const question = queue[currentIdx];
+
       if (correct) {
+        // Haptic success
+        try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); } catch {}
+
         showFlash(colors.success);
         incrementCombo();
         const newCombo = combo + 1;
@@ -89,59 +143,48 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
         setCorrectCount((prev) => prev + 1);
         setSessionMaxCombo((prev) => Math.max(prev, newCombo));
         showXpPopup(bonus);
+
+        // Show green banner briefly then auto-advance
+        showFeedbackBanner(true, '');
+        setTimeout(() => {
+          hideFeedbackAndAdvance();
+        }, 800);
       } else {
+        // Haptic error
+        try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); } catch {}
+
         showFlash(colors.error);
         resetCombo();
+        setMistakeCount((prev) => prev + 1);
         loseLife();
 
-        if (lives - 1 <= 0) {
-          setGameOver(true);
-          return;
-        }
+        // Add this question back to the end of the queue (Duolingo behavior)
+        setQueue((prev) => [...prev, question]);
+
+        // Show red banner with correct answer — user must tap "Continue"
+        const correctAns = typeof question.correctAnswer === 'string'
+          ? question.correctAnswer
+          : Array.isArray(question.correctAnswer)
+            ? question.correctAnswer.join(', ')
+            : String(question.correctAnswer);
+
+        showFeedbackBanner(false, correctAns);
+        // Don't auto-advance — wait for user to tap "Continue"
       }
-
-      // Advance to next question
-      setTimeout(() => {
-        if (currentIdx + 1 >= questions.length) {
-          const elapsed = Math.floor((Date.now() - startTime) / 1000);
-          (navigation as any).replace('GameResult', {
-            xpEarned: xpEarned + (correct ? (combo + 1 >= 3 ? XP_PER_CORRECT * 2 : XP_PER_CORRECT) : 0),
-            correctCount: correctCount + (correct ? 1 : 0),
-            totalCount: questions.length,
-            maxCombo: Math.max(sessionMaxCombo, correct ? combo + 1 : sessionMaxCombo),
-            lessonNumber,
-            elapsed,
-          });
-        } else {
-          setCurrentIdx((prev) => prev + 1);
-          setGameKey((prev) => prev + 1);
-        }
-      }, 400);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentIdx, combo, lives, correctCount, xpEarned, sessionMaxCombo, questions.length],
+    [currentIdx, combo, lives, isTransitioning, queue],
   );
-
-  const handleRetry = () => {
-    resetLives();
-    resetCombo();
-    setCurrentIdx(0);
-    setCorrectCount(0);
-    setXpEarned(0);
-    setSessionMaxCombo(0);
-    setGameOver(false);
-    setGameKey((prev) => prev + 1);
-  };
 
   const handleClose = () => {
     navigation.goBack();
   };
 
-  const question = questions[currentIdx];
-  const progress = (currentIdx + 1) / questions.length;
+  const question = queue[currentIdx];
+  // Progress: show progress through the original question count
+  const progress = Math.min(correctCount / totalOriginal.current, 1);
 
   const renderGame = () => {
-    if (!question) return null;
+    if (!question || feedbackVisible) return null;
     const gameProps = { question, onAnswer: handleAnswer, skillName };
 
     switch (question.type) {
@@ -161,37 +204,6 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
     }
   };
 
-  if (gameOver) {
-    return (
-      <SafeAreaView style={styles.screen} edges={['top']}>
-        <View style={styles.gameOverContainer}>
-          <Text style={styles.gameOverEmoji}>&#128148;</Text>
-          <Text style={styles.gameOverTitle}>Out of Lives!</Text>
-          <Text style={styles.gameOverSub}>
-            You got {correctCount}/{questions.length} correct
-          </Text>
-
-          <View style={styles.gameOverButtons}>
-            <TouchableOpacity onPress={handleRetry} activeOpacity={0.8}>
-              <LinearGradient
-                colors={[colors.primary, colors.primaryDark]}
-                style={styles.retryBtn}
-              >
-                <Text style={styles.retryText}>Try Again</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleClose} activeOpacity={0.7}>
-              <View style={styles.quitBtn}>
-                <Text style={styles.quitText}>Quit</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
       {/* Flash overlay */}
@@ -199,10 +211,7 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
         pointerEvents="none"
         style={[
           styles.flashOverlay,
-          {
-            opacity: flashOpacity,
-            backgroundColor: flashColor.current,
-          },
+          { opacity: flashOpacity, backgroundColor: flashColor.current },
         ]}
       />
 
@@ -214,14 +223,12 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
             styles.xpPop,
             {
               opacity: xpPopAnim,
-              transform: [
-                {
-                  translateY: xpPopAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [-60, 0],
-                  }),
-                },
-              ],
+              transform: [{
+                translateY: xpPopAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-60, 0],
+                }),
+              }],
             },
           ]}
         >
@@ -257,14 +264,14 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
       </View>
 
       {/* Combo */}
-      {combo >= 2 && (
+      {combo >= 2 && !feedbackVisible && (
         <View style={styles.comboContainer}>
           <LinearGradient
             colors={combo >= 3 ? [colors.primary, colors.primaryDark] : ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.04)']}
             style={styles.comboBadge}
           >
             <Text style={styles.comboText}>
-              {combo >= 3 ? `${combo}x COMBO (2x XP!)` : `${combo}x combo`}
+              {combo >= 3 ? `🔥 ${combo}x COMBO · 2x XP!` : `${combo}x combo`}
             </Text>
           </LinearGradient>
         </View>
@@ -272,6 +279,52 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
 
       {/* Game Area */}
       <View style={styles.gameArea}>{renderGame()}</View>
+
+      {/* Feedback Banner (Duolingo-style bottom sheet) */}
+      {feedbackVisible && (
+        <Animated.View
+          style={[
+            styles.feedbackBanner,
+            feedbackCorrect ? styles.feedbackCorrect : styles.feedbackWrong,
+            { transform: [{ translateY: feedbackSlide }] },
+          ]}
+        >
+          <View style={styles.feedbackContent}>
+            <View style={styles.feedbackHeader}>
+              <Text style={styles.feedbackEmoji}>
+                {feedbackCorrect ? '🎉' : '😔'}
+              </Text>
+              <Text style={[styles.feedbackTitle, feedbackCorrect ? styles.feedbackTitleCorrect : styles.feedbackTitleWrong]}>
+                {feedbackCorrect ? 'Correct!' : 'Not quite...'}
+              </Text>
+            </View>
+
+            {!feedbackCorrect && feedbackAnswer && (
+              <View style={styles.correctAnswerBox}>
+                <Text style={styles.correctAnswerLabel}>Correct answer:</Text>
+                <Text style={styles.correctAnswerText}>{feedbackAnswer}</Text>
+              </View>
+            )}
+
+            {!feedbackCorrect && (
+              <Text style={styles.feedbackHint}>
+                This question will come back later so you can practice it again.
+              </Text>
+            )}
+          </View>
+
+          {/* Continue button (only for wrong answers — correct auto-advances) */}
+          {!feedbackCorrect && (
+            <TouchableOpacity
+              onPress={hideFeedbackAndAdvance}
+              activeOpacity={0.8}
+              style={styles.continueBtn}
+            >
+              <Text style={styles.continueBtnText}>Continue</Text>
+            </TouchableOpacity>
+          )}
+        </Animated.View>
+      )}
     </SafeAreaView>
   );
 }
@@ -287,10 +340,12 @@ const styles = StyleSheet.create({
     top: 100,
     alignSelf: 'center',
     zIndex: 99,
-    backgroundColor: 'rgba(255, 107, 53, 0.2)',
+    backgroundColor: 'rgba(255, 107, 53, 0.15)',
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 107, 53, 0.2)',
   },
   xpPopText: { ...typography.h3, color: colors.primary },
 
@@ -312,12 +367,12 @@ const styles = StyleSheet.create({
   closeText: { color: colors.textSecondary, fontSize: 16 },
   progressBarContainer: { flex: 1 },
   progressBarBg: {
-    height: 8,
+    height: 10,
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 4,
+    borderRadius: 5,
     overflow: 'hidden',
   },
-  progressBarFill: { height: '100%', borderRadius: 4 },
+  progressBarFill: { height: '100%', borderRadius: 5 },
   livesContainer: { flexDirection: 'row', gap: 2 },
   heart: { fontSize: 18, color: colors.error },
   heartEmpty: { opacity: 0.2 },
@@ -325,36 +380,93 @@ const styles = StyleSheet.create({
   comboContainer: { alignItems: 'center', marginBottom: spacing.sm },
   comboBadge: {
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xs,
+    paddingVertical: spacing.xs + 2,
     borderRadius: borderRadius.full,
   },
-  comboText: { ...typography.caption, color: '#fff', fontWeight: '700' },
+  comboText: { ...typography.caption, color: '#fff', fontWeight: '700', fontSize: 12 },
 
   gameArea: { flex: 1, justifyContent: 'center' },
 
-  gameOverContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+  // Feedback banner
+  feedbackBanner: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingTop: spacing['2xl'],
+    paddingBottom: Platform.OS === 'ios' ? 40 : spacing['2xl'],
     paddingHorizontal: spacing.xl,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
   },
-  gameOverEmoji: { fontSize: 64, marginBottom: spacing.xl },
-  gameOverTitle: { ...typography.h1, color: colors.textPrimary, marginBottom: spacing.sm },
-  gameOverSub: { ...typography.body, color: colors.textSecondary, marginBottom: spacing['4xl'] },
-  gameOverButtons: { gap: spacing.lg, width: '100%' },
-  retryBtn: {
-    padding: spacing.lg,
-    borderRadius: borderRadius.lg,
-    alignItems: 'center',
+  feedbackCorrect: {
+    backgroundColor: 'rgba(52, 211, 153, 0.12)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(52, 211, 153, 0.2)',
   },
-  retryText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  quitBtn: {
-    padding: spacing.lg,
-    borderRadius: borderRadius.lg,
+  feedbackWrong: {
+    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(239, 68, 68, 0.2)',
+  },
+  feedbackContent: {
+    marginBottom: spacing.lg,
+  },
+  feedbackHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    gap: spacing.md,
+    marginBottom: spacing.md,
+  },
+  feedbackEmoji: {
+    fontSize: 28,
+  },
+  feedbackTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  feedbackTitleCorrect: {
+    color: colors.success,
+  },
+  feedbackTitleWrong: {
+    color: colors.error,
+  },
+  correctAnswerBox: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: borderRadius.md,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  correctAnswerLabel: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.4)',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: spacing.xs,
+  },
+  correctAnswerText: {
+    fontSize: 15,
+    color: colors.success,
+    fontWeight: '600',
+    lineHeight: 22,
+  },
+  feedbackHint: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.35)',
+    fontStyle: 'italic',
+  },
+  continueBtn: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
-  quitText: { color: colors.textSecondary, fontWeight: '600', fontSize: 15 },
+  continueBtnText: {
+    color: colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });
