@@ -156,9 +156,9 @@ export function FeedScreen() {
         <Text style={styles.postTime}>{timeAgo(item.created_at)}</Text>
       </View>
 
-      {/* Media Placeholder */}
+      {/* Media Preview */}
       <View style={styles.mediaPlaceholder}>
-        <Text style={styles.mediaPlaceholderText}>Practice photo/video</Text>
+        <Text style={styles.mediaPlaceholderText}>{item.media_type === 'video' ? '🎬' : '📷'}</Text>
       </View>
 
       {/* Actions */}
@@ -301,8 +301,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   mediaPlaceholderText: {
-    ...typography.bodySmall,
-    color: colors.textMuted,
+    fontSize: 40,
   },
 
   // Actions

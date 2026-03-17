@@ -148,9 +148,9 @@ export function PostDetailScreen() {
                     </View>
                   </View>
 
-                  {/* Media Placeholder */}
+                  {/* Media Preview */}
                   <View style={styles.mediaPlaceholder}>
-                    <Text style={styles.mediaPlaceholderText}>Practice photo/video</Text>
+                    <Text style={styles.mediaPlaceholderText}>{post.media_type === 'video' ? '🎬' : '📷'}</Text>
                   </View>
 
                   {/* Actions */}
@@ -268,8 +268,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   mediaPlaceholderText: {
-    ...typography.body,
-    color: colors.textMuted,
+    fontSize: 40,
   },
 
   // Actions

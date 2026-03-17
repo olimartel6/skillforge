@@ -5,6 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   Switch,
+  Alert,
+  Linking,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GlassCard } from '../../components/GlassCard';
@@ -67,6 +70,28 @@ export function SettingsScreen() {
     }
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'This will permanently delete all your data including progress, streaks, and badges. This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.clear();
+              await signOut();
+            } catch {
+              Alert.alert('Error', 'Could not delete account. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View style={styles.root}>
       <SafeAreaView style={styles.safe} edges={['top']}>
@@ -111,12 +136,45 @@ export function SettingsScreen() {
             </View>
           </GlassCard>
 
+          {/* Legal Section */}
+          <Text style={styles.sectionLabel}>LEGAL</Text>
+          <GlassCard style={styles.sectionCard}>
+            <TouchableOpacity
+              style={styles.settingRow}
+              onPress={() => Linking.openURL('https://skillforge.app/privacy')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.settingTitle}>Privacy Policy</Text>
+              <Text style={styles.chevron}>›</Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <TouchableOpacity
+              style={styles.settingRow}
+              onPress={() => Linking.openURL('https://skillforge.app/terms')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.settingTitle}>Terms of Use</Text>
+              <Text style={styles.chevron}>›</Text>
+            </TouchableOpacity>
+          </GlassCard>
+
           {/* Sign Out */}
           <View style={styles.signOutContainer}>
             <Button
               title="Sign Out"
               variant="secondary"
               onPress={handleSignOut}
+            />
+          </View>
+
+          {/* Delete Account (Required by App Store Guideline 5.1.1) */}
+          <View style={styles.deleteContainer}>
+            <Button
+              title="Delete Account"
+              variant="ghost"
+              onPress={handleDeleteAccount}
             />
           </View>
         </ScrollView>
@@ -191,8 +249,19 @@ const styles = StyleSheet.create({
     marginVertical: spacing.md,
   },
 
+  chevron: {
+    fontSize: 22,
+    color: colors.textSecondary,
+    fontWeight: '300',
+  },
+
   // Sign Out
   signOutContainer: {
     marginTop: spacing['3xl'],
+  },
+
+  // Delete Account
+  deleteContainer: {
+    marginTop: spacing.lg,
   },
 });

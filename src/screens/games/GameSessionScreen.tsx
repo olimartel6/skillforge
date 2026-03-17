@@ -51,7 +51,7 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
   const [sessionMaxCombo, setSessionMaxCombo] = useState(0);
   const [startTime] = useState(Date.now());
 
-  // Feedback banner state (Duolingo-style)
+  // Feedback banner state (interactive)
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackCorrect, setFeedbackCorrect] = useState(true);
   const [feedbackAnswer, setFeedbackAnswer] = useState('');
@@ -158,7 +158,7 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
         setMistakeCount((prev) => prev + 1);
         loseLife();
 
-        // Add this question back to the end of the queue (Duolingo behavior)
+        // Add this question back to the end of the queue (spaced repetition)
         setQueue((prev) => [...prev, question]);
 
         // Show red banner with correct answer — user must tap "Continue"
@@ -280,7 +280,7 @@ export function GameSessionScreen({ navigation, route }: { navigation: any; rout
       {/* Game Area */}
       <View style={styles.gameArea}>{renderGame()}</View>
 
-      {/* Feedback Banner (Duolingo-style bottom sheet) */}
+      {/* Feedback Banner (interactive bottom sheet) */}
       {feedbackVisible && (
         <Animated.View
           style={[

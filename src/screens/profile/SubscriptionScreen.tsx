@@ -5,6 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -142,10 +144,18 @@ export function SubscriptionScreen() {
             disabled={restoring}
           />
 
-          {/* Note */}
-          <Text style={styles.note}>
-            Payment will be charged to your Apple ID account
+          {/* Subscription Terms (Required by App Store Guideline 3.1.2) */}
+          <Text style={styles.terms}>
+            Subscription automatically renews monthly at $6.99/month unless cancelled at least 24 hours before the end of the current period. Payment will be charged to your Apple ID account at confirmation of purchase. You can manage or cancel your subscription in your Apple ID account settings. Any unused portion of a free trial period will be forfeited upon purchase.
           </Text>
+
+          {/* Legal Links */}
+          <TouchableOpacity onPress={() => Linking.openURL('https://skillforge.app/terms')}>
+            <Text style={styles.legalLink}>Terms of Use (EULA)</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Linking.openURL('https://skillforge.app/privacy')}>
+            <Text style={styles.legalLink}>Privacy Policy</Text>
+          </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -247,11 +257,19 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
 
-  // Note
-  note: {
+  // Terms & Legal
+  terms: {
     ...typography.caption,
     color: colors.textMuted,
     textAlign: 'center',
     marginTop: spacing.xl,
+    lineHeight: 18,
+  },
+  legalLink: {
+    ...typography.caption,
+    color: colors.primary,
+    textAlign: 'center',
+    marginTop: spacing.md,
+    textDecorationLine: 'underline',
   },
 });
