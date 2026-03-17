@@ -15,7 +15,11 @@ export function SpotDifferenceGame({ question, onAnswer }: GameProps) {
   const [answered, setAnswered] = useState(false);
 
   const descriptions = question.options || [];
-  const correctDescription = question.correctAnswer as string;
+  const correctDescription = typeof question.correctAnswer === 'string'
+    ? question.correctAnswer
+    : Array.isArray(question.correctAnswer)
+      ? question.correctAnswer[0]
+      : String(question.correctAnswer);
 
   const handleSelect = (desc: string) => {
     if (answered) return;

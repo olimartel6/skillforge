@@ -78,8 +78,8 @@ export function AIFeedbackScreen() {
     setIsSharing(true);
     try {
       await sharePractice(sessionId);
-    } catch (err) {
-      console.error('Share error:', err);
+    } catch {
+      // Share is a no-op locally
     } finally {
       setIsSharing(false);
       navigation.popToTop();

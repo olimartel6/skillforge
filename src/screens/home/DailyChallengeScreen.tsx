@@ -47,7 +47,6 @@ export function DailyChallengeScreen() {
 
   useEffect(() => {
     if (!profile?.id) return;
-    const userId = profile.id;
     const skillId = profile.selected_skill_id;
 
     fetchStreak();

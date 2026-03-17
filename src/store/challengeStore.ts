@@ -94,8 +94,7 @@ export const useChallengeStore = create<ChallengeState>((set, get) => ({
         timerState: { remaining: 300, isRunning: false, isPaused: false },
         isLoading: false,
       });
-    } catch (error) {
-      console.error('Error fetching today challenge:', error);
+    } catch {
       set({ isLoading: false });
     }
   },

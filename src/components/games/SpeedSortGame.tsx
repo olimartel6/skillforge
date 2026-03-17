@@ -12,7 +12,9 @@ interface GameProps {
 }
 
 export function SpeedSortGame({ question, onAnswer }: GameProps) {
-  const correctOrder = question.correctAnswer as string[];
+  const correctOrder = Array.isArray(question.correctAnswer)
+    ? question.correctAnswer
+    : [String(question.correctAnswer)];
 
   const shuffled = useMemo(() => {
     const arr = [...(question.options || correctOrder)];

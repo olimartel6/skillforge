@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,8 +12,6 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
 import { CommunityPost } from '../../utils/types';
-import { supabase } from '../../services/supabase';
-import { useUserStore } from '../../store/userStore';
 
 const PAGE_SIZE = 20;
 
@@ -124,7 +122,6 @@ const FAKE_POSTS: CommunityPost[] = [
 
 export function FeedScreen() {
   const navigation = useNavigation<any>();
-  const profile = useUserStore((s) => s.profile);
   const [posts, setPosts] = useState<CommunityPost[]>(FAKE_POSTS);
   const [loading, setLoading] = useState(false);
 

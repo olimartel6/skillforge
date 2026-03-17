@@ -8,15 +8,13 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
 import { CommunityPost, Comment } from '../../utils/types';
-import { supabase } from '../../services/supabase';
-import { useUserStore } from '../../store/userStore';
+import { useCommunityStore } from '../../store/communityStore';
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -42,140 +40,74 @@ function AvatarCircle({ username, size = 36 }: { username: string; size?: number
   );
 }
 
+// Fake post data matching FeedScreen's fake posts
+const FAKE_POSTS: Record<string, CommunityPost> = {
+  fp1: { id: 'fp1', user_id: 'u1', challenge_id: 'c1', skill_id: 's1', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 25).toISOString(), user: { id: 'u1', username: 'Maya', avatar_url: null }, skill: { name: 'Drawing', icon: '✏️' }, like_count: 47, comment_count: 12, is_liked: false },
+  fp2: { id: 'fp2', user_id: 'u2', challenge_id: 'c2', skill_id: 's2', media_url: null, media_type: 'video', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(), user: { id: 'u2', username: 'Jake', avatar_url: null }, skill: { name: 'Guitar', icon: '🎸' }, like_count: 23, comment_count: 5, is_liked: true },
+  fp3: { id: 'fp3', user_id: 'u3', challenge_id: 'c3', skill_id: 's3', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 180).toISOString(), user: { id: 'u3', username: 'Sofia', avatar_url: null }, skill: { name: 'Magic Tricks', icon: '🪄' }, like_count: 89, comment_count: 21, is_liked: false },
+  fp4: { id: 'fp4', user_id: 'u4', challenge_id: 'c4', skill_id: 's4', media_url: null, media_type: 'video', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 300).toISOString(), user: { id: 'u4', username: 'Leo', avatar_url: null }, skill: { name: 'Beatboxing', icon: '🥁' }, like_count: 156, comment_count: 34, is_liked: true },
+  fp5: { id: 'fp5', user_id: 'u5', challenge_id: 'c5', skill_id: 's5', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 420).toISOString(), user: { id: 'u5', username: 'Aria', avatar_url: null }, skill: { name: 'Dance', icon: '💃' }, like_count: 212, comment_count: 45, is_liked: false },
+  fp6: { id: 'fp6', user_id: 'u6', challenge_id: 'c6', skill_id: 's6', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 600).toISOString(), user: { id: 'u6', username: 'Marcus', avatar_url: null }, skill: { name: 'Photography', icon: '📸' }, like_count: 78, comment_count: 9, is_liked: false },
+  fp7: { id: 'fp7', user_id: 'u7', challenge_id: 'c7', skill_id: 's7', media_url: null, media_type: 'video', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 800).toISOString(), user: { id: 'u7', username: 'Zara', avatar_url: null }, skill: { name: 'Singing', icon: '🎤' }, like_count: 341, comment_count: 67, is_liked: true },
+  fp8: { id: 'fp8', user_id: 'u8', challenge_id: 'c8', skill_id: 's8', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 1000).toISOString(), user: { id: 'u8', username: 'Kai', avatar_url: null }, skill: { name: 'Stand-up Comedy', icon: '😂' }, like_count: 534, comment_count: 89, is_liked: false },
+  fp9: { id: 'fp9', user_id: 'u9', challenge_id: 'c9', skill_id: 's9', media_url: null, media_type: 'video', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 1200).toISOString(), user: { id: 'u9', username: 'Nina', avatar_url: null }, skill: { name: 'Piano', icon: '🎹' }, like_count: 167, comment_count: 28, is_liked: false },
+  fp10: { id: 'fp10', user_id: 'u10', challenge_id: 'c10', skill_id: 's10', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 1440).toISOString(), user: { id: 'u10', username: 'Alex', avatar_url: null }, skill: { name: 'Calligraphy', icon: '🖊️' }, like_count: 92, comment_count: 14, is_liked: true },
+};
+
 export function PostDetailScreen() {
   const route = useRoute<any>();
   const { practiceId } = route.params;
-  const profile = useUserStore((s) => s.profile);
+  const fetchComments = useCommunityStore((s) => s.fetchComments);
+  const addComment = useCommunityStore((s) => s.addComment);
+
   const [post, setPost] = useState<CommunityPost | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState('');
-  const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
 
-  const fetchPost = useCallback(async () => {
-    if (!profile?.id) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('practice_sessions')
-        .select(`
-          *,
-          user:users!user_id(id, username, avatar_url),
-          skill:skills!skill_id(name, icon)
-        `)
-        .eq('id', practiceId)
-        .single();
-
-      if (error) throw error;
-
-      const [likesRes, commentsRes, likedRes] = await Promise.all([
-        supabase.from('likes').select('*', { count: 'exact', head: true }).eq('practice_id', practiceId),
-        supabase.from('comments').select('*', { count: 'exact', head: true }).eq('practice_id', practiceId),
-        supabase.from('likes').select('id').eq('practice_id', practiceId).eq('user_id', profile.id).maybeSingle(),
-      ]);
-
-      setPost({
-        ...data,
-        user: data.user,
-        skill: data.skill,
-        like_count: likesRes.count || 0,
-        comment_count: commentsRes.count || 0,
-        is_liked: !!likedRes.data,
-      } as CommunityPost);
-    } catch (err) {
-      console.error('Error fetching post:', err);
-    }
-  }, [practiceId, profile?.id]);
-
-  const fetchComments = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('comments')
-        .select(`
-          *,
-          user:users!user_id(id, username, avatar_url)
-        `)
-        .eq('practice_id', practiceId)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setComments((data || []) as Comment[]);
-    } catch (err) {
-      console.error('Error fetching comments:', err);
-    }
-  }, [practiceId]);
-
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      await Promise.all([fetchPost(), fetchComments()]);
-      setLoading(false);
-    };
-    load();
-  }, [fetchPost, fetchComments]);
+    // Load post from fake data
+    const fakePost = FAKE_POSTS[practiceId] || null;
+    setPost(fakePost);
 
-  const toggleLike = async () => {
-    if (!profile?.id || !post) return;
+    // Load comments from local store
+    fetchComments(practiceId).then(setComments);
+  }, [practiceId, fetchComments]);
 
-    const prevPost = post;
+  const toggleLike = () => {
+    if (!post) return;
     setPost({
       ...post,
       is_liked: !post.is_liked,
       like_count: post.is_liked ? post.like_count - 1 : post.like_count + 1,
     });
-
-    try {
-      if (prevPost.is_liked) {
-        await supabase.from('likes').delete().eq('practice_id', post.id).eq('user_id', profile.id);
-      } else {
-        await supabase.from('likes').insert({ practice_id: post.id, user_id: profile.id });
-      }
-    } catch (err) {
-      setPost(prevPost);
-    }
   };
 
-  const sendComment = async () => {
-    if (!profile?.id || !commentText.trim()) return;
+  const sendComment = () => {
+    if (!commentText.trim()) return;
 
     setSending(true);
-    try {
-      const { data, error } = await supabase
-        .from('comments')
-        .insert({
-          practice_id: practiceId,
-          user_id: profile.id,
-          text: commentText.trim(),
-        })
-        .select(`*, user:users!user_id(id, username, avatar_url)`)
-        .single();
+    const text = commentText.trim();
 
-      if (error) throw error;
+    const newComment: Comment = {
+      id: `local-comment-${Date.now()}`,
+      user_id: 'local-user',
+      practice_id: practiceId,
+      text,
+      created_at: new Date().toISOString(),
+      user: { id: 'local-user', username: 'You', avatar_url: null },
+    };
 
-      setComments((prev) => [...prev, data as Comment]);
-      setCommentText('');
+    addComment(practiceId, text);
+    setComments((prev) => [...prev, newComment]);
+    setCommentText('');
 
-      if (post) {
-        setPost({ ...post, comment_count: post.comment_count + 1 });
-      }
-    } catch (err) {
-      console.error('Error sending comment:', err);
-    } finally {
-      setSending(false);
+    if (post) {
+      setPost({ ...post, comment_count: post.comment_count + 1 });
     }
-  };
 
-  if (loading) {
-    return (
-      <View style={styles.root}>
-        <SafeAreaView style={styles.safe} edges={['top']}>
-          <View style={styles.centered}>
-            <ActivityIndicator color={colors.primary} size="large" />
-          </View>
-        </SafeAreaView>
-      </View>
-    );
-  }
+    setSending(false);
+  };
 
   const renderComment = ({ item }: { item: Comment }) => (
     <View style={styles.commentRow}>
@@ -285,11 +217,6 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   list: {
     paddingHorizontal: spacing.xl,

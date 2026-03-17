@@ -50,8 +50,8 @@ export function ProfileScreen() {
             .single();
           if (data) setSkillName((data as Skill).name);
         }
-      } catch (err) {
-        console.error('Error loading profile data:', err);
+      } catch {
+        // Profile data may not be available from Supabase
       }
     };
 
@@ -61,8 +61,8 @@ export function ProfileScreen() {
   const handleSignOut = async () => {
     try {
       await signOut();
-    } catch (err) {
-      console.error('Error signing out:', err);
+    } catch {
+      // Sign out error
     }
   };
 

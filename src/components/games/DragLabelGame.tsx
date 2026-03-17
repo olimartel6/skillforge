@@ -12,7 +12,9 @@ interface GameProps {
 }
 
 export function DragLabelGame({ question, onAnswer }: GameProps) {
-  const correctLabels = question.correctAnswer as string[];
+  const correctLabels = Array.isArray(question.correctAnswer)
+    ? question.correctAnswer
+    : [String(question.correctAnswer)];
   const availableLabels = useMemo(() => {
     const labels = [...(question.options || correctLabels)];
     for (let i = labels.length - 1; i > 0; i--) {

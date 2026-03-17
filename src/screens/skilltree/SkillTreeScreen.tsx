@@ -50,8 +50,8 @@ export function SkillTreeScreen() {
         if (storedProgress) {
           setProgress(new Set(JSON.parse(storedProgress)));
         }
-      } catch (err) {
-        console.error('Error loading skill tree:', err);
+      } catch {
+        // Skill tree data may not be available
       } finally {
         setLoading(false);
       }

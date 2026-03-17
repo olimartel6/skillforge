@@ -30,8 +30,8 @@ export function SettingsScreen() {
       try {
         const enabled = await AsyncStorage.getItem(REMINDER_KEY);
         setReminderEnabled(enabled === 'true');
-      } catch (err) {
-        console.error('Error loading settings:', err);
+      } catch {
+        // Settings may not be available
       }
     };
     loadSettings();
@@ -54,8 +54,7 @@ export function SettingsScreen() {
         await Notifications.cancelAllScheduledNotificationsAsync();
         await AsyncStorage.setItem(REMINDER_KEY, 'false');
       }
-    } catch (err) {
-      console.error('Error toggling reminder:', err);
+    } catch {
       setReminderEnabled(!value);
     }
   };
@@ -63,8 +62,8 @@ export function SettingsScreen() {
   const handleSignOut = async () => {
     try {
       await signOut();
-    } catch (err) {
-      console.error('Error signing out:', err);
+    } catch {
+      // Sign out error
     }
   };
 

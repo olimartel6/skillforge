@@ -36,7 +36,6 @@ export function PracticeSessionScreen() {
   const { remaining, isRunning, isPaused, start, pause, resume, reset, progress } =
     useTimer(durationSeconds);
 
-  const [isRecording, setIsRecording] = useState(false);
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const cameraRef = useRef<CameraView>(null);
   const [permission, requestPermission] = useCameraPermissions();
@@ -94,8 +93,8 @@ export function PracticeSessionScreen() {
       try {
         const photo = await cameraRef.current.takePictureAsync({ quality: 0.7 });
         setCapturedUri(photo.uri);
-      } catch (err) {
-        console.error('Camera capture error:', err);
+      } catch {
+        // Camera capture may fail if not ready
       }
     }
 
@@ -156,8 +155,7 @@ export function PracticeSessionScreen() {
         duration: challenge.duration_minutes,
         dayNumber: todayNode?.day_number ?? 1,
       });
-    } catch (err) {
-      console.error('Session save error:', err);
+    } catch {
       navigation.goBack();
     }
   };

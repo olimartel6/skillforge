@@ -18,7 +18,9 @@ export function TimedChallengeGame({ question, onAnswer }: GameProps) {
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const progressAnim = useRef(new Animated.Value(1)).current;
 
-  const correctAnswers = question.correctAnswer as string[];
+  const correctAnswers = Array.isArray(question.correctAnswer)
+    ? question.correctAnswer
+    : [String(question.correctAnswer)];
   const requiredCount = correctAnswers.length;
 
   useEffect(() => {

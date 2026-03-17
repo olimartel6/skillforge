@@ -17,7 +17,9 @@ interface Card {
 }
 
 export function MemoryCardsGame({ question, onAnswer }: GameProps) {
-  const pairValues = question.correctAnswer as string[];
+  const pairValues = Array.isArray(question.correctAnswer)
+    ? question.correctAnswer
+    : [String(question.correctAnswer)];
 
   const cards = useMemo(() => {
     const allCards: Card[] = [];
