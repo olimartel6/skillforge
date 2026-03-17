@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommunityPost, Comment } from '../utils/types';
+import { FAKE_COMMENTS as SEED_COMMENTS } from '../screens/community/fakeData';
 
 interface CommunityState {
   feed: CommunityPost[];
@@ -12,25 +13,6 @@ interface CommunityState {
   fetchComments: (practiceId: string) => Promise<Comment[]>;
   sharePractice: (sessionId: string) => Promise<void>;
 }
-
-const FAKE_COMMENTS: Comment[] = [
-  {
-    id: 'fc1',
-    user_id: 'u2',
-    practice_id: 'fp1',
-    text: 'Love the progress! Keep it up!',
-    created_at: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
-    user: { id: 'u2', username: 'Jake', avatar_url: null },
-  },
-  {
-    id: 'fc2',
-    user_id: 'u3',
-    practice_id: 'fp1',
-    text: 'This is amazing work!',
-    created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-    user: { id: 'u3', username: 'Sofia', avatar_url: null },
-  },
-];
 
 const STORAGE_KEY = 'community_comments';
 
@@ -96,7 +78,7 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
       const allComments: Comment[] = stored ? JSON.parse(stored) : [];
       const forPost = allComments.filter((c) => c.practice_id === practiceId);
       // Include fake seed comments for demo posts
-      const seed = FAKE_COMMENTS.filter((c) => c.practice_id === practiceId);
+      const seed = SEED_COMMENTS.filter((c) => c.practice_id === practiceId);
       return [...seed, ...forPost];
     } catch {
       return [];

@@ -14,7 +14,15 @@ import { useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
 import { CommunityPost, Comment } from '../../utils/types';
-import { useCommunityStore } from '../../store/communityStore';
+import {
+  FAKE_POSTS,
+  FAKE_POSTS_BY_ID,
+  FAKE_COMMENTS,
+  AVATAR_GRADIENTS,
+  PRACTICE_DESCRIPTIONS,
+  POST_DAY_NUMBERS,
+  POST_STREAKS,
+} from './fakeData';
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -27,10 +35,24 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`;
 }
 
+function getAvatarGradient(username: string): [string, string] {
+  const postIndex = FAKE_POSTS.findIndex((p) => p.user?.username === username);
+  if (postIndex >= 0) {
+    return AVATAR_GRADIENTS[postIndex % AVATAR_GRADIENTS.length];
+  }
+  // Fallback: hash the username to pick a gradient
+  let hash = 0;
+  for (let i = 0; i < username.length; i++) {
+    hash = (hash * 31 + username.charCodeAt(i)) % AVATAR_GRADIENTS.length;
+  }
+  return AVATAR_GRADIENTS[Math.abs(hash) % AVATAR_GRADIENTS.length];
+}
+
 function AvatarCircle({ username, size = 36 }: { username: string; size?: number }) {
+  const gradientColors = getAvatarGradient(username);
   return (
     <LinearGradient
-      colors={[colors.secondary, colors.secondaryDark]}
+      colors={gradientColors}
       style={[styles.avatar, { width: size, height: size, borderRadius: size / 2 }]}
     >
       <Text style={[styles.avatarText, { fontSize: size * 0.38 }]}>
@@ -40,25 +62,9 @@ function AvatarCircle({ username, size = 36 }: { username: string; size?: number
   );
 }
 
-// Fake post data matching FeedScreen's fake posts
-const FAKE_POSTS: Record<string, CommunityPost> = {
-  fp1: { id: 'fp1', user_id: 'u1', challenge_id: 'c1', skill_id: 's1', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 25).toISOString(), user: { id: 'u1', username: 'Maya', avatar_url: null }, skill: { name: 'Drawing', icon: '✏️' }, like_count: 47, comment_count: 12, is_liked: false },
-  fp2: { id: 'fp2', user_id: 'u2', challenge_id: 'c2', skill_id: 's2', media_url: null, media_type: 'video', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(), user: { id: 'u2', username: 'Jake', avatar_url: null }, skill: { name: 'Guitar', icon: '🎸' }, like_count: 23, comment_count: 5, is_liked: true },
-  fp3: { id: 'fp3', user_id: 'u3', challenge_id: 'c3', skill_id: 's3', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 180).toISOString(), user: { id: 'u3', username: 'Sofia', avatar_url: null }, skill: { name: 'Magic Tricks', icon: '🪄' }, like_count: 89, comment_count: 21, is_liked: false },
-  fp4: { id: 'fp4', user_id: 'u4', challenge_id: 'c4', skill_id: 's4', media_url: null, media_type: 'video', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 300).toISOString(), user: { id: 'u4', username: 'Leo', avatar_url: null }, skill: { name: 'Beatboxing', icon: '🥁' }, like_count: 156, comment_count: 34, is_liked: true },
-  fp5: { id: 'fp5', user_id: 'u5', challenge_id: 'c5', skill_id: 's5', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 420).toISOString(), user: { id: 'u5', username: 'Aria', avatar_url: null }, skill: { name: 'Dance', icon: '💃' }, like_count: 212, comment_count: 45, is_liked: false },
-  fp6: { id: 'fp6', user_id: 'u6', challenge_id: 'c6', skill_id: 's6', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 600).toISOString(), user: { id: 'u6', username: 'Marcus', avatar_url: null }, skill: { name: 'Photography', icon: '📸' }, like_count: 78, comment_count: 9, is_liked: false },
-  fp7: { id: 'fp7', user_id: 'u7', challenge_id: 'c7', skill_id: 's7', media_url: null, media_type: 'video', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 800).toISOString(), user: { id: 'u7', username: 'Zara', avatar_url: null }, skill: { name: 'Singing', icon: '🎤' }, like_count: 341, comment_count: 67, is_liked: true },
-  fp8: { id: 'fp8', user_id: 'u8', challenge_id: 'c8', skill_id: 's8', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 1000).toISOString(), user: { id: 'u8', username: 'Kai', avatar_url: null }, skill: { name: 'Stand-up Comedy', icon: '😂' }, like_count: 534, comment_count: 89, is_liked: false },
-  fp9: { id: 'fp9', user_id: 'u9', challenge_id: 'c9', skill_id: 's9', media_url: null, media_type: 'video', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 1200).toISOString(), user: { id: 'u9', username: 'Nina', avatar_url: null }, skill: { name: 'Piano', icon: '🎹' }, like_count: 167, comment_count: 28, is_liked: false },
-  fp10: { id: 'fp10', user_id: 'u10', challenge_id: 'c10', skill_id: 's10', media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true, created_at: new Date(Date.now() - 1000 * 60 * 1440).toISOString(), user: { id: 'u10', username: 'Alex', avatar_url: null }, skill: { name: 'Calligraphy', icon: '🖊️' }, like_count: 92, comment_count: 14, is_liked: true },
-};
-
 export function PostDetailScreen() {
   const route = useRoute<any>();
   const { practiceId } = route.params;
-  const fetchComments = useCommunityStore((s) => s.fetchComments);
-  const addComment = useCommunityStore((s) => s.addComment);
 
   const [post, setPost] = useState<CommunityPost | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -66,13 +72,14 @@ export function PostDetailScreen() {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    // Load post from fake data
-    const fakePost = FAKE_POSTS[practiceId] || null;
+    // Load post from shared fake data
+    const fakePost = FAKE_POSTS_BY_ID[practiceId] || null;
     setPost(fakePost);
 
-    // Load comments from local store
-    fetchComments(practiceId).then(setComments);
-  }, [practiceId, fetchComments]);
+    // Load comments from fake data
+    const postComments = FAKE_COMMENTS.filter((c) => c.practice_id === practiceId);
+    setComments(postComments);
+  }, [practiceId]);
 
   const toggleLike = () => {
     if (!post) return;
@@ -98,7 +105,6 @@ export function PostDetailScreen() {
       user: { id: 'local-user', username: 'You', avatar_url: null },
     };
 
-    addComment(practiceId, text);
     setComments((prev) => [...prev, newComment]);
     setCommentText('');
 
@@ -119,6 +125,11 @@ export function PostDetailScreen() {
       </View>
     </View>
   );
+
+  const skillName = post?.skill?.name || '';
+  const desc = PRACTICE_DESCRIPTIONS[skillName];
+  const dayNumber = post ? (POST_DAY_NUMBERS[post.id] || 1) : 1;
+  const streak = post ? (POST_STREAKS[post.id] || 3) : 3;
 
   return (
     <View style={styles.root}>
@@ -143,14 +154,19 @@ export function PostDetailScreen() {
                     <View style={styles.postHeaderText}>
                       <Text style={styles.postUsername}>{post.user?.username || 'User'}</Text>
                       <Text style={styles.postMeta}>
-                        {post.skill?.icon} {post.skill?.name} · {timeAgo(post.created_at)}
+                        Day {dayNumber} · {post.skill?.icon} {post.skill?.name} · <Text style={{ color: colors.primary }}>🔥 {streak}</Text> · {timeAgo(post.created_at)}
                       </Text>
                     </View>
                   </View>
 
+                  {/* Practice description */}
+                  {desc && (
+                    <Text style={styles.practiceDescription}>{desc.text}</Text>
+                  )}
+
                   {/* Media Preview */}
                   <View style={styles.mediaPlaceholder}>
-                    <Text style={styles.mediaPlaceholderText}>{post.media_type === 'video' ? '🎬' : '📷'}</Text>
+                    <Text style={styles.mediaPlaceholderText}>{desc?.emoji || (post.media_type === 'video' ? '🎬' : '📷')}</Text>
                   </View>
 
                   {/* Actions */}
@@ -256,6 +272,11 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.textSecondary,
     marginTop: 2,
+  },
+  practiceDescription: {
+    ...typography.body,
+    color: colors.textSecondary,
+    marginBottom: spacing.lg,
   },
 
   // Media

@@ -12,6 +12,13 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
 import { CommunityPost } from '../../utils/types';
+import {
+  FAKE_POSTS,
+  AVATAR_GRADIENTS,
+  PRACTICE_DESCRIPTIONS,
+  POST_DAY_NUMBERS,
+  POST_STREAKS,
+} from './fakeData';
 
 const PAGE_SIZE = 20;
 
@@ -26,99 +33,16 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`;
 }
 
-function AvatarCircle({ username }: { username: string }) {
+function AvatarCircle({ username, gradientColors }: { username: string; gradientColors: [string, string] }) {
   return (
     <LinearGradient
-      colors={[colors.secondary, colors.secondaryDark]}
+      colors={gradientColors}
       style={styles.avatar}
     >
       <Text style={styles.avatarText}>{username.charAt(0).toUpperCase()}</Text>
     </LinearGradient>
   );
 }
-
-const FAKE_POSTS: CommunityPost[] = [
-  {
-    id: 'fp1', user_id: 'u1', challenge_id: 'c1', skill_id: 's1',
-    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-    user: { id: 'u1', username: 'Maya', avatar_url: null },
-    skill: { name: 'Drawing', icon: '✏️' },
-    like_count: 47, comment_count: 12, is_liked: false,
-  },
-  {
-    id: 'fp2', user_id: 'u2', challenge_id: 'c2', skill_id: 's2',
-    media_url: null, media_type: 'video', ai_feedback: null, is_shared: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
-    user: { id: 'u2', username: 'Jake', avatar_url: null },
-    skill: { name: 'Guitar', icon: '🎸' },
-    like_count: 23, comment_count: 5, is_liked: true,
-  },
-  {
-    id: 'fp3', user_id: 'u3', challenge_id: 'c3', skill_id: 's3',
-    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-    user: { id: 'u3', username: 'Sofia', avatar_url: null },
-    skill: { name: 'Magic Tricks', icon: '🪄' },
-    like_count: 89, comment_count: 21, is_liked: false,
-  },
-  {
-    id: 'fp4', user_id: 'u4', challenge_id: 'c4', skill_id: 's4',
-    media_url: null, media_type: 'video', ai_feedback: null, is_shared: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 300).toISOString(),
-    user: { id: 'u4', username: 'Leo', avatar_url: null },
-    skill: { name: 'Beatboxing', icon: '🥁' },
-    like_count: 156, comment_count: 34, is_liked: true,
-  },
-  {
-    id: 'fp5', user_id: 'u5', challenge_id: 'c5', skill_id: 's5',
-    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 420).toISOString(),
-    user: { id: 'u5', username: 'Aria', avatar_url: null },
-    skill: { name: 'Dance', icon: '💃' },
-    like_count: 212, comment_count: 45, is_liked: false,
-  },
-  {
-    id: 'fp6', user_id: 'u6', challenge_id: 'c6', skill_id: 's6',
-    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 600).toISOString(),
-    user: { id: 'u6', username: 'Marcus', avatar_url: null },
-    skill: { name: 'Photography', icon: '📸' },
-    like_count: 78, comment_count: 9, is_liked: false,
-  },
-  {
-    id: 'fp7', user_id: 'u7', challenge_id: 'c7', skill_id: 's7',
-    media_url: null, media_type: 'video', ai_feedback: null, is_shared: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 800).toISOString(),
-    user: { id: 'u7', username: 'Zara', avatar_url: null },
-    skill: { name: 'Singing', icon: '🎤' },
-    like_count: 341, comment_count: 67, is_liked: true,
-  },
-  {
-    id: 'fp8', user_id: 'u8', challenge_id: 'c8', skill_id: 's8',
-    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 1000).toISOString(),
-    user: { id: 'u8', username: 'Kai', avatar_url: null },
-    skill: { name: 'Stand-up Comedy', icon: '😂' },
-    like_count: 534, comment_count: 89, is_liked: false,
-  },
-  {
-    id: 'fp9', user_id: 'u9', challenge_id: 'c9', skill_id: 's9',
-    media_url: null, media_type: 'video', ai_feedback: null, is_shared: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 1200).toISOString(),
-    user: { id: 'u9', username: 'Nina', avatar_url: null },
-    skill: { name: 'Piano', icon: '🎹' },
-    like_count: 167, comment_count: 28, is_liked: false,
-  },
-  {
-    id: 'fp10', user_id: 'u10', challenge_id: 'c10', skill_id: 's10',
-    media_url: null, media_type: 'photo', ai_feedback: null, is_shared: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 1440).toISOString(),
-    user: { id: 'u10', username: 'Alex', avatar_url: null },
-    skill: { name: 'Calligraphy', icon: '🖊️' },
-    like_count: 92, comment_count: 14, is_liked: true,
-  },
-];
 
 export function FeedScreen() {
   const navigation = useNavigation<any>();
@@ -138,52 +62,65 @@ export function FeedScreen() {
     );
   };
 
-  const renderPost = ({ item }: { item: CommunityPost }) => (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      onPress={() => navigation.navigate('PostDetail', { practiceId: item.id })}
-      style={styles.postCard}
-    >
-      {/* Header */}
-      <View style={styles.postHeader}>
-        <AvatarCircle username={item.user?.username || 'U'} />
-        <View style={styles.postHeaderText}>
-          <Text style={styles.postUsername}>{item.user?.username || 'User'}</Text>
-          <Text style={styles.postMeta}>
-            Day {Math.floor(Math.random() * 28) + 1} · {item.skill?.icon} {item.skill?.name} · <Text style={{ color: colors.primary }}>🔥 {Math.floor(Math.random() * 25) + 3}</Text>
-          </Text>
+  const renderPost = ({ item, index }: { item: CommunityPost; index: number }) => {
+    const gradientColors = AVATAR_GRADIENTS[index % AVATAR_GRADIENTS.length];
+    const skillName = item.skill?.name || '';
+    const desc = PRACTICE_DESCRIPTIONS[skillName];
+    const dayNumber = POST_DAY_NUMBERS[item.id] || 1;
+    const streak = POST_STREAKS[item.id] || 3;
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() => navigation.navigate('PostDetail', { practiceId: item.id })}
+        style={styles.postCard}
+      >
+        {/* Header */}
+        <View style={styles.postHeader}>
+          <AvatarCircle username={item.user?.username || 'U'} gradientColors={gradientColors} />
+          <View style={styles.postHeaderText}>
+            <Text style={styles.postUsername}>{item.user?.username || 'User'}</Text>
+            <Text style={styles.postMeta}>
+              Day {dayNumber} · {item.skill?.icon} {item.skill?.name} · <Text style={{ color: colors.primary }}>🔥 {streak}</Text>
+            </Text>
+          </View>
+          <Text style={styles.postTime}>{timeAgo(item.created_at)}</Text>
         </View>
-        <Text style={styles.postTime}>{timeAgo(item.created_at)}</Text>
-      </View>
 
-      {/* Media Preview */}
-      <View style={styles.mediaPlaceholder}>
-        <Text style={styles.mediaPlaceholderText}>{item.media_type === 'video' ? '🎬' : '📷'}</Text>
-      </View>
+        {/* Practice description */}
+        {desc && (
+          <Text style={styles.practiceDescription}>{desc.text}</Text>
+        )}
 
-      {/* Actions */}
-      <View style={styles.postActions}>
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => toggleLike(item)}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.actionIcon}>{item.is_liked ? '❤️' : '🤍'}</Text>
-          <Text style={[styles.actionCount, item.is_liked && { color: colors.error }]}>
-            {item.like_count}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('PostDetail', { practiceId: item.id })}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.actionIcon}>💬</Text>
-          <Text style={styles.actionCount}>{item.comment_count}</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  );
+        {/* Media Preview */}
+        <View style={styles.mediaPlaceholder}>
+          <Text style={styles.mediaPlaceholderText}>{desc?.emoji || (item.media_type === 'video' ? '🎬' : '📷')}</Text>
+        </View>
+
+        {/* Actions */}
+        <View style={styles.postActions}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => toggleLike(item)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.actionIcon}>{item.is_liked ? '❤️' : '🤍'}</Text>
+            <Text style={[styles.actionCount, item.is_liked && { color: colors.error }]}>
+              {item.like_count}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('PostDetail', { practiceId: item.id })}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.actionIcon}>💬</Text>
+            <Text style={styles.actionCount}>{item.comment_count}</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   if (loading) {
     return (
@@ -291,6 +228,12 @@ const styles = StyleSheet.create({
   postTime: {
     ...typography.caption,
     color: colors.textMuted,
+  },
+  practiceDescription: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
   },
 
   // Media
