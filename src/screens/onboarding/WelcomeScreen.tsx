@@ -34,7 +34,7 @@ export function WelcomeScreen() {
         </View>
 
         {/* Title */}
-        <Text style={styles.title}>SkillForge</Text>
+        <Text style={styles.title}>Skilly</Text>
         <Text style={styles.subtitle}>TALENT IS PRACTICE</Text>
         <Text style={styles.body}>
           Master any creative skill{'\n'}

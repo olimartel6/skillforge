@@ -9,7 +9,7 @@ export async function requestPermissions(): Promise<boolean> {
 export async function scheduleDailyReminder(hour: number = 20, minute: number = 0) {
   await Notifications.cancelAllScheduledNotificationsAsync();
   await Notifications.scheduleNotificationAsync({
-    content: { title: 'SkillForge', body: 'Your 5-minute practice is waiting 🔥' },
+    content: { title: 'Skilly', body: 'Your 5-minute practice is waiting 🔥' },
     trigger: { type: 'daily' as any, hour, minute },
   });
 }

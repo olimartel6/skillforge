@@ -46,7 +46,7 @@ export function SubscriptionScreen() {
       }
       const success = await purchasePackage(packages[0]);
       if (success) {
-        Alert.alert('Success', 'Welcome to SkillForge Premium!');
+        Alert.alert('Success', 'Welcome to Skilly Premium!');
       }
     } catch (err) {
       Alert.alert('Error', 'Could not complete purchase. Please try again.');

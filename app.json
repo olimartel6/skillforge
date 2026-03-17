@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "SkillForge",
-    "slug": "skillforge",
+    "name": "Skilly",
+    "slug": "skilly",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "scheme": "skillforge",
+    "scheme": "skilly",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.olimartel6.skillforge2025",
+      "bundleIdentifier": "com.olimartel6.skilly",
       "buildNumber": "1",
       "infoPlist": {
         "NSCameraUsageDescription": "SkillForge needs camera access to record your practice sessions for AI feedback.",
@@ -26,7 +26,7 @@
       }
     },
     "android": {
-      "package": "com.olimartel6.skillforge2025",
+      "package": "com.olimartel6.skilly",
       "adaptiveIcon": {
         "backgroundColor": "#0a0a0b",
         "foregroundImage": "./assets/android-icon-foreground.png",
