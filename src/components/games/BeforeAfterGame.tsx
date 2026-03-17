@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 import { GlassCard } from '../../components/GlassCard';
 import { colors, spacing, typography, borderRadius } from '../../utils/theme';
 import type { GameQuestion } from '../../utils/gameQuestions';
@@ -36,6 +36,11 @@ export function BeforeAfterGame({ question, onAnswer }: GameProps) {
 
   return (
     <View style={styles.container}>
+      {question.image && (
+        <View style={{ alignItems: 'center', marginBottom: 16 }}>
+          <Image source={{ uri: question.image }} style={{ width: 220, height: 150, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }} resizeMode="cover" />
+        </View>
+      )}
       <Text style={styles.label}>WHICH IS BETTER?</Text>
       <Text style={styles.prompt}>{question.prompt}</Text>
 

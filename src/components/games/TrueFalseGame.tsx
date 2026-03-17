@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, typography, borderRadius } from '../../utils/theme';
 import type { GameQuestion } from '../../utils/gameQuestions';
@@ -40,6 +40,11 @@ export function TrueFalseGame({ question, onAnswer }: GameProps) {
 
   return (
     <View style={styles.container}>
+      {question.image && (
+        <View style={{ alignItems: 'center', marginBottom: spacing.xl }}>
+          <Image source={{ uri: question.image }} style={{ width: 220, height: 150, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }} resizeMode="cover" />
+        </View>
+      )}
       <View style={styles.statementContainer}>
         <Text style={styles.label}>TRUE OR FALSE?</Text>
         <Text style={styles.statement}>{question.prompt}</Text>

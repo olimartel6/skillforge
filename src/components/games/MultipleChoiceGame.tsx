@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 import { GlassCard } from '../../components/GlassCard';
 import { colors, spacing, typography, borderRadius } from '../../utils/theme';
 import type { GameQuestion } from '../../utils/gameQuestions';
@@ -43,6 +43,11 @@ export function MultipleChoiceGame({ question, onAnswer }: GameProps) {
 
   return (
     <View style={styles.container}>
+      {question.image && (
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: question.image }} style={styles.questionImage} resizeMode="cover" />
+        </View>
+      )}
       <Text style={styles.prompt}>{question.prompt}</Text>
       <View style={styles.options}>
         {(question.options || []).map((option, idx) => (
@@ -81,6 +86,17 @@ export function MultipleChoiceGame({ question, onAnswer }: GameProps) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: spacing.lg },
+  imageContainer: {
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+  },
+  questionImage: {
+    width: 220,
+    height: 150,
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
   prompt: {
     ...typography.h3,
     color: colors.textPrimary,
