@@ -45,11 +45,11 @@ export function AIFeedbackScreen() {
   useEffect(() => {
     if (!feedback || feedback.error) return;
 
-    const animations = [anim1, anim2, anim3, anim4].map((anim, index) =>
-      Animated.timing(anim, {
+    const animations = [anim1, anim2, anim3, anim4].map((anim) =>
+      Animated.spring(anim, {
         toValue: 1,
-        duration: 400,
-        delay: index * 200,
+        friction: 7,
+        tension: 40,
         useNativeDriver: true,
       })
     );

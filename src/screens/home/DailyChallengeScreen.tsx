@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,6 +14,7 @@ import { GlassCard } from '../../components/GlassCard';
 import { Button } from '../../components/Button';
 import { AmbientGlow } from '../../components/AmbientGlow';
 import { colors, spacing, borderRadius, typography, shadows } from '../../utils/theme';
+import { SkeletonLoader } from '../../components/SkeletonLoader';
 import { useChallengeStore } from '../../store/challengeStore';
 import { useStreakStore } from '../../store/streakStore';
 import { useUserStore } from '../../store/userStore';
@@ -57,6 +58,27 @@ export function DailyChallengeScreen() {
     }
   }, [profile?.id, profile?.selected_skill_id]);
 
+  // Pulse animation for START PRACTICE button
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.03,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1.0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [pulseAnim]);
+
   const dayNumber = getDayNumber(roadmap);
   const unlockedNodes = roadmap.filter((r) => r.completed_at).length;
 
@@ -85,8 +107,13 @@ export function DailyChallengeScreen() {
           {/* Challenge Card */}
           {isLoading ? (
             <GlassCard strong style={styles.loadingCard}>
-              <ActivityIndicator color={colors.primary} size="large" />
-              <Text style={styles.loadingText}>Preparing your challenge...</Text>
+              <SkeletonLoader width="60%" height={16} borderRadius={8} style={{ marginBottom: 12 }} />
+              <SkeletonLoader width="80%" height={20} borderRadius={8} style={{ marginBottom: 16 }} />
+              <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+                <SkeletonLoader width={64} height={28} borderRadius={14} />
+                <SkeletonLoader width={80} height={28} borderRadius={14} />
+              </View>
+              <SkeletonLoader width="100%" height={48} borderRadius={12} />
             </GlassCard>
           ) : currentChallenge ? (
             <TouchableOpacity
@@ -121,13 +148,15 @@ export function DailyChallengeScreen() {
                     </View>
                   </View>
 
-                  <TouchableOpacity
-                    style={styles.startButton}
-                    activeOpacity={0.85}
-                    onPress={() => navigation.navigate('PracticeSession')}
-                  >
-                    <Text style={styles.startButtonText}>START PRACTICE</Text>
-                  </TouchableOpacity>
+                  <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+                    <TouchableOpacity
+                      style={styles.startButton}
+                      activeOpacity={0.85}
+                      onPress={() => navigation.navigate('PracticeSession')}
+                    >
+                      <Text style={styles.startButtonText}>START PRACTICE</Text>
+                    </TouchableOpacity>
+                  </Animated.View>
                 </LinearGradient>
               </View>
             </TouchableOpacity>

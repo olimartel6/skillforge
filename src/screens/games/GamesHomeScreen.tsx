@@ -241,6 +241,7 @@ export function GamesHomeScreen({ navigation }: { navigation: any }) {
   }
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const completedPulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     initialize();
@@ -261,6 +262,15 @@ export function GamesHomeScreen({ navigation }: { navigation: any }) {
       ]),
     ).start();
   }, [pulseAnim]);
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(completedPulseAnim, { toValue: 1.05, duration: 2000, useNativeDriver: true }),
+        Animated.timing(completedPulseAnim, { toValue: 1, duration: 2000, useNativeDriver: true }),
+      ]),
+    ).start();
+  }, [completedPulseAnim]);
 
   const dailyProgress = Math.min(dailyXp / dailyXpGoal, 1);
 
@@ -364,12 +374,14 @@ export function GamesHomeScreen({ navigation }: { navigation: any }) {
                     </LinearGradient>
                   </Animated.View>
                 ) : lesson.completed ? (
-                  <LinearGradient
-                    colors={[colors.success, colors.successDark]}
-                    style={[styles.bubble, glowShadow(colors.success)]}
-                  >
-                    <Text style={styles.bubbleIcon}>{lesson.icon}</Text>
-                  </LinearGradient>
+                  <Animated.View style={{ transform: [{ scale: completedPulseAnim }] }}>
+                    <LinearGradient
+                      colors={[colors.success, colors.successDark]}
+                      style={[styles.bubble, glowShadow(colors.success)]}
+                    >
+                      <Text style={styles.bubbleIcon}>{lesson.icon}</Text>
+                    </LinearGradient>
+                  </Animated.View>
                 ) : (
                   <View style={[styles.bubble, styles.lockedBubble]}>
                     <Text style={[styles.bubbleIcon, { opacity: 0.3 }]}>{lesson.icon}</Text>

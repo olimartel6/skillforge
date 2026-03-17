@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlassCard } from '../../components/GlassCard';
 import { AmbientGlow } from '../../components/AmbientGlow';
+import { SkeletonLoader } from '../../components/SkeletonLoader';
 import { colors, spacing, borderRadius, typography, glowShadow } from '../../utils/theme';
 import { SkillTreeNode, UserProgress, Skill, Tier } from '../../utils/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,6 +24,31 @@ const TIER_CONFIG: Record<Tier, { label: string; colors: [string, string]; label
 };
 
 const TIER_ORDER: Tier[] = ['basics', 'intermediate', 'advanced'];
+
+function GlowNode({ children }: { children: React.ReactNode }) {
+  const opacityAnim = useRef(new Animated.Value(0.85)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacityAnim, {
+          toValue: 1.0,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 0.85,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [opacityAnim]);
+
+  return <Animated.View style={{ opacity: opacityAnim }}>{children}</Animated.View>;
+}
 
 export function SkillTreeScreen() {
   const profile = useUserStore((s) => s.profile);
@@ -66,8 +92,26 @@ export function SkillTreeScreen() {
     return (
       <View style={styles.root}>
         <SafeAreaView style={styles.safe} edges={['top']}>
-          <View style={styles.centered}>
-            <ActivityIndicator color={colors.primary} size="large" />
+          <View style={styles.skeletonContainer}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 32 }}>
+              <SkeletonLoader width={36} height={36} borderRadius={18} />
+              <View>
+                <SkeletonLoader width={120} height={18} borderRadius={8} />
+                <SkeletonLoader width={160} height={14} borderRadius={6} style={{ marginTop: 6 }} />
+              </View>
+            </View>
+            <SkeletonLoader width={80} height={12} borderRadius={4} style={{ marginBottom: 16 }} />
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              {[1, 2, 3, 4].map((i) => (
+                <SkeletonLoader key={i} width={64} height={64} borderRadius={12} />
+              ))}
+            </View>
+            <SkeletonLoader width={100} height={12} borderRadius={4} style={{ marginTop: 32, marginBottom: 16 }} />
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              {[1, 2, 3].map((i) => (
+                <SkeletonLoader key={i} width={64} height={64} borderRadius={12} />
+              ))}
+            </View>
           </View>
         </SafeAreaView>
       </View>
@@ -126,21 +170,23 @@ export function SkillTreeScreen() {
                           </View>
                         )}
                         {unlocked ? (
-                          <View style={[styles.nodeWrapper, glowShadow(config.colors[0])]}>
-                            <LinearGradient
-                              colors={config.colors}
-                              start={{ x: 0, y: 0 }}
-                              end={{ x: 1, y: 1 }}
-                              style={styles.nodeUnlocked}
-                            >
-                              <Text style={styles.nodeEmoji}>
-                                {node.name.match(/\p{Emoji}/u)?.[0] || '⭐'}
-                              </Text>
-                              <Text style={styles.nodeNameUnlocked} numberOfLines={2}>
-                                {node.name}
-                              </Text>
-                            </LinearGradient>
-                          </View>
+                          <GlowNode>
+                            <View style={[styles.nodeWrapper, glowShadow(config.colors[0])]}>
+                              <LinearGradient
+                                colors={config.colors}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                                style={styles.nodeUnlocked}
+                              >
+                                <Text style={styles.nodeEmoji}>
+                                  {node.name.match(/\p{Emoji}/u)?.[0] || '⭐'}
+                                </Text>
+                                <Text style={styles.nodeNameUnlocked} numberOfLines={2}>
+                                  {node.name}
+                                </Text>
+                              </LinearGradient>
+                            </View>
+                          </GlowNode>
                         ) : (
                           <View style={styles.nodeLocked}>
                             <Text style={styles.nodeEmojiLocked}>
@@ -176,6 +222,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  skeletonContainer: {
+    flex: 1,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
   },
   scroll: {
     paddingHorizontal: spacing.xl,

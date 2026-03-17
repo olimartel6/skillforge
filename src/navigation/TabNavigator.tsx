@@ -93,19 +93,42 @@ function TabIcon({ label, active }: { label: string; active: boolean }) {
   const opacityAnim = useRef(new Animated.Value(active ? 1 : 0.7)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: active ? 1 : 0.85,
-        friction: 5,
-        tension: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: active ? 1 : 0.7,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    if (active) {
+      // Bounce: scale up to 1.15, then spring back to 1.0
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(scaleAnim, {
+            toValue: 1.15,
+            duration: 150,
+            useNativeDriver: true,
+          }),
+          Animated.spring(scaleAnim, {
+            toValue: 1,
+            friction: 4,
+            tension: 200,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(scaleAnim, {
+          toValue: 0.85,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 0.7,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
   }, [active]);
 
   const icon = TAB_ICONS[label] || { default: '•', active: '•' };

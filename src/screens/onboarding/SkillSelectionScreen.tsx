@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Animated,
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -47,6 +48,27 @@ export function SkillSelectionScreen() {
 
   const visibleSkills = showAll ? skills : skills.slice(0, INITIAL_VISIBLE);
 
+  // Staggered card entrance animations
+  const cardAnims = useRef<Animated.Value[]>([]).current;
+  while (cardAnims.length < visibleSkills.length) {
+    cardAnims.push(new Animated.Value(0));
+  }
+
+  useEffect(() => {
+    if (loading || visibleSkills.length === 0) return;
+    // Reset all to 0
+    cardAnims.forEach((a) => a.setValue(0));
+    const animations = visibleSkills.map((_, i) =>
+      Animated.timing(cardAnims[i], {
+        toValue: 1,
+        duration: 300,
+        delay: i * 50,
+        useNativeDriver: true,
+      })
+    );
+    Animated.stagger(50, animations).start();
+  }, [loading, visibleSkills.length, showAll]);
+
   return (
     <SafeAreaView style={styles.safe}>
       <AmbientGlow color={colors.primary} size={250} top="5%" left="70%" opacity={0.08} />
@@ -62,28 +84,45 @@ export function SkillSelectionScreen() {
           <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />
         ) : (
           <View style={styles.grid}>
-            {visibleSkills.map((skill) => {
+            {visibleSkills.map((skill, index) => {
               const selected = skill.id === selectedId;
+              const anim = cardAnims[index];
               return (
-                <TouchableOpacity
+                <Animated.View
                   key={skill.id}
-                  activeOpacity={0.8}
-                  onPress={() => setSelectedId(skill.id)}
+                  style={{
+                    opacity: anim || 0,
+                    transform: [
+                      {
+                        translateY: anim
+                          ? anim.interpolate({
+                              inputRange: [0, 1],
+                              outputRange: [20, 0],
+                            })
+                          : 20,
+                      },
+                    ],
+                  }}
                 >
-                  <GlassCard
-                    strong={selected}
-                    glowColor={selected ? colors.primary : undefined}
-                    style={[styles.card, selected && styles.cardSelected]}
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => setSelectedId(skill.id)}
                   >
-                    <Text style={styles.cardIcon}>{skill.icon}</Text>
-                    <Text
-                      style={[styles.cardName, selected && styles.cardNameSelected]}
-                      numberOfLines={2}
+                    <GlassCard
+                      strong={selected}
+                      glowColor={selected ? colors.primary : undefined}
+                      style={[styles.card, selected && styles.cardSelected]}
                     >
-                      {skill.name}
-                    </Text>
-                  </GlassCard>
-                </TouchableOpacity>
+                      <Text style={styles.cardIcon}>{skill.icon}</Text>
+                      <Text
+                        style={[styles.cardName, selected && styles.cardNameSelected]}
+                        numberOfLines={2}
+                      >
+                        {skill.name}
+                      </Text>
+                    </GlassCard>
+                  </TouchableOpacity>
+                </Animated.View>
               );
             })}
           </View>
