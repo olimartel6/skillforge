@@ -33,6 +33,10 @@ export function ChangeSkillScreen() {
   const [loading, setLoading] = useState(true);
   const [switching, setSwitching] = useState(false);
 
+  const isPremium = profile?.premium_expires_at
+    ? new Date(profile.premium_expires_at) > new Date()
+    : false;
+
   useEffect(() => {
     (async () => {
       const { data } = await supabase.from('skills').select('*').order('name');
@@ -44,6 +48,18 @@ export function ChangeSkillScreen() {
   const handleSwitch = async () => {
     if (!selectedId || selectedId === profile?.selected_skill_id) {
       navigation.goBack();
+      return;
+    }
+
+    if (!isPremium) {
+      Alert.alert(
+        'Premium Feature',
+        'Free users can only learn 1 skill. Upgrade to Premium to switch between unlimited skills.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Go Premium', onPress: () => navigation.navigate('Subscription') },
+        ]
+      );
       return;
     }
 

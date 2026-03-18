@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
 import { CommunityPost } from '../../utils/types';
+import { useUserStore } from '../../store/userStore';
 import {
   FAKE_POSTS,
   AVATAR_GRADIENTS,
@@ -47,8 +48,38 @@ function AvatarCircle({ username, gradientColors }: { username: string; gradient
 
 export function FeedScreen() {
   const navigation = useNavigation<any>();
+  const profile = useUserStore((s) => s.profile);
   const [posts, setPosts] = useState<CommunityPost[]>(FAKE_POSTS);
   const [loading, setLoading] = useState(false);
+
+  const isPremium = profile?.premium_expires_at
+    ? new Date(profile.premium_expires_at) > new Date()
+    : false;
+
+  if (!isPremium) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.paywallContainer}>
+          <Text style={{ fontSize: 48, marginBottom: 20 }}>👥</Text>
+          <Text style={styles.paywallTitle}>Unlock Community</Text>
+          <Text style={styles.paywallSub}>See what other learners are practicing. Share your progress and get inspired.</Text>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('ProfileTab', { screen: 'Subscription' })}
+          >
+            <LinearGradient
+              colors={['#FF6B35', '#FF3D00']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.paywallBtn}
+            >
+              <Text style={styles.paywallBtnText}>Go Premium — $6.99/mo</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const toggleLike = (post: CommunityPost) => {
     try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
@@ -279,5 +310,41 @@ const styles = StyleSheet.create({
   emptyText: {
     ...typography.body,
     color: colors.textSecondary,
+  },
+  paywallContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: spacing['4xl'],
+    backgroundColor: colors.background,
+  },
+  paywallTitle: {
+    ...typography.h1,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  paywallSub: {
+    ...typography.body,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: spacing['4xl'],
+  },
+  paywallBtn: {
+    padding: 16,
+    borderRadius: borderRadius.lg,
+    alignItems: 'center',
+    paddingHorizontal: 48,
+    shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  paywallBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

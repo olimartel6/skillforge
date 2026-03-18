@@ -28,7 +28,7 @@ const DEFAULT_USER: User = {
   selected_skill_id: null,
   skill_level: null,
   goal: null,
-  premium_expires_at: '2099-12-31T00:00:00.000Z',
+  premium_expires_at: null,
   onboarding_complete: false,
   created_at: new Date().toISOString(),
 };
@@ -73,11 +73,6 @@ export const useUserStore = create<UserState>((set, get) => ({
       const stored = await AsyncStorage.getItem('user_profile');
       if (stored) {
         const profile = JSON.parse(stored) as User;
-        // Ensure premium is active
-        if (!profile.premium_expires_at) {
-          profile.premium_expires_at = '2099-12-31T00:00:00.000Z';
-          await AsyncStorage.setItem('user_profile', JSON.stringify(profile));
-        }
         set({
           profile,
           isOnboarded: profile.onboarding_complete,
