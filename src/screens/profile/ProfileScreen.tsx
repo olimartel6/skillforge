@@ -16,6 +16,7 @@ import { supabase } from '../../services/supabase';
 import { useUserStore } from '../../store/userStore';
 import { useStreakStore } from '../../store/streakStore';
 import { Skill } from '../../utils/types';
+import * as Haptics from 'expo-haptics';
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
@@ -109,7 +110,10 @@ export function ProfileScreen() {
           <View style={styles.menu}>
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => navigation.navigate('ChangeSkill')}
+              onPress={() => {
+                try { Haptics.selectionAsync(); } catch {}
+                navigation.navigate('ChangeSkill');
+              }}
             >
               <GlassCard style={styles.menuItem}>
                 <Text style={styles.menuText}>Change Skill</Text>
@@ -119,7 +123,10 @@ export function ProfileScreen() {
 
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => navigation.navigate('Settings')}
+              onPress={() => {
+                try { Haptics.selectionAsync(); } catch {}
+                navigation.navigate('Settings');
+              }}
             >
               <GlassCard style={styles.menuItem}>
                 <Text style={styles.menuText}>Settings</Text>
@@ -129,7 +136,10 @@ export function ProfileScreen() {
 
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => navigation.navigate('Subscription')}
+              onPress={() => {
+                try { Haptics.selectionAsync(); } catch {}
+                navigation.navigate('Subscription');
+              }}
             >
               <GlassCard style={styles.menuItem}>
                 <Text style={styles.menuText}>Subscription</Text>
@@ -137,7 +147,10 @@ export function ProfileScreen() {
               </GlassCard>
             </TouchableOpacity>
 
-            <TouchableOpacity activeOpacity={0.8} onPress={handleSignOut}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => {
+              try { Haptics.selectionAsync(); } catch {}
+              handleSignOut();
+            }}>
               <GlassCard style={styles.menuItem}>
                 <Text style={[styles.menuText, { color: colors.error }]}>Sign Out</Text>
                 <Text style={[styles.chevron, { color: colors.error }]}>›</Text>

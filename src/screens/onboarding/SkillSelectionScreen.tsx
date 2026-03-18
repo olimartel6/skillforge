@@ -19,6 +19,7 @@ import { colors, spacing, typography } from '../../utils/theme';
 import { Skill } from '../../utils/types';
 import { supabase } from '../../services/supabase';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
+import * as Haptics from 'expo-haptics';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'SkillSelection'>;
 
@@ -106,7 +107,10 @@ export function SkillSelectionScreen() {
                 >
                   <TouchableOpacity
                     activeOpacity={0.8}
-                    onPress={() => setSelectedId(skill.id)}
+                    onPress={() => {
+                      try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
+                      setSelectedId(skill.id);
+                    }}
                   >
                     <GlassCard
                       strong={selected}
@@ -139,6 +143,7 @@ export function SkillSelectionScreen() {
         <Button
           title="Continue"
           onPress={() => {
+            try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch {}
             if (selectedId) navigation.navigate('LevelSelection', { skillId: selectedId });
           }}
           disabled={!selectedId}

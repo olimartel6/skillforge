@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Animated,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,6 +17,7 @@ import { SkillTreeNode, UserProgress, Skill, Tier } from '../../utils/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../services/supabase';
 import { useUserStore } from '../../store/userStore';
+import * as Haptics from 'expo-haptics';
 
 const TIER_CONFIG: Record<Tier, { label: string; colors: [string, string]; labelColor: string }> = {
   basics: { label: 'Basics', colors: [colors.primary, colors.primaryDark], labelColor: colors.success },
@@ -170,23 +172,30 @@ export function SkillTreeScreen() {
                           </View>
                         )}
                         {unlocked ? (
-                          <GlowNode>
-                            <View style={[styles.nodeWrapper, glowShadow(config.colors[0])]}>
-                              <LinearGradient
-                                colors={config.colors}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 1 }}
-                                style={styles.nodeUnlocked}
-                              >
-                                <Text style={styles.nodeEmoji}>
-                                  {node.name.match(/\p{Emoji}/u)?.[0] || '⭐'}
-                                </Text>
-                                <Text style={styles.nodeNameUnlocked} numberOfLines={2}>
-                                  {node.name}
-                                </Text>
-                              </LinearGradient>
-                            </View>
-                          </GlowNode>
+                          <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={() => {
+                              try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
+                            }}
+                          >
+                            <GlowNode>
+                              <View style={[styles.nodeWrapper, glowShadow(config.colors[0])]}>
+                                <LinearGradient
+                                  colors={config.colors}
+                                  start={{ x: 0, y: 0 }}
+                                  end={{ x: 1, y: 1 }}
+                                  style={styles.nodeUnlocked}
+                                >
+                                  <Text style={styles.nodeEmoji}>
+                                    {node.name.match(/\p{Emoji}/u)?.[0] || '⭐'}
+                                  </Text>
+                                  <Text style={styles.nodeNameUnlocked} numberOfLines={2}>
+                                    {node.name}
+                                  </Text>
+                                </LinearGradient>
+                              </View>
+                            </GlowNode>
+                          </TouchableOpacity>
                         ) : (
                           <View style={styles.nodeLocked}>
                             <Text style={styles.nodeEmojiLocked}>

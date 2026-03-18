@@ -18,6 +18,7 @@ import { SkeletonLoader } from '../../components/SkeletonLoader';
 import { useChallengeStore } from '../../store/challengeStore';
 import { useStreakStore } from '../../store/streakStore';
 import { useUserStore } from '../../store/userStore';
+import * as Haptics from 'expo-haptics';
 
 function getGreeting(): string {
   const hour = new Date().getHours();
@@ -152,7 +153,10 @@ export function DailyChallengeScreen() {
                     <TouchableOpacity
                       style={styles.startButton}
                       activeOpacity={0.85}
-                      onPress={() => navigation.navigate('PracticeSession')}
+                      onPress={() => {
+                        try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); } catch {}
+                        navigation.navigate('PracticeSession');
+                      }}
                     >
                       <Text style={styles.startButtonText}>START PRACTICE</Text>
                     </TouchableOpacity>

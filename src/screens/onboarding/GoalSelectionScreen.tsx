@@ -18,6 +18,7 @@ import { useUserStore } from '../../store/userStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../services/supabase';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
+import * as Haptics from 'expo-haptics';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'GoalSelection'>;
 type Route = RouteProp<OnboardingStackParamList, 'GoalSelection'>;
@@ -92,7 +93,10 @@ export function GoalSelectionScreen() {
               <TouchableOpacity
                 key={goal.value}
                 activeOpacity={0.8}
-                onPress={() => setSelected(goal.value)}
+                onPress={() => {
+                  try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
+                  setSelected(goal.value);
+                }}
               >
                 <GlassCard
                   strong={isSelected}
@@ -118,7 +122,10 @@ export function GoalSelectionScreen() {
       <View style={styles.footer}>
         <Button
           title={loading ? '' : 'Generate My Roadmap →'}
-          onPress={handleGenerate}
+          onPress={() => {
+            try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); } catch {}
+            handleGenerate();
+          }}
           disabled={!selected || loading}
         />
         {loading && (

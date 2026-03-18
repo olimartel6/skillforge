@@ -19,6 +19,7 @@ import {
   POST_DAY_NUMBERS,
   POST_STREAKS,
 } from './fakeData';
+import * as Haptics from 'expo-haptics';
 
 const PAGE_SIZE = 20;
 
@@ -50,6 +51,7 @@ export function FeedScreen() {
   const [loading, setLoading] = useState(false);
 
   const toggleLike = (post: CommunityPost) => {
+    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
     setPosts((prev) =>
       prev.map((p) => {
         if (p.id !== post.id) return p;

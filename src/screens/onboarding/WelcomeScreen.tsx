@@ -8,6 +8,7 @@ import { AmbientGlow } from '../../components/AmbientGlow';
 import { Button } from '../../components/Button';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
+import * as Haptics from 'expo-haptics';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'Welcome'>;
 
@@ -45,7 +46,10 @@ export function WelcomeScreen() {
         <View style={styles.cta}>
           <Button
             title="Begin Your Journey"
-            onPress={() => navigation.navigate('ProfileSetup')}
+            onPress={() => {
+              try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch {}
+              navigation.navigate('ProfileSetup');
+            }}
           />
         </View>
       </View>

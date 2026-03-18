@@ -7,6 +7,7 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../utils/theme';
+import * as Haptics from 'expo-haptics';
 import { DailyChallengeScreen } from '../screens/home/DailyChallengeScreen';
 import { PracticeSessionScreen } from '../screens/home/PracticeSessionScreen';
 import { AIFeedbackScreen } from '../screens/home/AIFeedbackScreen';
@@ -94,6 +95,7 @@ function TabIcon({ label, active }: { label: string; active: boolean }) {
 
   useEffect(() => {
     if (active) {
+      try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
       // Bounce: scale up to 1.15, then spring back to 1.0
       Animated.parallel([
         Animated.sequence([

@@ -19,6 +19,7 @@ import { colors, spacing, typography, borderRadius } from '../../utils/theme';
 import { Skill } from '../../utils/types';
 import { supabase } from '../../services/supabase';
 import { useUserStore } from '../../store/userStore';
+import * as Haptics from 'expo-haptics';
 
 const CARD_GAP = spacing.sm;
 const SCREEN_PADDING = spacing.xl;
@@ -92,7 +93,10 @@ export function ChangeSkillScreen() {
                 <TouchableOpacity
                   key={skill.id}
                   activeOpacity={0.8}
-                  onPress={() => setSelectedId(skill.id)}
+                  onPress={() => {
+                    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
+                    setSelectedId(skill.id);
+                  }}
                 >
                   <GlassCard
                     strong={isSelected}
@@ -119,7 +123,10 @@ export function ChangeSkillScreen() {
       <View style={styles.footer}>
         <Button
           title={switching ? 'Switching...' : selectedId === profile?.selected_skill_id ? 'Already Selected' : 'Switch Skill'}
-          onPress={handleSwitch}
+          onPress={() => {
+            try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); } catch {}
+            handleSwitch();
+          }}
           disabled={!selectedId || switching || selectedId === profile?.selected_skill_id}
         />
       </View>

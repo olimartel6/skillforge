@@ -9,6 +9,7 @@ import { AmbientGlow } from '../../components/AmbientGlow';
 import { colors, spacing, typography } from '../../utils/theme';
 import { SkillLevel } from '../../utils/types';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
+import * as Haptics from 'expo-haptics';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'LevelSelection'>;
 type Route = RouteProp<OnboardingStackParamList, 'LevelSelection'>;
@@ -41,7 +42,10 @@ export function LevelSelectionScreen() {
               <TouchableOpacity
                 key={level.value}
                 activeOpacity={0.8}
-                onPress={() => setSelected(level.value)}
+                onPress={() => {
+                  try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
+                  setSelected(level.value);
+                }}
               >
                 <GlassCard
                   strong={isSelected}

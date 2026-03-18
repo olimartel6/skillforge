@@ -17,6 +17,7 @@ import { useUserStore } from '../../store/userStore';
 import { useTimer } from '../../hooks/useTimer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as Haptics from 'expo-haptics';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -51,9 +52,17 @@ export function PracticeSessionScreen() {
     start();
   }, []);
 
+  // Haptic at 60 seconds remaining
+  useEffect(() => {
+    if (remaining === 60 && isRunning) {
+      try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); } catch {}
+    }
+  }, [remaining, isRunning]);
+
   // Timer complete handler
   useEffect(() => {
     if (remaining === 0 && !isRunning && !isPaused) {
+      try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); } catch {}
       handleTimerComplete();
     }
   }, [remaining, isRunning, isPaused]);
@@ -82,6 +91,7 @@ export function PracticeSessionScreen() {
   };
 
   const handleCapture = async () => {
+    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); } catch {}
     // If timer hasn't started or is done, this is the "Done" button
     if (!isRunning && remaining === 0) {
       await handleSubmit(null);
@@ -161,6 +171,7 @@ export function PracticeSessionScreen() {
   };
 
   const handlePauseResume = () => {
+    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
     if (isRunning) {
       pause();
     } else if (isPaused) {

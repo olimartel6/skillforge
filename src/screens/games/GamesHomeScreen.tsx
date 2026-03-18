@@ -17,6 +17,7 @@ import { useGameStore } from '../../store/gameStore';
 import { useUserStore } from '../../store/userStore';
 import { supabase } from '../../services/supabase';
 import { colors, spacing, typography, borderRadius, glowShadow } from '../../utils/theme';
+import * as Haptics from 'expo-haptics';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const BUBBLE_SIZE = 64;
 const PATH_AMPLITUDE = 50;
@@ -284,6 +285,7 @@ export function GamesHomeScreen({ navigation }: { navigation: any }) {
   });
 
   const handleLessonPress = (lessonNum: number) => {
+    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch {}
     (navigation as any).navigate('GameSession', { lessonNumber: lessonNum, skillName });
   };
 

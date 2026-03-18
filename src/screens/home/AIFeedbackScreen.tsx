@@ -16,6 +16,7 @@ import { Button } from '../../components/Button';
 import { colors, spacing, borderRadius, typography, shadows } from '../../utils/theme';
 import { useCommunityStore } from '../../store/communityStore';
 import { AIFeedback } from '../../utils/types';
+import * as Haptics from 'expo-haptics';
 
 interface FeedbackParams {
   feedback: AIFeedback | null;
@@ -44,6 +45,8 @@ export function AIFeedbackScreen() {
 
   useEffect(() => {
     if (!feedback || feedback.error) return;
+
+    try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); } catch {}
 
     const animations = [anim1, anim2, anim3, anim4].map((anim) =>
       Animated.spring(anim, {
@@ -75,6 +78,7 @@ export function AIFeedbackScreen() {
 
   const handleShare = async () => {
     if (!sessionId) return;
+    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch {}
     setIsSharing(true);
     try {
       await sharePractice(sessionId);

@@ -23,6 +23,7 @@ import {
   POST_DAY_NUMBERS,
   POST_STREAKS,
 } from './fakeData';
+import * as Haptics from 'expo-haptics';
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -83,6 +84,7 @@ export function PostDetailScreen() {
 
   const toggleLike = () => {
     if (!post) return;
+    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
     setPost({
       ...post,
       is_liked: !post.is_liked,
@@ -92,6 +94,7 @@ export function PostDetailScreen() {
 
   const sendComment = () => {
     if (!commentText.trim()) return;
+    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch {}
 
     setSending(true);
     const text = commentText.trim();
