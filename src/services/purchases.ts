@@ -7,10 +7,14 @@ const API_KEY = Platform.select({
 }) || '';
 
 export async function initPurchases(userId: string) {
-  Purchases.configure({ apiKey: API_KEY, appUserID: userId });
+  if (!API_KEY) return; // Skip on Android if no key
+  try {
+    Purchases.configure({ apiKey: API_KEY, appUserID: userId });
+  } catch {}
 }
 
 export async function getOfferings(): Promise<PurchasesPackage[]> {
+  if (!API_KEY) return [];
   try {
     const offerings = await Purchases.getOfferings();
     return offerings.current?.availablePackages || [];
