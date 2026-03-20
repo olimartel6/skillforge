@@ -153,7 +153,7 @@ export function SubscriptionScreen() {
           <TouchableOpacity onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
             <Text style={styles.legalLink}>Terms of Use (EULA)</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => Linking.openURL('https://courageous-crisp-93ca64.netlify.app/privacy.html')}>
+          <TouchableOpacity onPress={() => Linking.openURL('https://karztsksjqohxhgxdeje.supabase.co/storage/v1/object/public/pages/privacy-policy.html')}>
             <Text style={styles.legalLink}>Privacy Policy</Text>
           </TouchableOpacity>
         </ScrollView>

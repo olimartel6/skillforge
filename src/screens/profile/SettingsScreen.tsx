@@ -141,7 +141,7 @@ export function SettingsScreen() {
           <GlassCard style={styles.sectionCard}>
             <TouchableOpacity
               style={styles.settingRow}
-              onPress={() => Linking.openURL('https://courageous-crisp-93ca64.netlify.app/privacy.html')}
+              onPress={() => Linking.openURL('https://karztsksjqohxhgxdeje.supabase.co/storage/v1/object/public/pages/privacy-policy.html')}
               activeOpacity={0.7}
             >
               <Text style={styles.settingTitle}>Privacy Policy</Text>
