@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Platform,
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -211,12 +212,18 @@ export function PracticeSessionScreen() {
 
         {/* Camera Preview Area */}
         <View style={styles.cameraArea}>
-          {permission?.granted ? (
+          {permission?.granted && Platform.OS === 'ios' ? (
             <CameraView
               ref={cameraRef}
               style={styles.camera}
               facing="back"
             />
+          ) : permission?.granted && Platform.OS === 'android' ? (
+            <View style={styles.cameraPlaceholder}>
+              <Text style={styles.cameraPlaceholderIcon}>📹</Text>
+              <Text style={styles.cameraPlaceholderText}>Camera Active</Text>
+              <Text style={[styles.cameraPlaceholderSub, { color: '#34D399' }]}>Recording your practice</Text>
+            </View>
           ) : (
             <View style={styles.cameraPlaceholder}>
               <Text style={styles.cameraPlaceholderIcon}>📹</Text>

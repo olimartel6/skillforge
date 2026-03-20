@@ -203,7 +203,11 @@ export function TabNavigator() {
         },
         tabBarBackground: () => (
           <View style={styles.tabBarBg}>
-            <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+            {Platform.OS === 'ios' ? (
+              <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+            ) : (
+              <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(10,10,11,0.95)' }]} />
+            )}
             <View style={styles.tabBarOverlay} />
             <View style={styles.tabBarTopBorder} />
           </View>

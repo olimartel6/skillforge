@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as SplashScreen from 'expo-splash-screen';
@@ -8,17 +8,41 @@ import { useFonts, Inter_300Light, Inter_400Regular, Inter_500Medium, Inter_600S
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { colors } from './src/utils/theme';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
+// Error boundary to prevent white screen crashes
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View style={{ flex: 1, backgroundColor: '#0a0a0b', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+          <Text style={{ fontSize: 48, marginBottom: 16 }}>😔</Text>
+          <Text style={{ color: '#fff', fontSize: 20, fontWeight: '700', marginBottom: 8 }}>Something went wrong</Text>
+          <Text style={{ color: '#888', fontSize: 14, textAlign: 'center' }}>Please restart the app</Text>
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function App() {
-  // Clean up any stale Supabase auth data
   useEffect(() => {
     const cleanup = async () => {
-      const keys = await AsyncStorage.getAllKeys();
-      const supabaseKeys = keys.filter(k => k.startsWith('sb-') || k.includes('supabase'));
-      if (supabaseKeys.length > 0) {
-        await AsyncStorage.multiRemove(supabaseKeys);
-      }
+      try {
+        const keys = await AsyncStorage.getAllKeys();
+        const supabaseKeys = keys.filter(k => k.startsWith('sb-') || k.includes('supabase'));
+        if (supabaseKeys.length > 0) {
+          await AsyncStorage.multiRemove(supabaseKeys);
+        }
+      } catch {}
     };
     cleanup();
   }, []);
@@ -35,7 +59,7 @@ export default function App() {
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+      try { await SplashScreen.hideAsync(); } catch {}
     }
   }, [fontsLoaded]);
 
@@ -44,10 +68,12 @@ export default function App() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <StatusBar style="light" />
-      <RootNavigator />
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <StatusBar style="light" />
+        <RootNavigator />
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
 
