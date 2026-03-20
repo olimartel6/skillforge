@@ -2,8 +2,8 @@ import Purchases, { PurchasesPackage } from 'react-native-purchases';
 import { Platform } from 'react-native';
 
 const API_KEY = Platform.select({
-  ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY,
-  android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY,
+  ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY || 'appl_vJjpXEYvprWlkEmRLXlgtVIPddF',
+  android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY || '',
 }) || '';
 
 export async function initPurchases(userId: string) {
