@@ -141,7 +141,7 @@ export function SettingsScreen() {
           <GlassCard style={styles.sectionCard}>
             <TouchableOpacity
               style={styles.settingRow}
-              onPress={() => Linking.openURL('https://skillforge.app/privacy')}
+              onPress={() => Linking.openURL('https://courageous-crisp-93ca64.netlify.app/privacy.html')}
               activeOpacity={0.7}
             >
               <Text style={styles.settingTitle}>Privacy Policy</Text>
@@ -152,7 +152,7 @@ export function SettingsScreen() {
 
             <TouchableOpacity
               style={styles.settingRow}
-              onPress={() => Linking.openURL('https://skillforge.app/terms')}
+              onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}
               activeOpacity={0.7}
             >
               <Text style={styles.settingTitle}>Terms of Use</Text>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skilly — Master Any Skill in 5 Min/Day</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #0a0a0b;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,107,53,0.12), transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -200px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(108,99,255,0.08), transparent 70%);
+    pointer-events: none;
+  }
+
+  .logo-box {
+    width: 100px;
+    height: 100px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #FF6B35, #FF3D00);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    box-shadow: 0 16px 48px rgba(255,107,53,0.3);
+    overflow: hidden;
+  }
+  .logo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .logo-box span { font-size: 48px; }
+
+  h1 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  h1 span { color: #FF6B35; }
+
+  .subtitle {
+    font-size: clamp(16px, 2.5vw, 22px);
+    color: #888;
+    font-weight: 300;
+    max-width: 500px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #FF6B35, #FF3D00);
+    color: #fff;
+    padding: 18px 36px;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 8px 32px rgba(255,107,53,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(255,107,53,0.4);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 18px 36px;
+    border-radius: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.1);
+  }
+
+  .store-badge { height: 52px; }
+  .trust { color: #555; font-size: 13px; margin-top: 12px; }
+
+  /* Features */
+  .features {
+    padding: 100px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .features h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 64px;
+    letter-spacing: -1px;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+  .feature-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 24px;
+    padding: 36px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,107,53,0.2);
+  }
+  .feature-icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+  }
+  .feature-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .feature-card p {
+    color: #888;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Skills */
+  .skills {
+    padding: 80px 24px;
+    text-align: center;
+  }
+  .skills h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    margin-bottom: 48px;
+    letter-spacing: -1px;
+  }
+  .skill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .skill-tag {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 15px;
+    color: #ccc;
+    transition: border-color 0.2s;
+  }
+  .skill-tag:hover {
+    border-color: rgba(255,107,53,0.3);
+  }
+
+  /* Pricing */
+  .pricing {
+    padding: 100px 24px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .pricing h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    margin-bottom: 48px;
+    letter-spacing: -1px;
+  }
+  .pricing-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 600px) {
+    .pricing-cards { grid-template-columns: 1fr; }
+  }
+  .price-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 24px;
+    padding: 40px 32px;
+    text-align: left;
+  }
+  .price-card.premium {
+    border-color: rgba(255,107,53,0.3);
+    box-shadow: 0 8px 40px rgba(255,107,53,0.08);
+  }
+  .price-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #555;
+    margin-bottom: 8px;
+  }
+  .price-label.premium { color: #FF6B35; }
+  .price-amount {
+    font-size: 36px;
+    font-weight: 900;
+    margin-bottom: 24px;
+  }
+  .price-amount span {
+    font-size: 16px;
+    font-weight: 400;
+    color: #555;
+  }
+  .price-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .price-features li {
+    font-size: 15px;
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .check { color: #34D399; }
+  .x { color: #EF4444; }
+
+  /* CTA bottom */
+  .bottom-cta {
+    padding: 100px 24px;
+    text-align: center;
+    position: relative;
+  }
+  .bottom-cta::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,107,53,0.08), transparent 70%);
+    pointer-events: none;
+  }
+  .bottom-cta h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+  }
+  .bottom-cta p {
+    color: #888;
+    font-size: 18px;
+    margin-bottom: 40px;
+  }
+
+  /* Footer */
+  footer {
+    padding: 40px 24px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    color: #333;
+    font-size: 13px;
+  }
+  footer a { color: #555; text-decoration: none; }
+  footer a:hover { color: #FF6B35; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="logo-box">
+    <span>⚡</span>
+  </div>
+  <h1>Master any skill.<br><span>5 minutes a day.</span></h1>
+  <p class="subtitle">AI-powered micro-learning with daily challenges, interactive games, and instant feedback. 30+ skills available.</p>
+
+  <div class="cta-row">
+    <a href="#" class="btn-primary" id="ios-btn">
+      <svg width="20" height="24" viewBox="0 0 20 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+      App Store
+    </a>
+    <a href="#" class="btn-secondary" id="android-btn">
+      <svg width="20" height="22" viewBox="0 0 20 22" fill="currentColor"><path d="M1 18q0 .425.288.712Q1.575 19 2 19h1v3q0 .425.288.712Q3.575 23 4 23q.425 0 .713-.288Q5 22.425 5 22v-3h4v3q0 .425.287.712Q9.575 23 10 23q.425 0 .713-.288Q11 22.425 11 22v-3h1q.425 0 .713-.288Q13 18.425 13 18V8H1ZM14 8q-.425 0-.712.287Q13 8.575 13 9v7q0 .425.288.712Q13.575 17 14 17q.425 0 .713-.288Q15 16.425 15 16V9q0-.425-.287-.713Q14.425 8 14 8ZM0 8q-.425 0-.712.287Q-1 8.575-1 9v7q0 .425.288.712Q-.425 17 0 17q.425 0 .713-.288Q1 16.425 1 16V9q0-.425-.287-.713Q.425 8 0 8Z"/></svg>
+      Download APK
+    </a>
+  </div>
+  <p class="trust">Free to download · No account required · Works offline</p>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <h2>Everything you need to learn <span style="color:#FF6B35">anything</span></h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Daily 5-Min Challenges</h3>
+      <p>A personalized challenge every day, designed for your skill level. Just 5 minutes — no excuses.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>AI Coach Feedback</h3>
+      <p>Record your practice and get instant analysis. Strengths, mistakes, and one tip to improve.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎮</div>
+      <h3>Interactive Mini-Games</h3>
+      <p>12 game types — quizzes, matching, memory cards, sorting. Wrong answers come back until you nail them.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔥</div>
+      <h3>Streak Tracking</h3>
+      <p>Build consistency with daily streaks, freeze tokens, and badges. Don't break the chain.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌳</div>
+      <h3>Skill Tree Progression</h3>
+      <p>Unlock nodes as you progress from basics to advanced. See your journey visually.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <h3>Community Feed</h3>
+      <p>Share your practice and see what others are learning. Like, comment, and get inspired.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="skills">
+  <h2>30+ skills available</h2>
+  <div class="skill-grid">
+    <div class="skill-tag">✏️ Drawing</div>
+    <div class="skill-tag">🎸 Guitar</div>
+    <div class="skill-tag">📈 Trading</div>
+    <div class="skill-tag">👨‍🍳 Cooking</div>
+    <div class="skill-tag">♟️ Chess</div>
+    <div class="skill-tag">💻 Coding</div>
+    <div class="skill-tag">🪄 Magic Tricks</div>
+    <div class="skill-tag">🎹 Piano</div>
+    <div class="skill-tag">📸 Photography</div>
+    <div class="skill-tag">🎤 Singing</div>
+    <div class="skill-tag">💃 Dance</div>
+    <div class="skill-tag">💼 Business</div>
+    <div class="skill-tag">📣 Marketing</div>
+    <div class="skill-tag">🎙️ Public Speaking</div>
+    <div class="skill-tag">💪 Fitness</div>
+    <div class="skill-tag">🧘 Meditation</div>
+    <div class="skill-tag">😂 Stand-up Comedy</div>
+    <div class="skill-tag">🥁 Beatboxing</div>
+    <div class="skill-tag">👗 Fashion Design</div>
+    <div class="skill-tag">🎙️ Podcasting</div>
+    <div class="skill-tag">🎥 Filmmaking</div>
+    <div class="skill-tag">✍️ Writing</div>
+    <div class="skill-tag">🎨 Painting</div>
+    <div class="skill-tag">🖊️ Calligraphy</div>
+    <div class="skill-tag">🎬 Video Editing</div>
+    <div class="skill-tag">🎭 Acting</div>
+    <div class="skill-tag">🗣️ Pronunciation</div>
+    <div class="skill-tag">🎞️ Animation</div>
+    <div class="skill-tag">🧊 3D Modeling</div>
+    <div class="skill-tag">📖 Storytelling</div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing">
+  <h2>Simple pricing</h2>
+  <div class="pricing-cards">
+    <div class="price-card">
+      <div class="price-label">Free</div>
+      <div class="price-amount">$0 <span>/forever</span></div>
+      <ul class="price-features">
+        <li><span class="check">✓</span> 1 skill</li>
+        <li><span class="check">✓</span> Daily challenges</li>
+        <li><span class="check">✓</span> Camera practice</li>
+        <li><span class="check">✓</span> Basic AI feedback</li>
+        <li><span class="check">✓</span> Streak tracking</li>
+        <li><span class="x">✕</span> Mini-games</li>
+        <li><span class="x">✕</span> Community</li>
+        <li><span class="x">✕</span> Unlimited skills</li>
+      </ul>
+    </div>
+    <div class="price-card premium">
+      <div class="price-label premium">Premium</div>
+      <div class="price-amount">$6.99 <span>/month</span></div>
+      <ul class="price-features">
+        <li><span class="check">✓</span> 30+ skills</li>
+        <li><span class="check">✓</span> Daily challenges</li>
+        <li><span class="check">✓</span> Camera practice</li>
+        <li><span class="check">✓</span> Advanced AI feedback</li>
+        <li><span class="check">✓</span> Streak + freeze tokens</li>
+        <li><span class="check">✓</span> 12 mini-game types</li>
+        <li><span class="check">✓</span> Community access</li>
+        <li><span class="check">✓</span> XP & levels</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM CTA -->
+<section class="bottom-cta">
+  <h2>Talent is practice.</h2>
+  <p>5 minutes a day is all it takes. Start now.</p>
+  <div class="cta-row">
+    <a href="#" class="btn-primary">Download Skilly</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Olivier Martel · <a href="https://karztsksjqohxhgxdeje.supabase.co/storage/v1/object/public/pages/privacy-policy.html">Privacy Policy</a> · <a href="https://karztsksjqohxhgxdeje.supabase.co/storage/v1/object/public/pages/support.html">Support</a></p>
+</footer>
+
+</body>
+</html>
