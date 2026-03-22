@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillForge — Master Any Skill in 5 Minutes a Day</title>
+<meta name="description" content="SkillForge is an AI-powered micro-learning coach. Pick a creative skill, practice 5 minutes daily, get instant AI feedback. Guitar, drawing, singing, photography & more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0a0a0b;
+--primary:#FF6B35;
+--primary-dark:#FF3D00;
+--secondary:#6C63FF;
+--secondary-dark:#4F46E5;
+--success:#34D399;
+--text:#FFFFFF;
+--text-secondary:#888888;
+--text-muted:#555555;
+--glass:rgba(255,255,255,0.04);
+--glass-border:rgba(255,255,255,0.08);
+--glass-strong:rgba(255,255,255,0.08);
+--radius:20px;
+--radius-sm:12px;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+/* Animations */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes pulse-glow{0%,100%{opacity:0.6}50%{opacity:1}}
+@keyframes fade-up{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity 0.8s ease,transform 0.8s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.delay-1{transition-delay:0.1s}.delay-2{transition-delay:0.2s}.delay-3{transition-delay:0.3s}.delay-4{transition-delay:0.4s}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 0;transition:all 0.3s}
+.nav.scrolled{background:rgba(10,10,11,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:1.5rem;font-weight:800;display:flex;align-items:center;gap:8px}
+.logo-icon{font-size:1.8rem}
+.logo span{background:linear-gradient(135deg,var(--primary),var(--primary-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links a{font-size:0.9rem;color:var(--text-secondary);transition:color 0.3s;font-weight:500}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:10px 24px;border-radius:50px;font-weight:600;font-size:0.85rem;border:none;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 20px rgba(255,107,53,0.3)}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(255,107,53,0.4)}
+
+/* Hero */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:120px 24px 80px}
+.hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(255,107,53,0.12) 0%,rgba(108,99,255,0.06) 40%,transparent 70%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:-100px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(108,99,255,0.1) 0%,transparent 60%);pointer-events:none}
+.hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--glass-border);border-radius:50px;padding:8px 20px;font-size:0.8rem;color:var(--primary);font-weight:600;margin-bottom:24px}
+.hero-badge-dot{width:8px;height:8px;background:var(--success);border-radius:50%;animation:pulse-glow 2s infinite}
+.hero h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;line-height:1.1;margin-bottom:20px;letter-spacing:-0.03em}
+.hero h1 .gradient{background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:1.15rem;color:var(--text-secondary);margin-bottom:40px;max-width:500px;line-height:1.7}
+.hero-buttons{display:flex;gap:16px;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:16px 32px;border-radius:16px;font-weight:700;font-size:1rem;border:none;cursor:pointer;transition:all 0.3s;box-shadow:0 8px 30px rgba(255,107,53,0.3)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(255,107,53,0.4)}
+.btn-secondary{display:inline-flex;align-items:center;gap:10px;background:var(--glass);border:1px solid var(--glass-border);color:#fff;padding:16px 32px;border-radius:16px;font-weight:600;font-size:1rem;cursor:pointer;transition:all 0.3s}
+.btn-secondary:hover{background:var(--glass-strong);border-color:rgba(255,255,255,0.15);transform:translateY(-3px)}
+.hero-stats{display:flex;gap:40px;margin-top:48px}
+.hero-stat-num{font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-stat-label{font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;font-weight:600}
+
+/* Phone Mockup */
+.hero-visual{display:flex;justify-content:center;position:relative}
+.phone-mockup{width:280px;height:560px;background:linear-gradient(145deg,rgba(20,20,22,1),rgba(15,15,17,1));border-radius:40px;border:2px solid rgba(255,255,255,0.1);position:relative;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5),0 0 60px rgba(255,107,53,0.1);animation:float 6s ease-in-out infinite}
+.phone-screen{position:absolute;inset:8px;border-radius:34px;overflow:hidden;background:#0a0a0b;display:flex;flex-direction:column;padding:20px}
+.phone-status{display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-muted);margin-bottom:20px}
+.phone-greeting{font-size:0.85rem;color:var(--text-secondary);margin-bottom:4px}
+.phone-title{font-size:1.3rem;font-weight:800;margin-bottom:20px}
+.phone-challenge{background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(108,99,255,0.1));border:1px solid rgba(255,107,53,0.2);border-radius:16px;padding:16px;margin-bottom:16px}
+.phone-challenge-label{font-size:0.65rem;color:var(--primary);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-bottom:6px}
+.phone-challenge-title{font-size:0.95rem;font-weight:700;margin-bottom:8px}
+.phone-challenge-meta{display:flex;gap:12px;font-size:0.7rem;color:var(--text-secondary)}
+.phone-streak{display:flex;align-items:center;gap:10px;background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;padding:12px 16px;margin-bottom:16px}
+.phone-streak-fire{font-size:1.5rem}
+.phone-streak-num{font-size:1.4rem;font-weight:900;color:var(--primary)}
+.phone-streak-label{font-size:0.7rem;color:var(--text-secondary)}
+.phone-btn{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border:none;border-radius:14px;padding:14px;font-weight:700;font-size:0.85rem;text-align:center;margin-top:auto;cursor:pointer}
+.phone-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:400px;background:radial-gradient(circle,rgba(255,107,53,0.08) 0%,transparent 60%);pointer-events:none;z-index:-1}
+
+/* Skills Section */
+.section{padding:100px 24px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-label{font-size:0.75rem;color:var(--primary);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:12px}
+.section-title{font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px}
+.section-sub{font-size:1.05rem;color:var(--text-secondary);max-width:550px;margin-bottom:60px}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.skill-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:20px 16px;text-align:center;transition:all 0.3s;cursor:default}
+.skill-card:hover{background:var(--glass-strong);border-color:rgba(255,107,53,0.2);transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
+.skill-emoji{font-size:2rem;margin-bottom:8px}
+.skill-name{font-size:0.8rem;font-weight:600}
+
+/* How It Works */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;counter-reset:step}
+.step{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;padding:40px 32px;position:relative;transition:all 0.3s}
+.step:hover{border-color:rgba(255,107,53,0.2);background:var(--glass-strong)}
+.step::before{counter-increment:step;content:counter(step,decimal-leading-zero);font-size:4rem;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0.3;position:absolute;top:20px;right:24px;line-height:1}
+.step-icon{font-size:2.5rem;margin-bottom:20px}
+.step h3{font-size:1.2rem;font-weight:700;margin-bottom:10px}
+.step p{font-size:0.9rem;color:var(--text-secondary);line-height:1.6}
+
+/* AI Feedback Section */
+.ai-section{background:linear-gradient(180deg,var(--bg) 0%,rgba(108,99,255,0.05) 50%,var(--bg) 100%)}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.ai-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;padding:32px;max-width:420px}
+.ai-card-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.ai-avatar{width:40px;height:40px;background:linear-gradient(135deg,var(--secondary),var(--secondary-dark));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.ai-name{font-weight:700;font-size:0.95rem}
+.ai-tag{font-size:0.7rem;color:var(--secondary);font-weight:600}
+.ai-feedback-item{margin-bottom:16px;padding-left:20px;position:relative}
+.ai-feedback-item::before{content:'';position:absolute;left:0;top:8px;width:8px;height:8px;border-radius:50%}
+.ai-feedback-item.strength::before{background:var(--success)}
+.ai-feedback-item.tip::before{background:var(--primary)}
+.ai-feedback-item h4{font-size:0.8rem;font-weight:700;margin-bottom:4px}
+.ai-feedback-item p{font-size:0.85rem;color:var(--text-secondary);line-height:1.5}
+.ai-score{display:flex;align-items:center;gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--glass-border)}
+.ai-score-num{font-size:2rem;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ai-score-bar{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.ai-score-fill{height:100%;width:78%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:3px}
+
+/* Pricing */
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:800px;margin:0 auto}
+.price-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:24px;padding:40px;position:relative;transition:all 0.3s}
+.price-card.featured{border-color:rgba(255,107,53,0.3);background:linear-gradient(145deg,rgba(255,107,53,0.06),rgba(108,99,255,0.04))}
+.price-card.featured::before{content:'POPULAR';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:0.65rem;font-weight:800;padding:5px 16px;border-radius:50px;letter-spacing:0.1em}
+.price-name{font-size:1.1rem;font-weight:700;margin-bottom:8px}
+.price-amount{font-size:2.5rem;font-weight:900;margin-bottom:4px}
+.price-amount span{font-size:1rem;font-weight:500;color:var(--text-secondary)}
+.price-desc{font-size:0.85rem;color:var(--text-secondary);margin-bottom:28px}
+.price-features{list-style:none;margin-bottom:32px}
+.price-features li{font-size:0.85rem;padding:8px 0;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:10px}
+.price-features li::before{content:'';display:inline-block;width:18px;height:18px;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 13l4 4L19 7' stroke='%2334D399' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;flex-shrink:0}
+.price-btn{display:block;width:100%;text-align:center;padding:16px;border-radius:14px;font-weight:700;font-size:0.95rem;border:none;cursor:pointer;transition:all 0.3s}
+.price-btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 8px 25px rgba(255,107,53,0.3)}
+.price-btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(255,107,53,0.4)}
+.price-btn-secondary{background:var(--glass-strong);border:1px solid var(--glass-border);color:#fff}
+.price-btn-secondary:hover{border-color:rgba(255,255,255,0.15)}
+
+/* Download CTA */
+.cta-section{padding:120px 24px;text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,107,53,0.1) 0%,rgba(108,99,255,0.05) 40%,transparent 70%);pointer-events:none}
+.cta-title{font-size:clamp(2rem,4vw,3.2rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;position:relative;z-index:1}
+.cta-sub{font-size:1.05rem;color:var(--text-secondary);margin-bottom:48px;position:relative;z-index:1}
+.download-buttons{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.store-btn{display:flex;align-items:center;gap:12px;background:var(--glass);border:1px solid var(--glass-border);padding:14px 28px;border-radius:14px;transition:all 0.3s;cursor:pointer}
+.store-btn:hover{background:var(--glass-strong);border-color:rgba(255,255,255,0.15);transform:translateY(-3px)}
+.store-icon{font-size:1.8rem}
+.store-text-small{font-size:0.65rem;color:var(--text-secondary)}
+.store-text-big{font-size:1rem;font-weight:700}
+
+/* Footer */
+footer{border-top:1px solid var(--glass-border);padding:40px 24px;text-align:center}
+footer p{font-size:0.8rem;color:var(--text-muted)}
+
+/* Mobile */
+@media(max-width:768px){
+.hero-inner{grid-template-columns:1fr;text-align:center;gap:48px}
+.hero-sub{margin:0 auto 32px}
+.hero-buttons{justify-content:center}
+.hero-stats{justify-content:center}
+.nav-links{display:none}
+.steps{grid-template-columns:1fr}
+.ai-grid{grid-template-columns:1fr}
+.pricing-grid{grid-template-columns:1fr}
+.skills-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(prefers-reduced-motion:reduce){
+.fade-in{opacity:1;transform:none;transition:none}
+.phone-mockup{animation:none}
+html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="nav">
+<div class="nav-inner">
+<div class="logo"><span class="logo-icon">&#9889;</span> <span>SkillForge</span></div>
+<div class="nav-links">
+<a href="#features">Features</a>
+<a href="#how">How it Works</a>
+<a href="#pricing">Pricing</a>
+<a href="#download" class="nav-cta">Download</a>
+</div>
+</div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+<div class="hero-inner">
+<div class="fade-in">
+<div class="hero-badge"><span class="hero-badge-dot"></span> AI-Powered Practice Coach</div>
+<h1>Master Any Skill.<br><span class="gradient">5 Minutes a Day.</span></h1>
+<p class="hero-sub">Pick a creative skill. Practice daily. Get instant AI feedback that actually helps you improve. Guitar, drawing, singing, photography &mdash; your coach never sleeps.</p>
+<div class="hero-buttons">
+<a href="#download" class="btn-primary">&#9889; Download Free</a>
+<a href="#how" class="btn-secondary">&#9654; See How It Works</a>
+</div>
+<div class="hero-stats">
+<div><div class="hero-stat-num">20+</div><div class="hero-stat-label">Skills</div></div>
+<div><div class="hero-stat-num">5 min</div><div class="hero-stat-label">Per Day</div></div>
+<div><div class="hero-stat-num">AI</div><div class="hero-stat-label">Feedback</div></div>
+</div>
+</div>
+<div class="hero-visual fade-in delay-2">
+<div class="phone-glow"></div>
+<div class="phone-mockup">
+<div class="phone-screen">
+<div class="phone-status"><span>9:41</span><span>&#128267; 87%</span></div>
+<div class="phone-greeting">Good morning &#128075;</div>
+<div class="phone-title">Today's Challenge</div>
+<div class="phone-challenge">
+<div class="phone-challenge-label">&#127928; Guitar &bull; Day 12</div>
+<div class="phone-challenge-title">Fingerpicking: Travis Pattern</div>
+<div class="phone-challenge-meta"><span>&#9201; 5 min</span><span>&#127775; Intermediate</span></div>
+</div>
+<div class="phone-streak">
+<div class="phone-streak-fire">&#128293;</div>
+<div><div class="phone-streak-num">12</div><div class="phone-streak-label">day streak</div></div>
+</div>
+<div class="phone-btn">Start Practice &#8594;</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Skills -->
+<section class="section" id="features">
+<div class="section-inner">
+<div class="section-label fade-in">20+ Creative Skills</div>
+<div class="section-title fade-in">Pick your craft. <span style="color:var(--text-secondary)">We'll guide you.</span></div>
+<p class="section-sub fade-in">From music to visual arts, SkillForge builds a personalized 30-day roadmap powered by AI.</p>
+<div class="skills-grid">
+<div class="skill-card fade-in"><div class="skill-emoji">&#127928;</div><div class="skill-name">Guitar</div></div>
+<div class="skill-card fade-in delay-1"><div class="skill-emoji">&#127912;</div><div class="skill-name">Drawing</div></div>
+<div class="skill-card fade-in delay-1"><div class="skill-emoji">&#127908;</div><div class="skill-name">Singing</div></div>
+<div class="skill-card fade-in delay-2"><div class="skill-emoji">&#128247;</div><div class="skill-name">Photography</div></div>
+<div class="skill-card fade-in delay-2"><div class="skill-emoji">&#127929;</div><div class="skill-name">Piano</div></div>
+<div class="skill-card fade-in delay-3"><div class="skill-emoji">&#128483;</div><div class="skill-name">Speaking</div></div>
+<div class="skill-card fade-in delay-3"><div class="skill-emoji">&#9999;&#65039;</div><div class="skill-name">Writing</div></div>
+<div class="skill-card fade-in delay-4"><div class="skill-emoji">&#128131;</div><div class="skill-name">Dancing</div></div>
+</div>
+</div>
+</section>
+
+<!-- How It Works -->
+<section class="section" id="how" style="background:linear-gradient(180deg,var(--bg),rgba(255,107,53,0.03),var(--bg))">
+<div class="section-inner">
+<div class="section-label fade-in">Simple as 1-2-3</div>
+<div class="section-title fade-in">How It Works</div>
+<p class="section-sub fade-in">No fluff. Just daily practice with real results.</p>
+<div class="steps">
+<div class="step fade-in">
+<div class="step-icon">&#127919;</div>
+<h3>Pick Your Skill</h3>
+<p>Choose from 20+ creative skills. Set your level and goals. AI generates your personal 30-day roadmap.</p>
+</div>
+<div class="step fade-in delay-1">
+<div class="step-icon">&#127916;</div>
+<h3>Practice 5 Minutes</h3>
+<p>Complete your daily challenge. Record your practice with the built-in camera. That's it &mdash; 5 minutes.</p>
+</div>
+<div class="step fade-in delay-2">
+<div class="step-icon">&#129302;</div>
+<h3>Get AI Feedback</h3>
+<p>Our AI analyzes your practice and gives you specific, actionable feedback. Strengths, mistakes, and what to focus on next.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- AI Feedback -->
+<section class="section ai-section">
+<div class="section-inner">
+<div class="ai-grid">
+<div class="fade-in">
+<div class="section-label">AI-Powered Feedback</div>
+<div class="section-title">Your personal coach.<br><span style="color:var(--text-secondary)">Always watching. Always helping.</span></div>
+<p class="section-sub">After every practice session, our AI vision model analyzes your technique and gives you structured feedback you can actually use.</p>
+</div>
+<div class="fade-in delay-2">
+<div class="ai-card">
+<div class="ai-card-header">
+<div class="ai-avatar">&#129302;</div>
+<div><div class="ai-name">SkillForge AI</div><div class="ai-tag">Guitar &bull; Day 12 Feedback</div></div>
+</div>
+<div class="ai-feedback-item strength">
+<h4>&#128154; Strength</h4>
+<p>Your thumb alternating bass pattern is solid and consistent. Great rhythm foundation.</p>
+</div>
+<div class="ai-feedback-item tip">
+<h4>&#128293; Improve</h4>
+<p>Try relaxing your picking hand wrist more &mdash; you're tensing up on the upstrokes which slows transitions.</p>
+</div>
+<div class="ai-feedback-item strength">
+<h4>&#127775; Next Step</h4>
+<p>Tomorrow: add the pinch technique to beats 1 and 3. You're ready for it.</p>
+</div>
+<div class="ai-score">
+<div class="ai-score-num">7.8</div>
+<div style="flex:1"><div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px">Session Score</div><div class="ai-score-bar"><div class="ai-score-fill"></div></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Pricing -->
+<section class="section" id="pricing">
+<div class="section-inner" style="text-align:center">
+<div class="section-label fade-in">Pricing</div>
+<div class="section-title fade-in">Start free. <span style="color:var(--text-secondary)">Upgrade when you're hooked.</span></div>
+<p class="section-sub fade-in" style="margin:0 auto 60px">No credit card required. Practice your first skill for free, forever.</p>
+<div class="pricing-grid">
+<div class="price-card fade-in">
+<div class="price-name">Free</div>
+<div class="price-amount">$0</div>
+<div class="price-desc">Perfect to get started</div>
+<ul class="price-features">
+<li>1 skill</li>
+<li>Daily challenges</li>
+<li>Basic AI feedback</li>
+<li>Streak tracking</li>
+<li>Skill tree progression</li>
+</ul>
+<a href="#download" class="price-btn price-btn-secondary">Get Started</a>
+</div>
+<div class="price-card featured fade-in delay-1">
+<div class="price-name">Premium</div>
+<div class="price-amount">$6.99<span>/mo</span></div>
+<div class="price-desc">For the serious learner</div>
+<ul class="price-features">
+<li>Unlimited skills</li>
+<li>Full AI analysis</li>
+<li>Community feed</li>
+<li>Advanced analytics</li>
+<li>Streak freeze tokens</li>
+<li>Priority support</li>
+</ul>
+<a href="#download" class="price-btn price-btn-primary">Start Free Trial</a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Download CTA -->
+<section class="cta-section" id="download">
+<div class="cta-title fade-in">Ready to forge your talent?</div>
+<div class="cta-sub fade-in">Download SkillForge and start your first practice session today.</div>
+<div class="download-buttons fade-in delay-1">
+<a href="#" id="appstore-link" class="store-btn">
+<div class="store-icon">&#63743;</div>
+<div><div class="store-text-small">Download on the</div><div class="store-text-big">App Store</div></div>
+</a>
+<a href="#" id="apk-link" class="store-btn">
+<div class="store-icon">&#9654;</div>
+<div><div class="store-text-small">Download</div><div class="store-text-big">Android APK</div></div>
+</a>
+</div>
+</section>
+
+<!-- Footer -->
+<footer>
+<p>&copy; 2026 SkillForge. Talent is Practice.</p>
+</footer>
+
+<script>
+// Nav scroll
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>50)});
+
+// Fade in on scroll
+const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}})},{threshold:0.1,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
