@@ -41,7 +41,7 @@ export function SubscriptionScreen() {
     try {
       const packages = await getOfferings();
       if (packages.length === 0) {
-        Alert.alert('Unavailable', 'No subscription packages available at this time.');
+        Alert.alert('Unavailable', 'No subscription packages available. Please check RevenueCat dashboard: offerings must have a "default" offering with at least one package linked to an App Store Connect product.');
         return;
       }
       const success = await purchasePackage(packages[0]);
