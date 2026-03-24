@@ -69,6 +69,12 @@ function AppContent() {
       }
 
       try {
+        // Initialize RevenueCat
+        const { initPurchases } = require('./src/services/purchases');
+        await initPurchases('local-user');
+      } catch {}
+
+      try {
         // Load navigator
         RootNavigator = require('./src/navigation/RootNavigator').RootNavigator;
       } catch (e: any) {
