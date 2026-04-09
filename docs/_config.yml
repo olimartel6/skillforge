@@ -1,0 +1,8 @@
+exclude:
+  - superpowers/
+  - "*.ts"
+  - "*.tsx"
+  - "*.js"
+  - node_modules/
+  - src/
+  - plugins/
