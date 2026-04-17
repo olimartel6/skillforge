@@ -2,7 +2,7 @@
   "expo": {
     "name": "Skilly",
     "slug": "skilly",
-    "version": "1.0.0",
+    "version": "1.9.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -12,6 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#0a0a0b"
     },
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.olimartel6.skilly",
@@ -29,7 +30,7 @@
       "package": "com.olimartel6.skilly",
       "adaptiveIcon": {
         "backgroundColor": "#0a0a0b",
-        "foregroundImage": "./assets/icon.png"
+        "foregroundImage": "./assets/android-icon-foreground.png"
       },
       "permissions": [
         "android.permission.CAMERA",
@@ -68,7 +69,9 @@
         {
           "photosPermission": "SkillForge needs photo library access to save practice photos."
         }
-      ]
+      ],
+      "expo-localization",
+      "expo-sharing"
     ],
     "extra": {
       "eas": {

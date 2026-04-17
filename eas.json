@@ -35,7 +35,8 @@
     "production": {
       "ios": {
         "appleId": "olimartel6@gmail.com",
-        "appleTeamId": "D8SXYV7QXP"
+        "appleTeamId": "D8SXYV7QXP",
+        "ascAppId": "6760734423"
       }
     }
   }

@@ -19,6 +19,7 @@ import { useTimer } from '../../hooks/useTimer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
+import { t } from '../../i18n';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -70,11 +71,11 @@ export function PracticeSessionScreen() {
 
   const handleTimerComplete = () => {
     Alert.alert(
-      'Time\'s Up!',
-      'Your practice time is complete. Submit your session?',
+      t('practice.timesUp'),
+      t('practice.timesUpMsg'),
       [
-        { text: 'Continue', style: 'cancel', onPress: () => start() },
-        { text: 'Submit', style: 'default', onPress: () => handleSubmit(null) },
+        { text: t('practice.continue'), style: 'cancel', onPress: () => start() },
+        { text: t('practice.submit'), style: 'default', onPress: () => handleSubmit(null) },
       ]
     );
   };
@@ -82,11 +83,11 @@ export function PracticeSessionScreen() {
   const handleClose = () => {
     pause();
     Alert.alert(
-      'End Session?',
-      'Your progress will be lost.',
+      t('practice.endSession'),
+      t('practice.endSessionMsg'),
       [
-        { text: 'Continue', style: 'cancel', onPress: () => resume() },
-        { text: 'End', style: 'destructive', onPress: () => navigation.goBack() },
+        { text: t('practice.continue'), style: 'cancel', onPress: () => resume() },
+        { text: t('practice.end'), style: 'destructive', onPress: () => navigation.goBack() },
       ]
     );
   };
@@ -111,11 +112,11 @@ export function PracticeSessionScreen() {
 
     // Show confirmation — don't auto-submit
     Alert.alert(
-      'Finish Early?',
-      'Submit your practice now or keep going?',
+      t('practice.finishEarly'),
+      t('practice.finishEarlyMsg'),
       [
-        { text: 'Keep Going', style: 'cancel' },
-        { text: 'Submit', style: 'default', onPress: () => handleSubmit(capturedUri) },
+        { text: t('practice.keepGoing'), style: 'cancel' },
+        { text: t('practice.submit'), style: 'default', onPress: () => handleSubmit(capturedUri) },
       ]
     );
   };
@@ -221,15 +222,15 @@ export function PracticeSessionScreen() {
           ) : permission?.granted && Platform.OS === 'android' ? (
             <View style={styles.cameraPlaceholder}>
               <Text style={styles.cameraPlaceholderIcon}>📹</Text>
-              <Text style={styles.cameraPlaceholderText}>Camera Active</Text>
-              <Text style={[styles.cameraPlaceholderSub, { color: '#34D399' }]}>Recording your practice</Text>
+              <Text style={styles.cameraPlaceholderText}>{t('practice.cameraActive')}</Text>
+              <Text style={[styles.cameraPlaceholderSub, { color: '#34D399' }]}>{t('practice.recordingPractice')}</Text>
             </View>
           ) : (
             <View style={styles.cameraPlaceholder}>
               <Text style={styles.cameraPlaceholderIcon}>📹</Text>
-              <Text style={styles.cameraPlaceholderText}>Camera Access Required</Text>
+              <Text style={styles.cameraPlaceholderText}>{t('practice.cameraRequired')}</Text>
               <TouchableOpacity onPress={requestPermission}>
-                <Text style={styles.cameraPlaceholderSub}>Tap to enable camera</Text>
+                <Text style={styles.cameraPlaceholderSub}>{t('practice.tapToEnable')}</Text>
               </TouchableOpacity>
             </View>
           )}

@@ -1,6 +1,37 @@
 import { supabase } from './supabase';
 import { AIFeedback, Challenge } from '../utils/types';
 
+export interface CoachMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface CoachMissed {
+  skillName: string;
+  moduleName: string;
+  prompt: string;
+  correctAnswer: string;
+  explanation?: string;
+}
+
+export interface CoachChatRequest {
+  messages: CoachMessage[];
+  missed: CoachMissed[];
+  skillName?: string;
+  xp?: number;
+  streak?: number;
+  level?: number;
+}
+
+export async function chatAICoach(req: CoachChatRequest): Promise<string> {
+  const { data, error } = await supabase.functions.invoke('chat-ai-coach', {
+    body: req,
+  });
+  if (error) throw error;
+  if (!data?.reply) throw new Error('empty reply');
+  return data.reply as string;
+}
+
 export async function generateChallenge(
   skillId: string,
   nodeId: string,

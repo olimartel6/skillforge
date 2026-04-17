@@ -20,6 +20,7 @@ import { Skill } from '../../utils/types';
 import { supabase } from '../../services/supabase';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import * as Haptics from 'expo-haptics';
+import { t } from '../../i18n';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'SkillSelection'>;
 
@@ -41,7 +42,7 @@ export function SkillSelectionScreen() {
       const { data, error } = await supabase
         .from('skills')
         .select('*')
-        .order('name');
+        .order('sort_order').order('name');
       if (!error && data) setSkills(data as Skill[]);
       setLoading(false);
     })();
@@ -78,8 +79,8 @@ export function SkillSelectionScreen() {
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.step}>STEP 1 OF 3</Text>
-        <Text style={styles.heading}>What will you master?</Text>
+        <Text style={styles.step}>{t('skillSelection.step')}</Text>
+        <Text style={styles.heading}>{t('skillSelection.heading')}</Text>
 
         {loading ? (
           <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />
@@ -134,14 +135,14 @@ export function SkillSelectionScreen() {
 
         {!showAll && skills.length > INITIAL_VISIBLE && (
           <TouchableOpacity onPress={() => setShowAll(true)} activeOpacity={0.7}>
-            <Text style={styles.seeAll}>See all {skills.length}+ skills →</Text>
+            <Text style={styles.seeAll}>{t('skillSelection.seeAll', { count: skills.length })}</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
 
       <View style={styles.footer}>
         <Button
-          title="Continue"
+          title={t('skillSelection.continue')}
           onPress={() => {
             try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch {}
             if (selectedId) navigation.navigate('LevelSelection', { skillId: selectedId });

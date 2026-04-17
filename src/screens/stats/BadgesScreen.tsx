@@ -11,6 +11,7 @@ import { colors, spacing, borderRadius, typography } from '../../utils/theme';
 import { useUserStore } from '../../store/userStore';
 import { useStreakStore } from '../../store/streakStore';
 import { Badge } from '../../utils/types';
+import { t } from '../../i18n';
 
 function getBadgeColor(conditionType: string): string {
   switch (conditionType) {
@@ -20,6 +21,14 @@ function getBadgeColor(conditionType: string): string {
       return colors.secondary;
     case 'skill':
       return colors.success;
+    case 'quiz':
+      return '#FFD700';
+    case 'trading':
+      return '#34D399';
+    case 'social':
+      return '#60A5FA';
+    case 'content':
+      return '#A78BFA';
     default:
       return colors.primary;
   }
@@ -27,7 +36,7 @@ function getBadgeColor(conditionType: string): string {
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 export function BadgesScreen() {
@@ -46,7 +55,7 @@ export function BadgesScreen() {
     <View style={styles.root}>
       <SafeAreaView style={styles.safe} edges={['top']}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <Text style={styles.title}>Badges</Text>
+          <Text style={styles.title}>{t('badges.title')}</Text>
 
           <View style={styles.grid}>
             {badges.map((badge: Badge) => {
@@ -69,6 +78,9 @@ export function BadgesScreen() {
                         <Text style={styles.badgeIcon}>{badge.icon}</Text>
                       </View>
                       <Text style={styles.badgeName}>{badge.name}</Text>
+                      {badge.description ? (
+                        <Text style={styles.badgeDesc}>{badge.description}</Text>
+                      ) : null}
                       <Text style={styles.earnedDate}>{formatDate(earnedAt!)}</Text>
                     </GlassCard>
                   ) : (
@@ -77,7 +89,10 @@ export function BadgesScreen() {
                         <Text style={styles.badgeIconLocked}>{badge.icon}</Text>
                       </View>
                       <Text style={styles.badgeNameLocked}>{badge.name}</Text>
-                      <Text style={styles.lockedLabel}>Locked</Text>
+                      {badge.description ? (
+                        <Text style={styles.badgeDescLocked}>{badge.description}</Text>
+                      ) : null}
+                      <Text style={styles.lockedLabel}>{t('badges.locked')}</Text>
                     </View>
                   )}
                 </View>
@@ -100,7 +115,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing['6xl'],
+    paddingBottom: 120,
   },
   title: {
     ...typography.h2,
@@ -141,6 +156,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
+  badgeDesc: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+    lineHeight: 14,
+  },
   earnedDate: {
     ...typography.caption,
     color: colors.textSecondary,
@@ -175,6 +197,13 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: '500',
     textAlign: 'center',
+  },
+  badgeDescLocked: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+    lineHeight: 14,
   },
   lockedLabel: {
     ...typography.caption,

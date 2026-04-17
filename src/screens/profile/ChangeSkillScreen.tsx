@@ -19,7 +19,9 @@ import { colors, spacing, typography, borderRadius } from '../../utils/theme';
 import { Skill } from '../../utils/types';
 import { supabase } from '../../services/supabase';
 import { useUserStore } from '../../store/userStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { t } from '../../i18n';
 
 const CARD_GAP = spacing.sm;
 const SCREEN_PADDING = spacing.xl;
@@ -27,7 +29,7 @@ const CARD_WIDTH = (Dimensions.get('window').width - SCREEN_PADDING * 2 - CARD_G
 
 export function ChangeSkillScreen() {
   const navigation = useNavigation<any>();
-  const { profile, changeSkill } = useUserStore();
+  const { profile, changeSkill, updateProfile } = useUserStore();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(profile?.selected_skill_id || null);
   const [loading, setLoading] = useState(true);
@@ -39,11 +41,41 @@ export function ChangeSkillScreen() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.from('skills').select('*').order('name');
+      const { data } = await supabase.from('skills').select('*').order('sort_order').order('name');
       if (data) setSkills(data as Skill[]);
       setLoading(false);
     })();
   }, []);
+
+  const promptLevel = () => {
+    Alert.alert(
+      t('changeSkill.levelPrompt'),
+      '',
+      [
+        {
+          text: t('levelSelection.beginner'),
+          onPress: async () => {
+            await updateProfile({ skill_level: 'beginner' });
+            navigation.goBack();
+          },
+        },
+        {
+          text: t('levelSelection.intermediate'),
+          onPress: async () => {
+            await updateProfile({ skill_level: 'intermediate' });
+            navigation.goBack();
+          },
+        },
+        {
+          text: t('levelSelection.advanced'),
+          onPress: async () => {
+            await updateProfile({ skill_level: 'advanced' });
+            navigation.goBack();
+          },
+        },
+      ]
+    );
+  };
 
   const handleSwitch = async () => {
     if (!selectedId || selectedId === profile?.selected_skill_id) {
@@ -53,29 +85,35 @@ export function ChangeSkillScreen() {
 
     if (!isPremium) {
       Alert.alert(
-        'Premium Feature',
-        'Free users can only learn 1 skill. Upgrade to Premium to switch between unlimited skills.',
+        t('changeSkill.premiumFeature'),
+        t('changeSkill.premiumMsg'),
         [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Go Premium', onPress: () => navigation.navigate('Subscription') },
+          { text: t('changeSkill.cancel'), style: 'cancel' },
+          { text: t('changeSkill.goPremium'), onPress: () => navigation.navigate('Subscription') },
         ]
       );
       return;
     }
 
     Alert.alert(
-      'Switch Skill?',
-      'Your progress on your current skill will be saved. You can switch back anytime without losing progress.',
+      t('changeSkill.switchSkill'),
+      t('changeSkill.switchMsg'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('changeSkill.cancel'), style: 'cancel' },
         {
-          text: 'Switch',
+          text: t('changeSkill.switch'),
           style: 'default',
           onPress: async () => {
             setSwitching(true);
             await changeSkill(selectedId);
             setSwitching(false);
-            navigation.goBack();
+            // Only ask for level if this skill hasn't been played before
+            const existingProgress = await AsyncStorage.getItem(`skill_progress_${selectedId}`);
+            if (!existingProgress) {
+              promptLevel();
+            } else {
+              navigation.goBack();
+            }
           },
         },
       ]
@@ -91,11 +129,11 @@ export function ChangeSkillScreen() {
         <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
           <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.heading}>Change Skill</Text>
+        <Text style={styles.heading}>{t('changeSkill.title')}</Text>
         <View style={{ width: 24 }} />
       </View>
 
-      <Text style={styles.subtitle}>Your progress is saved for each skill. Switch back anytime.</Text>
+      <Text style={styles.subtitle}>{t('changeSkill.subtitle')}</Text>
 
       {loading ? (
         <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />
@@ -125,7 +163,7 @@ export function ChangeSkillScreen() {
                     </Text>
                     {isCurrent && (
                       <View style={styles.currentBadge}>
-                        <Text style={styles.currentBadgeText}>Current</Text>
+                        <Text style={styles.currentBadgeText}>{t('changeSkill.current')}</Text>
                       </View>
                     )}
                   </GlassCard>
@@ -138,7 +176,7 @@ export function ChangeSkillScreen() {
 
       <View style={styles.footer}>
         <Button
-          title={switching ? 'Switching...' : selectedId === profile?.selected_skill_id ? 'Already Selected' : 'Switch Skill'}
+          title={switching ? t('changeSkill.switching') : selectedId === profile?.selected_skill_id ? t('changeSkill.alreadySelected') : t('changeSkill.switchBtn')}
           onPress={() => {
             try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); } catch {}
             handleSwitch();
@@ -220,7 +258,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: SCREEN_PADDING,
-    paddingBottom: spacing['4xl'],
+    paddingBottom: 100,
     paddingTop: spacing.lg,
     backgroundColor: colors.background,
   },

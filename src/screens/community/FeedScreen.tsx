@@ -21,8 +21,16 @@ import {
   POST_STREAKS,
 } from './fakeData';
 import * as Haptics from 'expo-haptics';
+import { t } from '../../i18n';
+
+import { LeaderboardScreen } from './LeaderboardScreen';
+import { LeagueScreen } from './LeagueScreen';
+import { CommDailyChallengeScreen } from './DailyChallengeScreen';
+import { GlobalLeaderboardScreen } from './GlobalLeaderboardScreen';
 
 const PAGE_SIZE = 20;
+
+type CommunityTab = 'leaderboard' | 'league' | 'challenge' | 'rankings';
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -46,40 +54,45 @@ function AvatarCircle({ username, gradientColors }: { username: string; gradient
   );
 }
 
-export function FeedScreen() {
-  const navigation = useNavigation<any>();
-  const profile = useUserStore((s) => s.profile);
-  const [posts, setPosts] = useState<CommunityPost[]>(FAKE_POSTS);
-  const [loading, setLoading] = useState(false);
+function TabBar({ activeTab, onTabPress }: { activeTab: CommunityTab; onTabPress: (tab: CommunityTab) => void }) {
+  const tabs: { key: CommunityTab; label: string }[] = [
+    { key: 'leaderboard', label: t('leaderboard.title') },
+    { key: 'rankings', label: t('globalLeaderboard.tab') },
+    { key: 'league', label: t('league.title') },
+    { key: 'challenge', label: t('challenge.title') },
+  ];
 
-  const isPremium = profile?.premium_expires_at
-    ? new Date(profile.premium_expires_at) > new Date()
-    : false;
-
-  if (!isPremium) {
-    return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.paywallContainer}>
-          <Text style={{ fontSize: 48, marginBottom: 20 }}>👥</Text>
-          <Text style={styles.paywallTitle}>Unlock Community</Text>
-          <Text style={styles.paywallSub}>See what other learners are practicing. Share your progress and get inspired.</Text>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate('ProfileTab', { screen: 'Subscription' })}
-          >
+  return (
+    <View style={styles.tabBar}>
+      {tabs.map((tab) => (
+        <TouchableOpacity
+          key={tab.key}
+          activeOpacity={0.7}
+          onPress={() => {
+            try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
+            onTabPress(tab.key);
+          }}
+          style={[styles.tab, activeTab === tab.key && styles.tabActive]}
+        >
+          <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
+            {tab.label}
+          </Text>
+          {activeTab === tab.key && (
             <LinearGradient
-              colors={['#FF6B35', '#FF3D00']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.paywallBtn}
-            >
-              <Text style={styles.paywallBtnText}>Go Premium — $6.99/mo</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
+              colors={[colors.primary, colors.primaryDark]}
+              style={styles.tabIndicator}
+            />
+          )}
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
+function FeedContent() {
+  const navigation = useNavigation<any>();
+  const [posts, setPosts] = useState<CommunityPost[]>(FAKE_POSTS);
+  const [loading] = useState(false);
 
   const toggleLike = (post: CommunityPost) => {
     try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
@@ -110,7 +123,18 @@ export function FeedScreen() {
       >
         {/* Header */}
         <View style={styles.postHeader}>
-          <AvatarCircle username={item.user?.username || 'U'} gradientColors={gradientColors} />
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('PublicProfile', {
+              userId: item.user?.id,
+              username: item.user?.username || 'User',
+              xp: item.like_count * 10,
+              skill: item.skill?.name || 'Learning',
+              isCurrentUser: false,
+            })}
+          >
+            <AvatarCircle username={item.user?.username || 'U'} gradientColors={gradientColors} />
+          </TouchableOpacity>
           <View style={styles.postHeaderText}>
             <Text style={styles.postUsername}>{item.user?.username || 'User'}</Text>
             <Text style={styles.postMeta}>
@@ -157,37 +181,70 @@ export function FeedScreen() {
 
   if (loading) {
     return (
-      <View style={styles.root}>
-        <SafeAreaView style={styles.safe} edges={['top']}>
-          <View style={styles.centered}>
-            <ActivityIndicator color={colors.primary} size="large" />
-          </View>
-        </SafeAreaView>
+      <View style={styles.centered}>
+        <ActivityIndicator color={colors.primary} size="large" />
       </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={posts}
+      renderItem={renderPost}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.list}
+      showsVerticalScrollIndicator={false}
+      ListEmptyComponent={
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>{t('community.noPosts')}</Text>
+        </View>
+      }
+    />
+  );
+}
+
+export function FeedScreen() {
+  const navigation = useNavigation<any>();
+  const profile = useUserStore((s) => s.profile);
+  const [activeTab, setActiveTab] = useState<CommunityTab>('leaderboard');
+
+  const isPremium = profile?.premium_expires_at
+    ? new Date(profile.premium_expires_at) > new Date()
+    : false;
+
+  if (!isPremium) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.paywallContainer}>
+          <Text style={{ fontSize: 48, marginBottom: 20 }}>👥</Text>
+          <Text style={styles.paywallTitle}>{t('community.unlockTitle')}</Text>
+          <Text style={styles.paywallSub}>{t('community.unlockSub')}</Text>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('ProfileTab', { screen: 'Subscription' })}
+          >
+            <LinearGradient
+              colors={['#FF6B35', '#FF3D00']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.paywallBtn}
+            >
+              <Text style={styles.paywallBtnText}>{t('community.goPremium')}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
     <View style={styles.root}>
       <SafeAreaView style={styles.safe} edges={['top']}>
-        <Text style={styles.title}>Community</Text>
-        <FlatList
-          data={posts}
-          renderItem={renderPost}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-          ListFooterComponent={
-            false ? (
-              <ActivityIndicator color={colors.primary} style={styles.footer} />
-            ) : null
-          }
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No posts yet. Share your practice!</Text>
-            </View>
-          }
-        />
+        <TabBar activeTab={activeTab} onTabPress={setActiveTab} />
+        {activeTab === 'leaderboard' && <LeaderboardScreen />}
+        {activeTab === 'rankings' && <GlobalLeaderboardScreen />}
+        {activeTab === 'league' && <LeagueScreen />}
+        {activeTab === 'challenge' && <CommDailyChallengeScreen />}
       </SafeAreaView>
     </View>
   );
@@ -200,22 +257,50 @@ const styles = StyleSheet.create({
   },
   safe: {
     flex: 1,
+    backgroundColor: colors.background,
   },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    ...typography.h2,
-    color: colors.textPrimary,
+
+  // Tab Bar
+  tabBar: {
+    flexDirection: 'row',
     paddingHorizontal: spacing.xl,
-    marginTop: spacing.lg,
-    marginBottom: spacing.lg,
+    paddingTop: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
   },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    position: 'relative',
+  },
+  tabActive: {},
+  tabText: {
+    ...typography.bodySmall,
+    color: colors.textMuted,
+    fontWeight: '600',
+  },
+  tabTextActive: {
+    color: colors.textPrimary,
+  },
+  tabIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    left: '20%',
+    right: '20%',
+    height: 2,
+    borderRadius: 1,
+  },
+
   list: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing['6xl'],
+    paddingBottom: 120,
+    paddingTop: spacing.lg,
   },
 
   // Post Card
@@ -300,9 +385,6 @@ const styles = StyleSheet.create({
   },
 
   // Footer / Empty
-  footer: {
-    paddingVertical: spacing.xl,
-  },
   emptyContainer: {
     paddingVertical: spacing['5xl'],
     alignItems: 'center',

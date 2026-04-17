@@ -17,6 +17,7 @@ import { Button } from '../../components/Button';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
 import { useUserStore } from '../../store/userStore';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
+import { t } from '../../i18n';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'ProfileSetup'>;
 
@@ -54,16 +55,16 @@ export function ProfileSetupScreen() {
 
           <View style={styles.header}>
             <Text style={styles.emoji}>👋</Text>
-            <Text style={styles.heading}>What's your name?</Text>
-            <Text style={styles.sub}>We'll personalize your experience</Text>
+            <Text style={styles.heading}>{t('profileSetup.heading')}</Text>
+            <Text style={styles.sub}>{t('profileSetup.sub')}</Text>
           </View>
 
           {/* Name Input */}
           <View style={styles.inputSection}>
-            <Text style={styles.label}>YOUR NAME</Text>
+            <Text style={styles.label}>{t('profileSetup.nameLabel')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter your name"
+              placeholder={t('profileSetup.namePlaceholder')}
               placeholderTextColor={colors.textMuted}
               value={name}
               onChangeText={setName}
@@ -74,7 +75,7 @@ export function ProfileSetupScreen() {
 
           {/* Date of Birth */}
           <View style={styles.inputSection}>
-            <Text style={styles.label}>DATE OF BIRTH</Text>
+            <Text style={styles.label}>{t('profileSetup.dobLabel')}</Text>
             <View style={styles.dobRow}>
               <TextInput
                 style={[styles.input, styles.dobInput]}
@@ -119,7 +120,7 @@ export function ProfileSetupScreen() {
           {birthYear.length === 4 && birthMonth && birthDay && (
             <View style={styles.ageContainer}>
               <Text style={styles.ageText}>
-                {calculateAge(parseInt(birthYear), parseInt(birthMonth), parseInt(birthDay))} years old
+                {calculateAge(parseInt(birthYear), parseInt(birthMonth), parseInt(birthDay))} {t('profileSetup.yearsOld')}
               </Text>
             </View>
           )}
@@ -127,7 +128,7 @@ export function ProfileSetupScreen() {
 
         <View style={styles.footer}>
           <Button
-            title="Continue"
+            title={t('profileSetup.continue')}
             onPress={handleContinue}
             disabled={!isValid}
           />

@@ -14,6 +14,7 @@ import { colors, spacing, borderRadius, typography } from '../../utils/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUserStore } from '../../store/userStore';
 import { useStreakStore } from '../../store/streakStore';
+import { t } from '../../i18n';
 
 export function StreakDashboardScreen() {
   const navigation = useNavigation<any>();
@@ -29,7 +30,7 @@ export function StreakDashboardScreen() {
       try {
         const stored = await AsyncStorage.getItem('practice_count');
         setTotalMinutes((stored ? parseInt(stored, 10) : 0) * 5);
-      } catch {}
+      } catch (e) { console.warn('Load practice minutes failed:', e); }
     };
     loadMinutes();
   }, []);
@@ -44,22 +45,22 @@ export function StreakDashboardScreen() {
           <View style={styles.hero}>
             <Text style={styles.flameEmoji}>🔥</Text>
             <Text style={styles.streakNumber}>{currentStreak}</Text>
-            <Text style={styles.streakLabel}>Day Streak</Text>
+            <Text style={styles.streakLabel}>{t('stats.dayStreak')}</Text>
           </View>
 
           {/* Stats Row */}
           <View style={styles.statsRow}>
             <GlassCard style={styles.statCard}>
               <Text style={styles.statValue}>{longestStreak}</Text>
-              <Text style={styles.statLabel}>Best Streak</Text>
+              <Text style={styles.statLabel}>{t('stats.bestStreak')}</Text>
             </GlassCard>
             <GlassCard style={styles.statCard}>
               <Text style={styles.statValue}>{freezeTokens}</Text>
-              <Text style={styles.statLabel}>Freeze Tokens</Text>
+              <Text style={styles.statLabel}>{t('stats.freezeTokens')}</Text>
             </GlassCard>
             <GlassCard style={styles.statCard}>
               <Text style={styles.statValue}>{totalMinutes}</Text>
-              <Text style={styles.statLabel}>Total Minutes</Text>
+              <Text style={styles.statLabel}>{t('stats.totalMinutes')}</Text>
             </GlassCard>
           </View>
 
@@ -72,9 +73,9 @@ export function StreakDashboardScreen() {
               <View style={styles.badgesLinkContent}>
                 <Text style={styles.badgesIcon}>🏆</Text>
                 <View style={styles.badgesTextContainer}>
-                  <Text style={styles.badgesTitle}>View Badges</Text>
+                  <Text style={styles.badgesTitle}>{t('stats.viewBadges')}</Text>
                   <Text style={styles.badgesSubtitle}>
-                    See all your achievements
+                    {t('stats.seeAchievements')}
                   </Text>
                 </View>
                 <Text style={styles.chevron}>›</Text>
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing['6xl'],
+    paddingBottom: 120,
   },
 
   // Hero

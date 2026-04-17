@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, SkillLevel, Goal } from '../utils/types';
+import { saveBackupDebounced } from '../services/cloudSync';
 
 interface SkillProgress {
   roadmap: any[];
@@ -34,7 +35,7 @@ const DEFAULT_USER: User = {
 };
 
 // Keys that hold per-skill progress
-const PROGRESS_KEYS = ['user_roadmap', 'streak_data', 'earned_badges', 'practice_count', 'game_store'];
+const PROGRESS_KEYS = ['user_roadmap', 'streak_data', 'earned_badges', 'practice_count', 'game_xp', 'game_daily_xp', 'game_daily_date', 'game_completed_lessons'];
 
 async function saveCurrentSkillProgress(skillId: string) {
   const progress: Record<string, string | null> = {};
@@ -97,6 +98,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     const updated = { ...profile, ...updates };
     set({ profile: updated });
     await AsyncStorage.setItem('user_profile', JSON.stringify(updated));
+    saveBackupDebounced();
   },
 
   completeOnboarding: async (skillId, level, goal) => {
@@ -113,6 +115,7 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     set({ profile: updated, isOnboarded: true });
     await AsyncStorage.setItem('user_profile', JSON.stringify(updated));
+    saveBackupDebounced();
   },
 
   changeSkill: async (newSkillId) => {
@@ -134,6 +137,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     };
     set({ profile: updated });
     await AsyncStorage.setItem('user_profile', JSON.stringify(updated));
+    saveBackupDebounced();
   },
 
   signOut: async () => {

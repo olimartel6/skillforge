@@ -24,6 +24,7 @@ import {
   POST_STREAKS,
 } from './fakeData';
 import * as Haptics from 'expo-haptics';
+import { t } from '../../i18n';
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -191,12 +192,12 @@ export function PostDetailScreen() {
                   </View>
 
                   {/* Comments Header */}
-                  <Text style={styles.commentsHeader}>Comments</Text>
+                  <Text style={styles.commentsHeader}>{t('community.comments')}</Text>
                 </View>
               ) : null
             }
             ListEmptyComponent={
-              <Text style={styles.noComments}>No comments yet. Be the first!</Text>
+              <Text style={styles.noComments}>{t('community.noComments')}</Text>
             }
           />
 
@@ -204,7 +205,7 @@ export function PostDetailScreen() {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.textInput}
-              placeholder="Add a comment..."
+              placeholder={t('community.addComment')}
               placeholderTextColor={colors.textMuted}
               value={commentText}
               onChangeText={setCommentText}
@@ -217,7 +218,7 @@ export function PostDetailScreen() {
               disabled={!commentText.trim() || sending}
               activeOpacity={0.7}
             >
-              <Text style={styles.sendText}>Send</Text>
+              <Text style={styles.sendText}>{t('community.send')}</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.lg,
+    paddingBottom: 120,
   },
 
   // Avatar

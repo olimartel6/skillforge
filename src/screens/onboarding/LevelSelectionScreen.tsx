@@ -10,14 +10,15 @@ import { colors, spacing, typography } from '../../utils/theme';
 import { SkillLevel } from '../../utils/types';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import * as Haptics from 'expo-haptics';
+import { t } from '../../i18n';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'LevelSelection'>;
 type Route = RouteProp<OnboardingStackParamList, 'LevelSelection'>;
 
-const LEVELS: { value: SkillLevel; icon: string; title: string; subtitle: string }[] = [
-  { value: 'beginner', icon: '🌱', title: 'Beginner', subtitle: 'Starting from scratch' },
-  { value: 'intermediate', icon: '⚡', title: 'Intermediate', subtitle: 'I know the fundamentals' },
-  { value: 'advanced', icon: '🔥', title: 'Advanced', subtitle: 'Ready to master it' },
+const LEVELS: { value: SkillLevel; icon: string; titleKey: string; subtitleKey: string }[] = [
+  { value: 'beginner', icon: '🌱', titleKey: 'levelSelection.beginner', subtitleKey: 'levelSelection.beginnerSub' },
+  { value: 'intermediate', icon: '⚡', titleKey: 'levelSelection.intermediate', subtitleKey: 'levelSelection.intermediateSub' },
+  { value: 'advanced', icon: '🔥', titleKey: 'levelSelection.advanced', subtitleKey: 'levelSelection.advancedSub' },
 ];
 
 export function LevelSelectionScreen() {
@@ -32,8 +33,8 @@ export function LevelSelectionScreen() {
       <AmbientGlow color={colors.secondary} size={250} top="10%" left="60%" opacity={0.08} />
 
       <View style={styles.content}>
-        <Text style={styles.step}>STEP 2 OF 3</Text>
-        <Text style={styles.heading}>Your experience?</Text>
+        <Text style={styles.step}>{t('levelSelection.step')}</Text>
+        <Text style={styles.heading}>{t('levelSelection.heading')}</Text>
 
         <View style={styles.options}>
           {LEVELS.map((level) => {
@@ -55,9 +56,9 @@ export function LevelSelectionScreen() {
                   <Text style={styles.icon}>{level.icon}</Text>
                   <View style={styles.cardText}>
                     <Text style={[styles.cardTitle, isSelected && styles.cardTitleSelected]}>
-                      {level.title}
+                      {t(level.titleKey)}
                     </Text>
-                    <Text style={styles.cardSubtitle}>{level.subtitle}</Text>
+                    <Text style={styles.cardSubtitle}>{t(level.subtitleKey)}</Text>
                   </View>
                 </GlassCard>
               </TouchableOpacity>
@@ -68,7 +69,7 @@ export function LevelSelectionScreen() {
 
       <View style={styles.footer}>
         <Button
-          title="Continue"
+          title={t('levelSelection.continue')}
           onPress={() => {
             if (selected) {
               navigation.navigate('GoalSelection', { skillId, level: selected });

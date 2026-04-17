@@ -13,7 +13,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GlassCard } from '../../components/GlassCard';
 import { Button } from '../../components/Button';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
-import { purchasePackage, restorePurchases, getOfferings } from '../../services/purchases';
+import { purchasePackage, restorePurchases, getOfferings, isStripePayment, purchaseStripe } from '../../services/purchases';
+import { useUserStore } from '../../store/userStore';
+import { t } from '../../i18n';
 
 interface FeatureRow {
   label: string;
@@ -22,34 +24,45 @@ interface FeatureRow {
 }
 
 const FEATURES: FeatureRow[] = [
-  { label: '1 skill track', free: true, premium: true },
-  { label: 'Unlimited skills', free: false, premium: true },
-  { label: 'Basic AI feedback', free: true, premium: true },
-  { label: 'Advanced AI feedback', free: false, premium: true },
-  { label: 'Streak tracking', free: true, premium: true },
-  { label: 'Community access', free: false, premium: true },
-  { label: 'Detailed analytics', free: false, premium: true },
-  { label: 'Freeze tokens', free: false, premium: true },
+  { label: t('subscription.oneSkill'), free: true, premium: true },
+  { label: t('subscription.unlimitedSkills'), free: false, premium: true },
+  { label: t('subscription.basicFeedback'), free: true, premium: true },
+  { label: t('subscription.advancedFeedback'), free: false, premium: true },
+  { label: t('subscription.streakTracking'), free: true, premium: true },
+  { label: t('subscription.communityAccess'), free: false, premium: true },
+  { label: t('subscription.detailedAnalytics'), free: false, premium: true },
+  { label: t('subscription.freezeTokens'), free: false, premium: true },
 ];
 
 export function SubscriptionScreen() {
   const [purchasing, setPurchasing] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const { initialize, profile } = useUserStore();
+  const isPremium = profile?.premium_expires_at ? new Date(profile.premium_expires_at) > new Date() : false;
 
   const handleSubscribe = async () => {
     setPurchasing(true);
     try {
-      const packages = await getOfferings();
-      if (packages.length === 0) {
-        Alert.alert('Unavailable', 'No subscription packages available. Please check RevenueCat dashboard: offerings must have a "default" offering with at least one package linked to an App Store Connect product.');
-        return;
-      }
-      const success = await purchasePackage(packages[0]);
-      if (success) {
-        Alert.alert('Success', 'Welcome to Skilly Premium!');
+      if (isStripePayment()) {
+        const success = await purchaseStripe();
+        if (success) {
+          await initialize();
+          Alert.alert(t('subscription.success'), t('subscription.welcomePremium'));
+        }
+      } else {
+        const packages = await getOfferings();
+        if (packages.length === 0) {
+          Alert.alert(t('subscription.unavailable'), t('subscription.unavailableMsg'));
+          return;
+        }
+        const success = await purchasePackage(packages[0]);
+        if (success) {
+          await initialize();
+          Alert.alert(t('subscription.success'), t('subscription.welcomePremium'));
+        }
       }
     } catch (err) {
-      Alert.alert('Error', 'Could not complete purchase. Please try again.');
+      Alert.alert(t('subscription.error'), t('subscription.purchaseError'));
     } finally {
       setPurchasing(false);
     }
@@ -60,12 +73,12 @@ export function SubscriptionScreen() {
     try {
       const success = await restorePurchases();
       if (success) {
-        Alert.alert('Restored', 'Your premium subscription has been restored.');
+        Alert.alert(t('subscription.restored'), t('subscription.restoredMsg'));
       } else {
-        Alert.alert('No Purchases', 'No previous purchases found.');
+        Alert.alert(t('subscription.noPurchases'), t('subscription.noPurchasesMsg'));
       }
     } catch (err) {
-      Alert.alert('Error', 'Could not restore purchases. Please try again.');
+      Alert.alert(t('subscription.error'), t('subscription.purchaseError'));
     } finally {
       setRestoring(false);
     }
@@ -82,16 +95,16 @@ export function SubscriptionScreen() {
             end={{ x: 1, y: 0 }}
             style={styles.titleGradient}
           >
-            <Text style={styles.title}>Go Premium</Text>
+            <Text style={styles.title}>{t('subscription.title')}</Text>
           </LinearGradient>
 
           {/* Feature Comparison */}
           <GlassCard strong style={styles.comparisonCard}>
             {/* Header */}
             <View style={styles.comparisonHeader}>
-              <Text style={[styles.columnLabel, styles.featureColumn]}>Feature</Text>
-              <Text style={styles.columnLabel}>Free</Text>
-              <Text style={[styles.columnLabel, { color: colors.secondary }]}>Pro</Text>
+              <Text style={[styles.columnLabel, styles.featureColumn]}>{t('subscription.feature')}</Text>
+              <Text style={styles.columnLabel}>{t('subscription.free')}</Text>
+              <Text style={[styles.columnLabel, { color: colors.secondary }]}>{t('subscription.pro')}</Text>
             </View>
 
             {/* Rows */}
@@ -122,39 +135,51 @@ export function SubscriptionScreen() {
             ))}
           </GlassCard>
 
-          {/* Price */}
-          <View style={styles.priceSection}>
-            <Text style={styles.price}>$6.99</Text>
-            <Text style={styles.priceLabel}>/month</Text>
-          </View>
+          {isPremium ? (
+            <View style={{ alignItems: 'center', marginBottom: spacing['2xl'] }}>
+              <Text style={{ fontSize: 48, marginBottom: spacing.md }}>✓</Text>
+              <Text style={{ ...typography.h2, color: colors.success, marginBottom: spacing.sm }}>Premium Active</Text>
+              <Text style={{ ...typography.body, color: colors.textSecondary, textAlign: 'center' }}>
+                You have access to all premium features.
+              </Text>
+            </View>
+          ) : (
+            <>
+              {/* Price */}
+              <View style={styles.priceSection}>
+                <Text style={styles.price}>$6.99</Text>
+                <Text style={styles.priceLabel}>{t('subscription.perMonth')}</Text>
+              </View>
 
-          {/* Subscribe Button */}
-          <Button
-            title={purchasing ? 'Processing...' : 'Subscribe'}
-            onPress={handleSubscribe}
-            disabled={purchasing}
-            style={styles.subscribeButton}
-          />
+              {/* Subscribe Button */}
+              <Button
+                title={purchasing ? t('subscription.processing') : t('subscription.subscribe')}
+                onPress={handleSubscribe}
+                disabled={purchasing}
+                style={styles.subscribeButton}
+              />
 
-          {/* Restore */}
-          <Button
-            title={restoring ? 'Restoring...' : 'Restore Purchases'}
-            variant="ghost"
-            onPress={handleRestore}
-            disabled={restoring}
-          />
+              {/* Restore */}
+              <Button
+                title={restoring ? t('subscription.restoring') : t('subscription.restorePurchases')}
+                variant="ghost"
+                onPress={handleRestore}
+                disabled={restoring}
+              />
+            </>
+          )}
 
           {/* Subscription Terms (Required by App Store Guideline 3.1.2) */}
           <Text style={styles.terms}>
-            Subscription automatically renews monthly at $6.99/month unless cancelled at least 24 hours before the end of the current period. Payment will be charged to your Apple ID account at confirmation of purchase. You can manage or cancel your subscription in your Apple ID account settings. Any unused portion of a free trial period will be forfeited upon purchase.
+            {t('subscription.terms')}
           </Text>
 
           {/* Legal Links */}
           <TouchableOpacity onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
-            <Text style={styles.legalLink}>Terms of Use (EULA)</Text>
+            <Text style={styles.legalLink}>{t('subscription.termsOfUse')}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => Linking.openURL('https://karztsksjqohxhgxdeje.supabase.co/storage/v1/object/public/pages/privacy-policy.html')}>
-            <Text style={styles.legalLink}>Privacy Policy</Text>
+            <Text style={styles.legalLink}>{t('subscription.privacyPolicy')}</Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
@@ -172,7 +197,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing['6xl'],
+    paddingBottom: 120,
   },
 
   // Title

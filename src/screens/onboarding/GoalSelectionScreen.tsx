@@ -19,14 +19,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../services/supabase';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import * as Haptics from 'expo-haptics';
+import { t } from '../../i18n';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'GoalSelection'>;
 type Route = RouteProp<OnboardingStackParamList, 'GoalSelection'>;
 
-const GOALS: { value: Goal; icon: string; title: string; subtitle: string }[] = [
-  { value: 'creativity', icon: '🎨', title: 'Unlock creativity', subtitle: 'Express yourself freely' },
-  { value: 'learn_faster', icon: '⚡', title: 'Learn faster', subtitle: 'Accelerate your growth' },
-  { value: 'discipline', icon: '🧱', title: 'Build discipline', subtitle: 'Show up every day' },
+const GOALS: { value: Goal; icon: string; titleKey: string; subtitleKey: string }[] = [
+  { value: 'creativity', icon: '🎨', titleKey: 'goalSelection.creativity', subtitleKey: 'goalSelection.creativitySub' },
+  { value: 'learn_faster', icon: '⚡', titleKey: 'goalSelection.learnFaster', subtitleKey: 'goalSelection.learnFasterSub' },
+  { value: 'discipline', icon: '🧱', titleKey: 'goalSelection.discipline', subtitleKey: 'goalSelection.disciplineSub' },
 ];
 
 export function GoalSelectionScreen() {
@@ -44,7 +45,10 @@ export function GoalSelectionScreen() {
     setError('');
     setLoading(true);
     try {
-      await completeOnboarding(skillId, level as any, selected);
+      // Don't complete onboarding yet — wait until after paywall
+      // Save skill selection without marking onboarding complete
+      const { updateProfile } = useUserStore.getState();
+      await updateProfile({ selected_skill_id: skillId, skill_level: level as any, goal: selected });
 
       // Generate a simple local roadmap from skill tree nodes
       const { data: nodes } = await supabase
@@ -70,9 +74,9 @@ export function GoalSelectionScreen() {
         await AsyncStorage.setItem('user_roadmap', JSON.stringify(roadmap));
       }
 
-      navigation.navigate('RoadmapPreview', { skillId, level, goal: selected });
+      navigation.navigate('Tutorial', { skillId, level, goal: selected });
     } catch (e: any) {
-      setError(e.message || 'Failed to generate roadmap');
+      setError(e.message || t('goalSelection.failedGenerate'));
     } finally {
       setLoading(false);
     }
@@ -83,8 +87,8 @@ export function GoalSelectionScreen() {
       <AmbientGlow color={colors.primary} size={250} top="10%" left="40%" opacity={0.08} />
 
       <View style={styles.content}>
-        <Text style={styles.step}>STEP 3 OF 3</Text>
-        <Text style={styles.heading}>What drives you?</Text>
+        <Text style={styles.step}>{t('goalSelection.step')}</Text>
+        <Text style={styles.heading}>{t('goalSelection.heading')}</Text>
 
         <View style={styles.options}>
           {GOALS.map((goal) => {
@@ -106,9 +110,9 @@ export function GoalSelectionScreen() {
                   <Text style={styles.icon}>{goal.icon}</Text>
                   <View style={styles.cardText}>
                     <Text style={[styles.cardTitle, isSelected && styles.cardTitleSelected]}>
-                      {goal.title}
+                      {t(goal.titleKey)}
                     </Text>
-                    <Text style={styles.cardSubtitle}>{goal.subtitle}</Text>
+                    <Text style={styles.cardSubtitle}>{t(goal.subtitleKey)}</Text>
                   </View>
                 </GlassCard>
               </TouchableOpacity>
@@ -121,7 +125,7 @@ export function GoalSelectionScreen() {
 
       <View style={styles.footer}>
         <Button
-          title={loading ? '' : 'Generate My Roadmap →'}
+          title={loading ? '' : t('goalSelection.generate')}
           onPress={() => {
             try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); } catch {}
             handleGenerate();

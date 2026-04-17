@@ -9,6 +9,7 @@ import { Button } from '../../components/Button';
 import { colors, spacing, borderRadius, typography } from '../../utils/theme';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import * as Haptics from 'expo-haptics';
+import { t } from '../../i18n';
 
 type Nav = NativeStackNavigationProp<OnboardingStackParamList, 'Welcome'>;
 
@@ -36,16 +37,16 @@ export function WelcomeScreen() {
 
         {/* Title */}
         <Text style={styles.title}>Skilly</Text>
-        <Text style={styles.subtitle}>TALENT IS PRACTICE</Text>
+        <Text style={styles.subtitle}>{t('welcome.subtitle')}</Text>
         <Text style={styles.body}>
-          Master any creative skill{'\n'}
-          <Text style={styles.bodyBold}>5 minutes a day</Text> · AI coaching
+          {t('welcome.body')}{'\n'}
+          <Text style={styles.bodyBold}>{t('welcome.bodyBold')}</Text> · {t('welcome.bodyAi')}
         </Text>
 
         {/* CTA */}
         <View style={styles.cta}>
           <Button
-            title="Begin Your Journey"
+            title={t('welcome.cta')}
             onPress={() => {
               try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); } catch {}
               navigation.navigate('ProfileSetup');

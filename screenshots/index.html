@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skilly - App Store Screenshots</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #111;
+    color: #fff;
+    min-height: 100vh;
+  }
+
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(17,17,17,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #333;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .controls h1 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #FF6B35;
+    margin-right: auto;
+  }
+
+  .tab-group {
+    display: flex;
+    gap: 4px;
+    background: #222;
+    border-radius: 10px;
+    padding: 3px;
+  }
+
+  .tab-group button {
+    background: transparent;
+    border: none;
+    color: #888;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .tab-group button.active {
+    background: #FF6B35;
+    color: #fff;
+  }
+
+  .tab-group button:hover:not(.active) {
+    color: #fff;
+  }
+
+  .gallery {
+    display: flex;
+    gap: 32px;
+    padding: 40px 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  /* Each screenshot container at exact App Store 6.7" ratio */
+  .screenshot-wrapper {
+    flex-shrink: 0;
+    scroll-snap-align: center;
+  }
+
+  .screenshot {
+    width: 430px;
+    height: 932px;
+    border-radius: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  /* Gradient backgrounds per screenshot */
+  .screenshot.s1 { background: linear-gradient(170deg, #1a0a00 0%, #0a0a0b 40%, #1a0800 100%); }
+  .screenshot.s2 { background: linear-gradient(170deg, #0d0a15 0%, #0a0a0b 40%, #0a1010 100%); }
+  .screenshot.s3 { background: linear-gradient(170deg, #0a100d 0%, #0a0a0b 40%, #15100a 100%); }
+  .screenshot.s4 { background: linear-gradient(170deg, #100a15 0%, #0a0a0b 40%, #0a0d15 100%); }
+  .screenshot.s5 { background: linear-gradient(170deg, #150d0a 0%, #0a0a0b 40%, #0a150d 100%); }
+  .screenshot.s6 { background: linear-gradient(170deg, #15100a 0%, #0a0a0b 40%, #150a0d 100%); }
+
+  .headline-area {
+    padding: 48px 32px 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .headline-area h2 {
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 0%, #ddd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .headline-area .sub {
+    font-size: 15px;
+    color: #FF6B35;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  /* Phone frame */
+  .phone-frame {
+    width: 340px;
+    height: 700px;
+    border-radius: 36px;
+    border: 3px solid #333;
+    background: #0a0a0b;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+
+  .phone-frame::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 28px;
+    background: #0a0a0b;
+    border-radius: 0 0 18px 18px;
+    z-index: 10;
+  }
+
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding: 38px 16px 16px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .status-bar .right {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  /* ===== SCREEN 1: HERO ===== */
+  .screen-hero .hero-logo {
+    text-align: center;
+    margin: 24px 0 16px;
+  }
+
+  .screen-hero .hero-logo .logo-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #FF6B35, #FF8F60);
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+
+  .screen-hero .hero-logo h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .screen-hero .hero-logo p {
+    font-size: 11px;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  .screen-hero .hero-cta {
+    background: linear-gradient(135deg, #FF6B35, #FF8F60);
+    border: none;
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 12px auto;
+    display: block;
+    width: 80%;
+    text-align: center;
+  }
+
+  .screen-hero .hero-features {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 0 8px;
+  }
+
+  .screen-hero .hf-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .screen-hero .hf-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255,107,53,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .screen-hero .hf-text h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .screen-hero .hf-text p {
+    font-size: 10px;
+    color: #888;
+    margin-top: 1px;
+  }
+
+  /* ===== SCREEN 2: SKILLS ===== */
+  .screen-skills .skills-search {
+    background: rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .screen-skills .skills-search span {
+    color: #666;
+    font-size: 13px;
+  }
+
+  .screen-skills .cat-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 10px 0 8px 4px;
+  }
+
+  .screen-skills .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .screen-skills .skill-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 14px 8px 10px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .screen-skills .skill-card .sk-icon {
+    font-size: 26px;
+    margin-bottom: 6px;
+  }
+
+  .screen-skills .skill-card .sk-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: #ccc;
+  }
+
+  .screen-skills .skill-card.popular {
+    border-color: rgba(255,107,53,0.3);
+    background: rgba(255,107,53,0.08);
+  }
+
+  .screen-skills .skill-card.popular .sk-name {
+    color: #FF6B35;
+  }
+
+  /* ===== SCREEN 3: AI FEEDBACK ===== */
+  .screen-ai .ai-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .screen-ai .ai-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #FF6B35, #FF8F60);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .screen-ai .ai-name h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .screen-ai .ai-name p {
+    font-size: 10px;
+    color: #4ade80;
+    font-weight: 600;
+  }
+
+  .screen-ai .ai-skill-badge {
+    margin-left: auto;
+    background: rgba(255,107,53,0.15);
+    color: #FF6B35;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .screen-ai .ai-content-area {
+    background: rgba(255,255,255,0.04);
+    border-radius: 16px;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 10px;
+  }
+
+  .screen-ai .ai-drawing-area {
+    width: 100%;
+    height: 120px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 1px dashed rgba(255,255,255,0.1);
+  }
+
+  .screen-ai .ai-drawing-area .sketch-lines {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    opacity: 0.3;
+  }
+
+  .screen-ai .ai-bubble {
+    background: rgba(255,107,53,0.1);
+    border-radius: 14px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,107,53,0.15);
+  }
+
+  .screen-ai .ai-bubble p {
+    font-size: 12px;
+    color: #ddd;
+    line-height: 1.5;
+  }
+
+  .screen-ai .ai-bubble .highlight {
+    color: #FF6B35;
+    font-weight: 700;
+  }
+
+  .screen-ai .ai-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .screen-ai .ai-actions button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: #ccc;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+  }
+
+  .screen-ai .ai-actions button.primary {
+    background: linear-gradient(135deg, #FF6B35, #FF8F60);
+    border: none;
+    color: #fff;
+  }
+
+  .screen-ai .ai-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 10px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+  }
+
+  .screen-ai .ai-score .score-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid #FF6B35;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: #FF6B35;
+  }
+
+  .screen-ai .ai-score .score-text {
+    font-size: 11px;
+    color: #888;
+    line-height: 1.4;
+  }
+
+  .screen-ai .ai-score .score-text strong {
+    color: #fff;
+    font-size: 12px;
+  }
+
+  /* ===== SCREEN 4: MINI-GAMES ===== */
+  .screen-games .games-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .screen-games .games-header h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .screen-games .streak-badge {
+    background: rgba(255,107,53,0.15);
+    color: #FF6B35;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .screen-games .game-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .screen-games .game-card .g-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .screen-games .game-card .g-icon.quiz { background: rgba(168,85,247,0.15); }
+  .screen-games .game-card .g-icon.speed { background: rgba(59,130,246,0.15); }
+  .screen-games .game-card .g-icon.memory { background: rgba(16,185,129,0.15); }
+  .screen-games .game-card .g-icon.challenge { background: rgba(255,107,53,0.15); }
+
+  .screen-games .game-card .g-info h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .screen-games .game-card .g-info p {
+    font-size: 10px;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  .screen-games .game-card .g-info .g-xp {
+    font-size: 10px;
+    font-weight: 700;
+    color: #FF6B35;
+    margin-top: 4px;
+  }
+
+  .screen-games .game-card .g-play {
+    margin-left: auto;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .screen-games .daily-challenge {
+    background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,107,53,0.05));
+    border: 1px solid rgba(255,107,53,0.2);
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  .screen-games .daily-challenge h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #FF6B35;
+    margin-bottom: 4px;
+  }
+
+  .screen-games .daily-challenge p {
+    font-size: 11px;
+    color: #aaa;
+  }
+
+  .screen-games .daily-challenge .dc-reward {
+    display: inline-block;
+    background: rgba(255,107,53,0.2);
+    color: #FF6B35;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 8px;
+  }
+
+  /* ===== SCREEN 5: PROGRESS ===== */
+  .screen-progress .prog-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .screen-progress .prog-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #FF6B35, #FF8F60);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  .screen-progress .prog-info h3 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .screen-progress .prog-info p {
+    font-size: 11px;
+    color: #888;
+  }
+
+  .screen-progress .prog-info .level-badge {
+    display: inline-block;
+    background: rgba(255,107,53,0.15);
+    color: #FF6B35;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 3px;
+  }
+
+  .screen-progress .stat-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .screen-progress .stat-box {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 14px 10px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .screen-progress .stat-box .stat-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: #FF6B35;
+  }
+
+  .screen-progress .stat-box .stat-label {
+    font-size: 9px;
+    color: #888;
+    font-weight: 600;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .screen-progress .streak-calendar {
+    background: rgba(255,255,255,0.04);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .screen-progress .streak-calendar h4 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .screen-progress .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .screen-progress .cal-day {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: #555;
+    font-weight: 600;
+  }
+
+  .screen-progress .cal-day.active {
+    background: rgba(255,107,53,0.25);
+    color: #FF6B35;
+  }
+
+  .screen-progress .cal-day.today {
+    background: #FF6B35;
+    color: #fff;
+  }
+
+  .screen-progress .xp-bar-section {
+    background: rgba(255,255,255,0.04);
+    border-radius: 14px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .screen-progress .xp-bar-section h4 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .screen-progress .xp-bar-section .xp-sub {
+    font-size: 10px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+
+  .screen-progress .xp-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .screen-progress .xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FF6B35, #FF8F60);
+    border-radius: 5px;
+    width: 72%;
+  }
+
+  .screen-progress .skill-progress-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .screen-progress .sp-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .screen-progress .sp-item .sp-icon {
+    font-size: 18px;
+  }
+
+  .screen-progress .sp-item .sp-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .screen-progress .sp-item .sp-bar-inner {
+    height: 100%;
+    background: #FF6B35;
+    border-radius: 3px;
+  }
+
+  .screen-progress .sp-item .sp-pct {
+    font-size: 10px;
+    font-weight: 700;
+    color: #aaa;
+    min-width: 30px;
+    text-align: right;
+  }
+
+  /* ===== SCREEN 6: PREMIUM ===== */
+  .screen-premium .premium-badge {
+    text-align: center;
+    margin: 8px 0 14px;
+  }
+
+  .screen-premium .premium-badge .crown {
+    font-size: 40px;
+    margin-bottom: 4px;
+  }
+
+  .screen-premium .premium-badge h3 {
+    font-size: 20px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #FF6B35, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .screen-premium .premium-badge p {
+    font-size: 11px;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  .screen-premium .prem-features {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .screen-premium .pf-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .screen-premium .pf-item .pf-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: rgba(255,107,53,0.15);
+    color: #FF6B35;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .screen-premium .pf-item p {
+    font-size: 12px;
+    color: #ccc;
+    font-weight: 500;
+  }
+
+  .screen-premium .price-box {
+    background: linear-gradient(135deg, rgba(255,107,53,0.12), rgba(255,215,0,0.08));
+    border: 1px solid rgba(255,107,53,0.25);
+    border-radius: 16px;
+    padding: 18px;
+    text-align: center;
+  }
+
+  .screen-premium .price-box .price {
+    font-size: 32px;
+    font-weight: 900;
+    color: #FF6B35;
+  }
+
+  .screen-premium .price-box .price-period {
+    font-size: 13px;
+    color: #888;
+    font-weight: 500;
+  }
+
+  .screen-premium .price-box .price-sub {
+    font-size: 10px;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .screen-premium .prem-cta {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #FF6B35, #FFD700);
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 12px;
+    font-family: inherit;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 6px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    margin-top: auto;
+  }
+
+  .bottom-nav .nav-item {
+    text-align: center;
+    font-size: 18px;
+    opacity: 0.4;
+  }
+
+  .bottom-nav .nav-item.active {
+    opacity: 1;
+  }
+
+  .bottom-nav .nav-item .nav-label {
+    display: block;
+    font-size: 8px;
+    font-weight: 600;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  .bottom-nav .nav-item.active .nav-label {
+    color: #FF6B35;
+  }
+
+  /* Export info */
+  .export-info {
+    text-align: center;
+    padding: 16px;
+    color: #555;
+    font-size: 11px;
+  }
+
+  /* For individual export - hide controls */
+  @media print {
+    .controls, .export-info { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <h1>Skilly Screenshots</h1>
+
+  <div class="tab-group" id="langTabs">
+    <button class="active" data-lang="en">English</button>
+    <button data-lang="fr">Francais</button>
+    <button data-lang="es">Espanol</button>
+  </div>
+
+  <div class="tab-group" id="screenTabs">
+    <button class="active" data-screen="all">All</button>
+    <button data-screen="0">1</button>
+    <button data-screen="1">2</button>
+    <button data-screen="2">3</button>
+    <button data-screen="3">4</button>
+    <button data-screen="4">5</button>
+    <button data-screen="5">6</button>
+  </div>
+</div>
+
+<div class="gallery" id="gallery"></div>
+
+<div class="export-info">
+  iPhone 6.7" format (1290x2796px) &mdash; Screenshots render at 430x932px (3x scale for export)
+</div>
+
+<script>
+const DATA = {
+  en: {
+    headlines: [
+      { h: "Master Any Skill", sub: "In just 5 minutes a day" },
+      { h: "30+ Skills to Learn", sub: "Something for everyone" },
+      { h: "AI-Powered Coaching", sub: "Personalized feedback in real-time" },
+      { h: "Fun Mini-Games", sub: "Learn while you play" },
+      { h: "Track Your Progress", sub: "Streaks, XP & achievements" },
+      { h: "Go Premium", sub: "Unlock everything" }
+    ],
+    ui: {
+      getStarted: "Get Started Free",
+      aiCoach: "AI Coach", online: "Online",
+      drawing: "Drawing", guitar: "Guitar", cooking: "Cooking",
+      trading: "Trading", chess: "Chess", photo: "Photography",
+      coding: "Coding", fitness: "Fitness", language: "Languages",
+      yoga: "Yoga", music: "Music Theory", writing: "Writing",
+      searchSkills: "Search 30+ skills...",
+      popular: "Popular", creative: "Creative", lifestyle: "Lifestyle",
+      greatWork: "Great improvement on your shading technique!",
+      tipText: "Try using lighter strokes near the edges for a smoother gradient. Your proportions are getting much better.",
+      tryAgain: "Try Again", nextLesson: "Next Lesson",
+      score: "Score", improvement: "Improvement since last session",
+      todaysGames: "Today's Games",
+      quizName: "Quick Quiz", quizDesc: "Test your knowledge",
+      speedName: "Speed Round", speedDesc: "Beat the clock",
+      memoryName: "Memory Match", memoryDesc: "Train your recall",
+      challengeName: "Daily Challenge", challengeDesc: "Complete today's challenge for bonus XP",
+      xpReward: "+50 XP", bonusXp: "+100 Bonus XP",
+      streak: "7 Day Streak",
+      profile: "Skill Explorer",
+      level: "Level 12",
+      streakLabel: "Streak", xpLabel: "Total XP", skillsLabel: "Skills",
+      lessonsLabel: "Lessons",
+      streakCalendar: "March Streak",
+      levelProgress: "Level Progress",
+      xpToNext: "2,180 / 3,000 XP to Level 13",
+      crownTitle: "Skilly Premium",
+      crownSub: "Take your learning to the next level",
+      pf1: "Unlimited AI coaching sessions",
+      pf2: "Access all 30+ skill paths",
+      pf3: "Advanced analytics & insights",
+      pf4: "Ad-free experience",
+      pf5: "Exclusive challenges & rewards",
+      pf6: "Priority support",
+      perMonth: "/month",
+      cancelAnytime: "Cancel anytime. 7-day free trial.",
+      startTrial: "Start Free Trial",
+      navHome: "Home", navSkills: "Skills", navGames: "Games",
+      navProgress: "Progress", navProfile: "Profile"
+    }
+  },
+  fr: {
+    headlines: [
+      { h: "Maitrise n'importe\nquelle competence", sub: "En seulement 5 minutes par jour" },
+      { h: "30+ competences", sub: "Quelque chose pour tous" },
+      { h: "Coaching par IA", sub: "Feedback personnalise en temps reel" },
+      { h: "Mini-jeux amusants", sub: "Apprends en jouant" },
+      { h: "Suis ta progression", sub: "Series, XP et exploits" },
+      { h: "Passe au Premium", sub: "Debloquez tout" }
+    ],
+    ui: {
+      getStarted: "Commencer gratuitement",
+      aiCoach: "Coach IA", online: "En ligne",
+      drawing: "Dessin", guitar: "Guitare", cooking: "Cuisine",
+      trading: "Trading", chess: "Echecs", photo: "Photo",
+      coding: "Code", fitness: "Fitness", language: "Langues",
+      yoga: "Yoga", music: "Theorie musicale", writing: "Ecriture",
+      searchSkills: "Chercher 30+ competences...",
+      popular: "Populaire", creative: "Creatif", lifestyle: "Style de vie",
+      greatWork: "Super amelioration de ta technique d'ombrage !",
+      tipText: "Essaie des traits plus legers pres des bords pour un degrade plus lisse. Tes proportions s'ameliorent beaucoup.",
+      tryAgain: "Reessayer", nextLesson: "Lecon suivante",
+      score: "Score", improvement: "Amelioration depuis la derniere seance",
+      todaysGames: "Jeux du jour",
+      quizName: "Quiz rapide", quizDesc: "Teste tes connaissances",
+      speedName: "Contre la montre", speedDesc: "Bats le chrono",
+      memoryName: "Jeu de memoire", memoryDesc: "Entraine ta memoire",
+      challengeName: "Defi du jour", challengeDesc: "Complete le defi pour du XP bonus",
+      xpReward: "+50 XP", bonusXp: "+100 XP Bonus",
+      streak: "Serie de 7 jours",
+      profile: "Explorateur de competences",
+      level: "Niveau 12",
+      streakLabel: "Serie", xpLabel: "XP Total", skillsLabel: "Comp.",
+      lessonsLabel: "Lecons",
+      streakCalendar: "Serie de mars",
+      levelProgress: "Progression de niveau",
+      xpToNext: "2 180 / 3 000 XP pour le Niveau 13",
+      crownTitle: "Skilly Premium",
+      crownSub: "Passe au niveau superieur",
+      pf1: "Coaching IA illimite",
+      pf2: "Acces a 30+ parcours",
+      pf3: "Analyses avancees",
+      pf4: "Sans publicite",
+      pf5: "Defis et recompenses exclusifs",
+      pf6: "Support prioritaire",
+      perMonth: "/mois",
+      cancelAnytime: "Annule a tout moment. 7 jours d'essai.",
+      startTrial: "Essai gratuit",
+      navHome: "Accueil", navSkills: "Comp.", navGames: "Jeux",
+      navProgress: "Progres", navProfile: "Profil"
+    }
+  },
+  es: {
+    headlines: [
+      { h: "Domina cualquier\nhabilidad", sub: "En solo 5 minutos al dia" },
+      { h: "30+ habilidades", sub: "Algo para todos" },
+      { h: "Coaching con IA", sub: "Feedback personalizado en tiempo real" },
+      { h: "Minijuegos divertidos", sub: "Aprende jugando" },
+      { h: "Sigue tu progreso", sub: "Rachas, XP y logros" },
+      { h: "Hazte Premium", sub: "Desbloquea todo" }
+    ],
+    ui: {
+      getStarted: "Empieza gratis",
+      aiCoach: "Coach IA", online: "En linea",
+      drawing: "Dibujo", guitar: "Guitarra", cooking: "Cocina",
+      trading: "Trading", chess: "Ajedrez", photo: "Fotografia",
+      coding: "Codigo", fitness: "Fitness", language: "Idiomas",
+      yoga: "Yoga", music: "Teoria musical", writing: "Escritura",
+      searchSkills: "Buscar 30+ habilidades...",
+      popular: "Popular", creative: "Creativo", lifestyle: "Estilo de vida",
+      greatWork: "Gran mejora en tu tecnica de sombreado!",
+      tipText: "Prueba trazos mas suaves cerca de los bordes para un degradado mas uniforme. Tus proporciones mejoran mucho.",
+      tryAgain: "Reintentar", nextLesson: "Siguiente leccion",
+      score: "Puntuacion", improvement: "Mejora desde la ultima sesion",
+      todaysGames: "Juegos de hoy",
+      quizName: "Quiz rapido", quizDesc: "Pon a prueba tus conocimientos",
+      speedName: "Contrarreloj", speedDesc: "Gana al reloj",
+      memoryName: "Memoria", memoryDesc: "Entrena tu memoria",
+      challengeName: "Reto diario", challengeDesc: "Completa el reto para XP bonus",
+      xpReward: "+50 XP", bonusXp: "+100 XP Bonus",
+      streak: "Racha de 7 dias",
+      profile: "Explorador de habilidades",
+      level: "Nivel 12",
+      streakLabel: "Racha", xpLabel: "XP Total", skillsLabel: "Hab.",
+      lessonsLabel: "Lecciones",
+      streakCalendar: "Racha de marzo",
+      levelProgress: "Progreso de nivel",
+      xpToNext: "2.180 / 3.000 XP para Nivel 13",
+      crownTitle: "Skilly Premium",
+      crownSub: "Lleva tu aprendizaje al siguiente nivel",
+      pf1: "Coaching IA ilimitado",
+      pf2: "Acceso a 30+ rutas",
+      pf3: "Analiticas avanzadas",
+      pf4: "Sin anuncios",
+      pf5: "Retos y recompensas exclusivos",
+      pf6: "Soporte prioritario",
+      perMonth: "/mes",
+      cancelAnytime: "Cancela en cualquier momento. 7 dias gratis.",
+      startTrial: "Prueba gratuita",
+      navHome: "Inicio", navSkills: "Hab.", navGames: "Juegos",
+      navProgress: "Progreso", navProfile: "Perfil"
+    }
+  }
+};
+
+function buildStatusBar() {
+  return `<div class="status-bar"><span>9:41</span><div class="right"><span>5G</span><span>&#9679;&#9679;&#9679;</span></div></div>`;
+}
+
+function buildBottomNav(ui, activeIdx) {
+  const items = [
+    { icon: '&#127968;', label: ui.navHome },
+    { icon: '&#9733;', label: ui.navSkills },
+    { icon: '&#127918;', label: ui.navGames },
+    { icon: '&#128200;', label: ui.navProgress },
+    { icon: '&#128100;', label: ui.navProfile }
+  ];
+  return `<div class="bottom-nav">${items.map((it, i) =>
+    `<div class="nav-item${i === activeIdx ? ' active' : ''}"><span>${it.icon}</span><span class="nav-label">${it.label}</span></div>`
+  ).join('')}</div>`;
+}
+
+function buildScreen1(ui) {
+  return `<div class="phone-screen screen-hero">
+    ${buildStatusBar()}
+    <div class="hero-logo">
+      <div class="logo-icon">&#9889;</div>
+      <h3>Skilly</h3>
+      <p>AI-Powered Skill Learning</p>
+    </div>
+    <div class="hero-cta">${ui.getStarted}</div>
+    <div class="hero-features">
+      <div class="hf-item"><div class="hf-icon">&#129302;</div><div class="hf-text"><h4>${ui.aiCoach}</h4><p>Personalized AI feedback</p></div></div>
+      <div class="hf-item"><div class="hf-icon">&#127912;</div><div class="hf-text"><h4>30+ ${ui.skillsLabel || 'Skills'}</h4><p>${ui.drawing}, ${ui.guitar}, ${ui.cooking}...</p></div></div>
+      <div class="hf-item"><div class="hf-icon">&#127918;</div><div class="hf-text"><h4>Mini-Games</h4><p>Learn while having fun</p></div></div>
+      <div class="hf-item"><div class="hf-icon">&#128293;</div><div class="hf-text"><h4>${ui.streakLabel}</h4><p>Daily challenges & rewards</p></div></div>
+    </div>
+    ${buildBottomNav(ui, 0)}
+  </div>`;
+}
+
+function buildScreen2(ui) {
+  const skills = [
+    { icon: '&#127912;', name: ui.drawing, pop: true },
+    { icon: '&#127928;', name: ui.guitar, pop: true },
+    { icon: '&#127859;', name: ui.cooking, pop: true },
+    { icon: '&#128200;', name: ui.trading, pop: false },
+    { icon: '&#9823;', name: ui.chess, pop: false },
+    { icon: '&#128247;', name: ui.photo, pop: false },
+    { icon: '&#128187;', name: ui.coding, pop: false },
+    { icon: '&#128170;', name: ui.fitness, pop: false },
+    { icon: '&#127760;', name: ui.language, pop: false },
+    { icon: '&#129495;', name: ui.yoga, pop: false },
+    { icon: '&#127925;', name: ui.music, pop: false },
+    { icon: '&#9997;', name: ui.writing, pop: false }
+  ];
+  return `<div class="phone-screen screen-skills">
+    ${buildStatusBar()}
+    <div class="skills-search"><span>&#128269;</span><span>${ui.searchSkills}</span></div>
+    <div class="cat-label">&#128293; ${ui.popular}</div>
+    <div class="skills-grid">${skills.slice(0,3).map(s => `<div class="skill-card popular"><div class="sk-icon">${s.icon}</div><div class="sk-name">${s.name}</div></div>`).join('')}</div>
+    <div class="cat-label">&#127912; ${ui.creative}</div>
+    <div class="skills-grid">${skills.slice(3,6).map(s => `<div class="skill-card"><div class="sk-icon">${s.icon}</div><div class="sk-name">${s.name}</div></div>`).join('')}</div>
+    <div class="cat-label">&#127793; ${ui.lifestyle}</div>
+    <div class="skills-grid">${skills.slice(6,9).map(s => `<div class="skill-card"><div class="sk-icon">${s.icon}</div><div class="sk-name">${s.name}</div></div>`).join('')}</div>
+    <div class="cat-label">&#128218; More</div>
+    <div class="skills-grid">${skills.slice(9).map(s => `<div class="skill-card"><div class="sk-icon">${s.icon}</div><div class="sk-name">${s.name}</div></div>`).join('')}</div>
+    ${buildBottomNav(ui, 1)}
+  </div>`;
+}
+
+function buildScreen3(ui) {
+  return `<div class="phone-screen screen-ai">
+    ${buildStatusBar()}
+    <div class="ai-header">
+      <div class="ai-avatar">&#129302;</div>
+      <div class="ai-name"><h4>${ui.aiCoach}</h4><p>&#9679; ${ui.online}</p></div>
+      <div class="ai-skill-badge">&#127912; ${ui.drawing}</div>
+    </div>
+    <div class="ai-content-area">
+      <div class="ai-drawing-area"><div class="sketch-lines">&#127912;</div></div>
+      <div class="ai-bubble">
+        <p><span class="highlight">${ui.greatWork}</span></p>
+        <p style="margin-top:6px">${ui.tipText}</p>
+      </div>
+    </div>
+    <div class="ai-score">
+      <div class="score-circle">87</div>
+      <div class="score-text"><strong>${ui.score}: 87/100</strong><br>${ui.improvement}</div>
+    </div>
+    <div class="ai-actions">
+      <button>${ui.tryAgain}</button>
+      <button class="primary">${ui.nextLesson}</button>
+    </div>
+    ${buildBottomNav(ui, 0)}
+  </div>`;
+}
+
+function buildScreen4(ui) {
+  return `<div class="phone-screen screen-games">
+    ${buildStatusBar()}
+    <div class="games-header">
+      <h3>${ui.todaysGames}</h3>
+      <div class="streak-badge">&#128293; ${ui.streak}</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon quiz">&#129504;</div>
+      <div class="g-info"><h4>${ui.quizName}</h4><p>${ui.quizDesc}</p><div class="g-xp">${ui.xpReward}</div></div>
+      <div class="g-play">&#9654;</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon speed">&#9889;</div>
+      <div class="g-info"><h4>${ui.speedName}</h4><p>${ui.speedDesc}</p><div class="g-xp">${ui.xpReward}</div></div>
+      <div class="g-play">&#9654;</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon memory">&#129513;</div>
+      <div class="g-info"><h4>${ui.memoryName}</h4><p>${ui.memoryDesc}</p><div class="g-xp">${ui.xpReward}</div></div>
+      <div class="g-play">&#9654;</div>
+    </div>
+    <div class="daily-challenge">
+      <h4>&#127942; ${ui.challengeName}</h4>
+      <p>${ui.challengeDesc}</p>
+      <div class="dc-reward">${ui.bonusXp}</div>
+    </div>
+    ${buildBottomNav(ui, 2)}
+  </div>`;
+}
+
+function buildScreen5(ui) {
+  const days = [];
+  for (let i = 1; i <= 28; i++) {
+    const cls = i <= 25 ? (i === 25 ? 'today' : (i >= 3 && Math.random() > 0.15 ? 'active' : '')) : '';
+    days.push(`<div class="cal-day ${cls}">${i}</div>`);
+  }
+  return `<div class="phone-screen screen-progress">
+    ${buildStatusBar()}
+    <div class="prog-header">
+      <div class="prog-avatar">&#128100;</div>
+      <div class="prog-info">
+        <h3>${ui.profile}</h3>
+        <p>${ui.level}</p>
+        <span class="level-badge">&#9733; ${ui.level}</span>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-num">23</div><div class="stat-label">${ui.streakLabel}</div></div>
+      <div class="stat-box"><div class="stat-num">8.4k</div><div class="stat-label">${ui.xpLabel}</div></div>
+      <div class="stat-box"><div class="stat-num">5</div><div class="stat-label">${ui.skillsLabel}</div></div>
+      <div class="stat-box"><div class="stat-num">47</div><div class="stat-label">${ui.lessonsLabel}</div></div>
+    </div>
+    <div class="streak-calendar">
+      <h4>&#128293; ${ui.streakCalendar}</h4>
+      <div class="cal-grid">${days.join('')}</div>
+    </div>
+    <div class="xp-bar-section">
+      <h4>${ui.levelProgress}</h4>
+      <div class="xp-sub">${ui.xpToNext}</div>
+      <div class="xp-track"><div class="xp-fill"></div></div>
+      <div class="skill-progress-list">
+        <div class="sp-item"><span class="sp-icon">&#127912;</span><div class="sp-bar"><div class="sp-bar-inner" style="width:82%"></div></div><span class="sp-pct">82%</span></div>
+        <div class="sp-item"><span class="sp-icon">&#127928;</span><div class="sp-bar"><div class="sp-bar-inner" style="width:64%"></div></div><span class="sp-pct">64%</span></div>
+        <div class="sp-item"><span class="sp-icon">&#127859;</span><div class="sp-bar"><div class="sp-bar-inner" style="width:45%"></div></div><span class="sp-pct">45%</span></div>
+      </div>
+    </div>
+    ${buildBottomNav(ui, 3)}
+  </div>`;
+}
+
+function buildScreen6(ui) {
+  return `<div class="phone-screen screen-premium">
+    ${buildStatusBar()}
+    <div class="premium-badge">
+      <div class="crown">&#128081;</div>
+      <h3>${ui.crownTitle}</h3>
+      <p>${ui.crownSub}</p>
+    </div>
+    <div class="prem-features">
+      <div class="pf-item"><div class="pf-check">&#10003;</div><p>${ui.pf1}</p></div>
+      <div class="pf-item"><div class="pf-check">&#10003;</div><p>${ui.pf2}</p></div>
+      <div class="pf-item"><div class="pf-check">&#10003;</div><p>${ui.pf3}</p></div>
+      <div class="pf-item"><div class="pf-check">&#10003;</div><p>${ui.pf4}</p></div>
+      <div class="pf-item"><div class="pf-check">&#10003;</div><p>${ui.pf5}</p></div>
+      <div class="pf-item"><div class="pf-check">&#10003;</div><p>${ui.pf6}</p></div>
+    </div>
+    <div class="price-box">
+      <div class="price">$6.99<span class="price-period">${ui.perMonth}</span></div>
+      <div class="price-sub">${ui.cancelAnytime}</div>
+    </div>
+    <button class="prem-cta">${ui.startTrial}</button>
+    ${buildBottomNav(ui, 4)}
+  </div>`;
+}
+
+const screenBuilders = [buildScreen1, buildScreen2, buildScreen3, buildScreen4, buildScreen5, buildScreen6];
+
+let currentLang = 'en';
+let currentScreen = 'all';
+
+function render() {
+  const gallery = document.getElementById('gallery');
+  const langData = DATA[currentLang];
+  const indices = currentScreen === 'all' ? [0,1,2,3,4,5] : [parseInt(currentScreen)];
+
+  gallery.innerHTML = indices.map(i => {
+    const hl = langData.headlines[i];
+    const headlineText = hl.h.replace(/\n/g, '<br>');
+    return `<div class="screenshot-wrapper">
+      <div class="screenshot s${i+1}">
+        <div class="headline-area">
+          <h2>${headlineText}</h2>
+          <div class="sub">${hl.sub}</div>
+        </div>
+        <div class="phone-frame">
+          ${screenBuilders[i](langData.ui)}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Tab interactions
+document.getElementById('langTabs').addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#langTabs button').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  currentLang = e.target.dataset.lang;
+  render();
+});
+
+document.getElementById('screenTabs').addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#screenTabs button').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  currentScreen = e.target.dataset.screen;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

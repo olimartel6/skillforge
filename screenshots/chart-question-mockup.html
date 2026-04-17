@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0b;font-family:'Inter',sans-serif;display:flex;justify-content:center;padding:20px}
+.phone{width:393px;height:852px;background:#0a0a0b;border-radius:44px;border:3px solid #222;overflow:hidden;position:relative}
+.notch{width:160px;height:34px;background:#000;border-radius:0 0 20px 20px;margin:0 auto}
+.content{padding:20px 24px}
+
+.progress-bar{display:flex;gap:4px;margin-bottom:20px}
+.progress-bar div{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,0.08)}
+.progress-bar div.done{background:#FF6B35}
+.progress-bar div.current{background:linear-gradient(90deg,#FF6B35,#FF6B3555)}
+
+.question-num{font-size:13px;color:#888;font-weight:600;margin-bottom:12px}
+.question-text{font-size:20px;font-weight:700;color:#fff;line-height:1.4;margin-bottom:20px}
+
+.chart-container{background:#111;border-radius:16px;padding:16px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.06)}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.chart-ticker{font-size:14px;font-weight:700;color:#fff}
+.chart-price{font-size:13px;color:#34D399}
+.chart-timeframe{display:flex;gap:8px;margin-bottom:12px}
+.chart-timeframe span{font-size:11px;color:#555;font-weight:600;padding:4px 8px;border-radius:6px}
+.chart-timeframe span.active{color:#FF6B35;background:rgba(255,107,53,0.15)}
+
+/* SVG Chart */
+.chart-svg{width:100%;height:160px}
+
+.chart-label{font-size:11px;color:#555;text-align:center;margin-top:8px}
+
+.options{display:flex;flex-direction:column;gap:10px}
+.option{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 18px;font-size:16px;color:#fff;font-weight:500;cursor:pointer;transition:all 0.2s}
+.option:hover{border-color:rgba(255,107,53,0.3);background:rgba(255,107,53,0.05)}
+.option.selected{border-color:#FF6B35;background:rgba(255,107,53,0.1)}
+.option-letter{color:#FF6B35;font-weight:700;margin-right:10px}
+
+.bottom-bar{position:absolute;bottom:0;left:0;right:0;padding:16px 24px 36px;background:linear-gradient(transparent,#0a0a0b 30%)}
+.skip-btn{width:100%;padding:14px;border-radius:14px;background:rgba(255,255,255,0.06);border:none;color:#888;font-size:15px;font-weight:600;text-align:center}
+
+/* Page 2 styles */
+.phone2 .chart-container{background:#111;position:relative}
+.indicator-badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;margin-right:6px}
+.rsi-badge{background:rgba(108,99,255,0.2);color:#6C63FF}
+.macd-badge{background:rgba(52,211,153,0.2);color:#34D399}
+</style>
+</head>
+<body>
+
+<!-- Question 1: Pattern Recognition -->
+<div class="phone" style="margin-right:20px">
+<div class="notch"></div>
+<div class="content">
+  <div class="progress-bar">
+    <div class="done"></div><div class="done"></div><div class="done"></div>
+    <div class="current"></div><div></div><div></div><div></div><div></div>
+  </div>
+  <div class="question-num">Question 4 of 8</div>
+  <div class="question-text">What pattern do you see on this chart?</div>
+
+  <div class="chart-container">
+    <div class="chart-header">
+      <div class="chart-ticker">AAPL · Daily</div>
+      <div class="chart-price">$178.52 +2.3%</div>
+    </div>
+    <svg class="chart-svg" viewBox="0 0 340 160">
+      <!-- Grid -->
+      <line x1="0" y1="40" x2="340" y2="40" stroke="#1a1a1a" stroke-width="0.5"/>
+      <line x1="0" y1="80" x2="340" y2="80" stroke="#1a1a1a" stroke-width="0.5"/>
+      <line x1="0" y1="120" x2="340" y2="120" stroke="#1a1a1a" stroke-width="0.5"/>
+
+      <!-- Price labels -->
+      <text x="320" y="38" fill="#555" font-size="8">$185</text>
+      <text x="320" y="78" fill="#555" font-size="8">$175</text>
+      <text x="320" y="118" fill="#555" font-size="8">$165</text>
+
+      <!-- Double Bottom Pattern -->
+      <!-- Left shoulder down -->
+      <path d="M20,50 L40,45 L55,60 L70,90 L85,110 L95,120 L105,115 L115,100 L125,80 L135,70 L145,75 L155,90 L165,110 L175,118 L185,115 L195,95 L205,75 L215,60 L225,50 L240,45 L260,42 L280,38 L300,35"
+            fill="none" stroke="#34D399" stroke-width="2"/>
+
+      <!-- Volume bars -->
+      <rect x="20" y="140" width="8" height="12" fill="#34D39933" rx="1"/>
+      <rect x="40" y="138" width="8" height="14" fill="#34D39933" rx="1"/>
+      <rect x="60" y="135" width="8" height="17" fill="#EF444433" rx="1"/>
+      <rect x="80" y="130" width="8" height="22" fill="#EF444433" rx="1"/>
+      <rect x="100" y="133" width="8" height="19" fill="#EF444433" rx="1"/>
+      <rect x="120" y="136" width="8" height="16" fill="#34D39933" rx="1"/>
+      <rect x="140" y="138" width="8" height="14" fill="#34D39933" rx="1"/>
+      <rect x="160" y="132" width="8" height="20" fill="#EF444433" rx="1"/>
+      <rect x="180" y="128" width="8" height="24" fill="#EF444433" rx="1"/>
+      <rect x="200" y="134" width="8" height="18" fill="#34D39933" rx="1"/>
+      <rect x="220" y="130" width="8" height="22" fill="#34D39933" rx="1"/>
+      <rect x="240" y="125" width="8" height="27" fill="#34D39933" rx="1"/>
+      <rect x="260" y="122" width="8" height="30" fill="#34D39933" rx="1"/>
+      <rect x="280" y="120" width="8" height="32" fill="#34D39933" rx="1"/>
+
+      <!-- Annotations -->
+      <circle cx="95" cy="120" r="4" fill="none" stroke="#FF6B35" stroke-width="1.5"/>
+      <circle cx="175" cy="118" r="4" fill="none" stroke="#FF6B35" stroke-width="1.5"/>
+      <text x="85" y="135" fill="#FF6B35" font-size="7" font-weight="700">Bottom 1</text>
+      <text x="163" y="135" fill="#FF6B35" font-size="7" font-weight="700">Bottom 2</text>
+
+      <!-- Neckline -->
+      <line x1="20" y1="50" x2="300" y2="50" stroke="#FF6B3555" stroke-width="1" stroke-dasharray="4,4"/>
+      <text x="5" y="48" fill="#FF6B35" font-size="7" opacity="0.7">Neckline</text>
+    </svg>
+  </div>
+
+  <div class="options">
+    <div class="option"><span class="option-letter">A</span>Head and Shoulders</div>
+    <div class="option selected"><span class="option-letter">B</span>Double Bottom</div>
+    <div class="option"><span class="option-letter">C</span>Cup and Handle</div>
+    <div class="option"><span class="option-letter">D</span>Falling Wedge</div>
+  </div>
+</div>
+<div class="bottom-bar"><div class="skip-btn">Skip →</div></div>
+</div>
+
+<!-- Question 2: RSI Reading -->
+<div class="phone phone2">
+<div class="notch"></div>
+<div class="content">
+  <div class="progress-bar">
+    <div class="done"></div><div class="done"></div><div class="done"></div>
+    <div class="done"></div><div class="done"></div><div class="current"></div>
+    <div></div><div></div>
+  </div>
+  <div class="question-num">Question 6 of 8</div>
+  <div class="question-text">Based on the RSI, what should you consider?</div>
+
+  <div class="chart-container">
+    <div class="chart-header">
+      <div class="chart-ticker">TSLA · 4H</div>
+      <div class="chart-price" style="color:#EF4444">$242.10 -4.8%</div>
+    </div>
+    <svg class="chart-svg" viewBox="0 0 340 160" style="height:100px">
+      <!-- Candlesticks -->
+      <line x1="30" y1="20" x2="30" y2="50" stroke="#34D399" stroke-width="1"/>
+      <rect x="26" y="25" width="8" height="18" fill="#34D399" rx="1"/>
+      <line x1="60" y1="22" x2="60" y2="55" stroke="#34D399" stroke-width="1"/>
+      <rect x="56" y="28" width="8" height="15" fill="#34D399" rx="1"/>
+      <line x1="90" y1="30" x2="90" y2="65" stroke="#EF4444" stroke-width="1"/>
+      <rect x="86" y="35" width="8" height="22" fill="#EF4444" rx="1"/>
+      <line x1="120" y1="45" x2="120" y2="78" stroke="#EF4444" stroke-width="1"/>
+      <rect x="116" y="48" width="8" height="25" fill="#EF4444" rx="1"/>
+      <line x1="150" y1="55" x2="150" y2="85" stroke="#EF4444" stroke-width="1"/>
+      <rect x="146" y="60" width="8" height="20" fill="#EF4444" rx="1"/>
+      <line x1="180" y1="62" x2="180" y2="92" stroke="#EF4444" stroke-width="1"/>
+      <rect x="176" y="65" width="8" height="22" fill="#EF4444" rx="1"/>
+      <line x1="210" y1="70" x2="210" y2="95" stroke="#EF4444" stroke-width="1"/>
+      <rect x="206" y="72" width="8" height="18" fill="#EF4444" rx="1"/>
+      <line x1="240" y1="72" x2="240" y2="96" stroke="#34D399" stroke-width="1"/>
+      <rect x="236" y="78" width="8" height="12" fill="#34D399" rx="1"/>
+    </svg>
+
+    <!-- RSI subplot -->
+    <div style="border-top:1px solid #222;padding-top:8px;margin-top:4px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span class="indicator-badge rsi-badge">RSI (14)</span>
+        <span style="font-size:12px;font-weight:700;color:#EF4444">22.4</span>
+      </div>
+      <svg viewBox="0 0 340 50" style="width:100%;height:40px">
+        <!-- Overbought/oversold zones -->
+        <rect x="0" y="0" width="340" height="15" fill="rgba(239,68,68,0.05)"/>
+        <rect x="0" y="35" width="340" height="15" fill="rgba(52,211,153,0.05)"/>
+        <line x1="0" y1="15" x2="340" y2="15" stroke="#EF444433" stroke-width="0.5" stroke-dasharray="3,3"/>
+        <line x1="0" y1="35" x2="340" y2="35" stroke="#34D39933" stroke-width="0.5" stroke-dasharray="3,3"/>
+        <text x="2" y="12" fill="#EF4444" font-size="6" opacity="0.5">70</text>
+        <text x="2" y="42" fill="#34D399" font-size="6" opacity="0.5">30</text>
+
+        <!-- RSI line going into oversold -->
+        <path d="M30,18 L60,15 L90,20 L120,28 L150,33 L180,38 L210,42 L240,44"
+              fill="none" stroke="#6C63FF" stroke-width="2"/>
+        <circle cx="240" cy="44" r="3" fill="#6C63FF"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="options">
+    <div class="option"><span class="option-letter">A</span>Buy more immediately</div>
+    <div class="option"><span class="option-letter">B</span>Short the stock aggressively</div>
+    <div class="option selected"><span class="option-letter">C</span>Watch for a reversal signal — RSI is oversold</div>
+    <div class="option"><span class="option-letter">D</span>RSI doesn't matter in a downtrend</div>
+  </div>
+</div>
+<div class="bottom-bar"><div class="skip-btn">Skip →</div></div>
+</div>
+
+</body>
+</html>

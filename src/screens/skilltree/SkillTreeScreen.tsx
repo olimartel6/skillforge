@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../../services/supabase';
 import { useUserStore } from '../../store/userStore';
 import * as Haptics from 'expo-haptics';
+import { t } from '../../i18n';
 
 const TIER_CONFIG: Record<Tier, { label: string; colors: [string, string]; labelColor: string }> = {
   basics: { label: 'Basics', colors: [colors.primary, colors.primaryDark], labelColor: colors.success },
@@ -131,9 +132,9 @@ export function SkillTreeScreen() {
           <View style={styles.header}>
             <Text style={styles.skillIcon}>{skill?.icon || '🎯'}</Text>
             <View style={styles.headerText}>
-              <Text style={styles.skillName}>{skill?.name || 'Skill Tree'}</Text>
+              <Text style={styles.skillName}>{skill?.name || t('skillTree.defaultTitle')}</Text>
               <Text style={styles.subtitle}>
-                {unlockedCount} of {nodes.length} nodes unlocked
+                {t('skillTree.nodesUnlocked', { unlocked: unlockedCount, total: nodes.length })}
               </Text>
             </View>
           </View>
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing['6xl'],
+    paddingBottom: 120,
   },
 
   // Header

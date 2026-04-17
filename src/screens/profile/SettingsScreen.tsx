@@ -19,6 +19,10 @@ import {
   scheduleDailyReminder,
 } from '../../services/notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { saveBackup, restoreBackup, getBackupInfo } from '../../services/cloudSync';
+let Clipboard: any = { setStringAsync: async () => {} };
+try { Clipboard = require('expo-clipboard'); } catch (e) { console.warn('expo-clipboard import failed:', e); }
+import { t } from '../../i18n';
 
 const REMINDER_KEY = 'daily_reminder_enabled';
 
@@ -27,18 +31,68 @@ export function SettingsScreen() {
   const signOut = useUserStore((s) => s.signOut);
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime] = useState('8:00 PM');
+  const [lastBackup, setLastBackup] = useState<string | null>(null);
+  const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
+  const [backingUp, setBackingUp] = useState(false);
 
   useEffect(() => {
     const loadSettings = async () => {
       try {
         const enabled = await AsyncStorage.getItem(REMINDER_KEY);
         setReminderEnabled(enabled === 'true');
+        const info = await getBackupInfo();
+        setLastBackup(info.lastBackup);
+        setRecoveryCode(info.recoveryCode);
       } catch {
         // Settings may not be available
       }
     };
     loadSettings();
   }, []);
+
+  const handleBackup = async () => {
+    setBackingUp(true);
+    try {
+      const result = await saveBackup();
+      if (result.success) {
+        Alert.alert(t('settings.backupSuccess'));
+        const info = await getBackupInfo();
+        setLastBackup(info.lastBackup);
+      } else {
+        Alert.alert(t('settings.backupError'));
+      }
+    } catch {
+      Alert.alert(t('settings.backupError'));
+    } finally {
+      setBackingUp(false);
+    }
+  };
+
+  const handleRestore = () => {
+    Alert.prompt(
+      t('settings.restoreTitle'),
+      t('settings.restoreMsg'),
+      async (code: string) => {
+        if (!code?.trim()) return;
+        const result = await restoreBackup(code.trim());
+        if (result.success) {
+          Alert.alert(t('settings.restoreSuccess'));
+        } else {
+          Alert.alert(t('settings.restoreError'));
+        }
+      },
+      'plain-text',
+      '',
+      'default',
+    );
+  };
+
+  const handleCopyCode = async () => {
+    if (recoveryCode) {
+      await Clipboard.setStringAsync(recoveryCode);
+      Alert.alert(t('settings.copied'));
+    }
+  };
 
   const toggleReminder = async (value: boolean) => {
     setReminderEnabled(value);
@@ -72,19 +126,19 @@ export function SettingsScreen() {
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Delete Account',
-      'This will permanently delete all your data including progress, streaks, and badges. This action cannot be undone.',
+      t('settings.deleteTitle'),
+      t('settings.deleteMsg'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('changeSkill.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('settings.deleteBtn'),
           style: 'destructive',
           onPress: async () => {
             try {
               await AsyncStorage.clear();
               await signOut();
             } catch {
-              Alert.alert('Error', 'Could not delete account. Please try again.');
+              Alert.alert(t('subscription.error'), t('settings.deleteError'));
             }
           },
         },
@@ -96,16 +150,16 @@ export function SettingsScreen() {
     <View style={styles.root}>
       <SafeAreaView style={styles.safe} edges={['top']}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <Text style={styles.title}>Settings</Text>
+          <Text style={styles.title}>{t('settings.title')}</Text>
 
           {/* Notifications Section */}
-          <Text style={styles.sectionLabel}>NOTIFICATIONS</Text>
+          <Text style={styles.sectionLabel}>{t('settings.notifications')}</Text>
           <GlassCard style={styles.sectionCard}>
             <View style={styles.settingRow}>
               <View style={styles.settingTextContainer}>
-                <Text style={styles.settingTitle}>Daily Reminder</Text>
+                <Text style={styles.settingTitle}>{t('settings.dailyReminder')}</Text>
                 <Text style={styles.settingDescription}>
-                  Get reminded to practice every day
+                  {t('settings.dailyReminderDesc')}
                 </Text>
               </View>
               <Switch
@@ -120,31 +174,96 @@ export function SettingsScreen() {
 
             <View style={styles.settingRow}>
               <View style={styles.settingTextContainer}>
-                <Text style={styles.settingTitle}>Reminder Time</Text>
+                <Text style={styles.settingTitle}>{t('settings.reminderTime')}</Text>
                 <Text style={styles.settingDescription}>{reminderTime}</Text>
               </View>
-              <Text style={styles.adaptNote}>Adapts to your practice time</Text>
+              <Text style={styles.adaptNote}>{t('settings.adaptsNote')}</Text>
             </View>
+          </GlassCard>
+
+          {/* Backup & Restore Section */}
+          <Text style={styles.sectionLabel}>{t('settings.backup')}</Text>
+          <GlassCard style={styles.sectionCard}>
+            <Text style={styles.settingDescription}>{t('settings.backupDesc')}</Text>
+
+            <View style={styles.divider} />
+
+            <View style={styles.settingRow}>
+              <Text style={styles.settingTitle}>{t('settings.lastBackup')}</Text>
+              <Text style={styles.settingValue}>
+                {lastBackup ? new Date(lastBackup).toLocaleDateString() : t('settings.never')}
+              </Text>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.settingRow}>
+              <View style={styles.settingTextContainer}>
+                <Text style={styles.settingTitle}>{t('settings.recoveryCode')}</Text>
+                <Text style={styles.settingDescription}>{t('settings.recoveryCodeDesc')}</Text>
+              </View>
+              <TouchableOpacity onPress={handleCopyCode} activeOpacity={0.7}>
+                <Text style={[styles.settingValue, { color: colors.primary }]}>
+                  {recoveryCode || '—'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.divider} />
+
+            <Button
+              title={backingUp ? t('settings.backingUp') : t('settings.backupNow')}
+              variant="secondary"
+              onPress={handleBackup}
+              disabled={backingUp}
+            />
+
+            <View style={{ height: spacing.sm }} />
+
+            <Button
+              title={t('settings.restore')}
+              variant="ghost"
+              onPress={handleRestore}
+            />
           </GlassCard>
 
           {/* Account Section */}
-          <Text style={styles.sectionLabel}>ACCOUNT</Text>
+          <Text style={styles.sectionLabel}>{t('settings.account')}</Text>
           <GlassCard style={styles.sectionCard}>
-            <View style={styles.settingRow}>
-              <Text style={styles.settingTitle}>Username</Text>
-              <Text style={styles.settingValue}>{profile?.username || '—'}</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.settingRow}
+              activeOpacity={0.7}
+              onPress={() => {
+                Alert.prompt(
+                  t('settings.changeName') || 'Change Name',
+                  t('settings.changeNameMsg') || 'Enter your new name',
+                  (newName) => {
+                    if (newName && newName.trim()) {
+                      useUserStore.getState().updateProfile({ username: newName.trim() });
+                    }
+                  },
+                  'plain-text',
+                  profile?.username || '',
+                );
+              }}
+            >
+              <Text style={styles.settingTitle}>{t('settings.username')}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={styles.settingValue}>{profile?.username || '—'}</Text>
+                <Text style={styles.chevron}>›</Text>
+              </View>
+            </TouchableOpacity>
           </GlassCard>
 
           {/* Legal Section */}
-          <Text style={styles.sectionLabel}>LEGAL</Text>
+          <Text style={styles.sectionLabel}>{t('settings.legal')}</Text>
           <GlassCard style={styles.sectionCard}>
             <TouchableOpacity
               style={styles.settingRow}
               onPress={() => Linking.openURL('https://karztsksjqohxhgxdeje.supabase.co/storage/v1/object/public/pages/privacy-policy.html')}
               activeOpacity={0.7}
             >
-              <Text style={styles.settingTitle}>Privacy Policy</Text>
+              <Text style={styles.settingTitle}>{t('settings.privacyPolicy')}</Text>
               <Text style={styles.chevron}>›</Text>
             </TouchableOpacity>
 
@@ -155,7 +274,7 @@ export function SettingsScreen() {
               onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}
               activeOpacity={0.7}
             >
-              <Text style={styles.settingTitle}>Terms of Use</Text>
+              <Text style={styles.settingTitle}>{t('settings.termsOfUse')}</Text>
               <Text style={styles.chevron}>›</Text>
             </TouchableOpacity>
           </GlassCard>
@@ -163,7 +282,7 @@ export function SettingsScreen() {
           {/* Sign Out */}
           <View style={styles.signOutContainer}>
             <Button
-              title="Sign Out"
+              title={t('settings.signOut')}
               variant="secondary"
               onPress={handleSignOut}
             />
@@ -172,7 +291,7 @@ export function SettingsScreen() {
           {/* Delete Account (Required by App Store Guideline 5.1.1) */}
           <View style={styles.deleteContainer}>
             <Button
-              title="Delete Account"
+              title={t('settings.deleteAccount')}
               variant="ghost"
               onPress={handleDeleteAccount}
             />
@@ -193,7 +312,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing['6xl'],
+    paddingBottom: 120,
   },
   title: {
     ...typography.h2,

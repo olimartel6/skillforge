@@ -1,5 +1,16 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { saveBackupDebounced } from '../services/cloudSync';
+import { useUserStore } from './userStore';
+import { useLeagueStore } from './leagueStore';
+import type { GameQuestion } from '../utils/gameQuestions';
+
+export interface MissedQuestion {
+  skillName: string;
+  moduleName: string;
+  question: GameQuestion;
+  date: string;
+}
 
 export interface GameState {
   xp: number;
@@ -11,6 +22,7 @@ export interface GameState {
   lives: number;
   currentLesson: number;
   completedLessons: number[];
+  missedQuestions: MissedQuestion[];
   isLoading: boolean;
 
   initialize: () => Promise<void>;
@@ -21,12 +33,16 @@ export interface GameState {
   resetLives: () => void;
   completeLesson: (lessonNumber: number) => Promise<void>;
   resetDailyXp: () => Promise<void>;
+  addMissedQuestion: (skillName: string, moduleName: string, question: GameQuestion) => Promise<void>;
+  removeMissedQuestion: (prompt: string) => Promise<void>;
+  getMissedQuestions: () => MissedQuestion[];
 }
 
 const STORAGE_KEY_XP = 'game_xp';
 const STORAGE_KEY_DAILY_XP = 'game_daily_xp';
 const STORAGE_KEY_DAILY_DATE = 'game_daily_date';
 const STORAGE_KEY_COMPLETED = 'game_completed_lessons';
+const STORAGE_KEY_MISSED = 'missed_questions';
 
 function calculateLevel(xp: number): number {
   return Math.floor(xp / 500) + 1;
@@ -42,21 +58,26 @@ export const useGameStore = create<GameState>((set, get) => ({
   lives: 3,
   currentLesson: 1,
   completedLessons: [],
+  missedQuestions: [],
   isLoading: true,
 
   initialize: async () => {
     try {
-      const [storedXp, storedDailyXp, storedDate, storedCompleted] =
+      const [storedXp, storedDailyXp, storedDate, storedCompleted, storedMissed] =
         await Promise.all([
           AsyncStorage.getItem(STORAGE_KEY_XP),
           AsyncStorage.getItem(STORAGE_KEY_DAILY_XP),
           AsyncStorage.getItem(STORAGE_KEY_DAILY_DATE),
           AsyncStorage.getItem(STORAGE_KEY_COMPLETED),
+          AsyncStorage.getItem(STORAGE_KEY_MISSED),
         ]);
 
       const xp = storedXp ? parseInt(storedXp, 10) : 0;
       const completedLessons: number[] = storedCompleted
         ? JSON.parse(storedCompleted)
+        : [];
+      const missedQuestions: MissedQuestion[] = storedMissed
+        ? JSON.parse(storedMissed)
         : [];
 
       const today = new Date().toISOString().split('T')[0];
@@ -68,16 +89,26 @@ export const useGameStore = create<GameState>((set, get) => ({
         await AsyncStorage.setItem(STORAGE_KEY_DAILY_XP, '0');
       }
 
-      const currentLesson =
-        completedLessons.length > 0
-          ? Math.max(...completedLessons) + 1
-          : 1;
+      let currentLesson: number;
+      if (completedLessons.length > 0) {
+        currentLesson = Math.max(...completedLessons) + 1;
+      } else {
+        // Adaptive start based on skill_level (only on first load with no progress)
+        const userProfile = useUserStore.getState().profile;
+        const skillLevel = userProfile?.skill_level;
+        if (skillLevel === 'advanced') {
+          currentLesson = 9;
+        } else {
+          currentLesson = 1;
+        }
+      }
 
       set({
         xp,
         dailyXp,
         level: calculateLevel(xp),
         completedLessons,
+        missedQuestions,
         currentLesson,
         isLoading: false,
         lives: 3,
@@ -91,20 +122,46 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   addXp: async (amount: number) => {
     const state = get();
-    const bonus = state.combo >= 3 ? amount * 2 : amount;
-    const newXp = state.xp + bonus;
-    const newDailyXp = state.dailyXp + bonus;
+    const oldLevel = state.level;
+    // amount already includes combo bonus from GameSessionScreen
+    const newXp = state.xp + amount;
+    const newDailyXp = state.dailyXp + amount;
+    const newLevel = calculateLevel(newXp);
 
     set({
       xp: newXp,
       dailyXp: newDailyXp,
-      level: calculateLevel(newXp),
+      level: newLevel,
     });
 
     await AsyncStorage.setItem(STORAGE_KEY_XP, String(newXp));
     await AsyncStorage.setItem(STORAGE_KEY_DAILY_XP, String(newDailyXp));
     const today = new Date().toISOString().split('T')[0];
     await AsyncStorage.setItem(STORAGE_KEY_DAILY_DATE, today);
+    saveBackupDebounced();
+
+    // Update iOS home screen widget
+    try { const { syncWidgetFromStores } = require('../services/widgetData'); syncWidgetFromStores(); } catch {}
+
+    // Update weekly league XP
+    try { useLeagueStore.getState().addWeeklyXp(amount); } catch {}
+
+    // Track per-skill XP for global leaderboard
+    try {
+      const { addSkillXp } = require('../screens/community/GlobalLeaderboardScreen');
+      const cachedSkillName = await AsyncStorage.getItem('skilly_current_skill_name');
+      if (cachedSkillName) {
+        addSkillXp(cachedSkillName, amount);
+      }
+    } catch {}
+
+    // Send level-up milestone notification
+    if (newLevel > oldLevel) {
+      try {
+        const { sendLevelUpNotification } = require('../services/notifications');
+        sendLevelUpNotification(newLevel);
+      } catch {}
+    }
   },
 
   incrementCombo: () => {
@@ -138,6 +195,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     set({ completedLessons: completed, currentLesson });
     await AsyncStorage.setItem(STORAGE_KEY_COMPLETED, JSON.stringify(completed));
+    saveBackupDebounced();
   },
 
   resetDailyXp: async () => {
@@ -145,5 +203,30 @@ export const useGameStore = create<GameState>((set, get) => ({
     await AsyncStorage.setItem(STORAGE_KEY_DAILY_XP, '0');
     const today = new Date().toISOString().split('T')[0];
     await AsyncStorage.setItem(STORAGE_KEY_DAILY_DATE, today);
+  },
+
+  addMissedQuestion: async (skillName: string, moduleName: string, question: GameQuestion) => {
+    const state = get();
+    // Deduplicate by prompt
+    const exists = state.missedQuestions.some((mq) => mq.question.prompt === question.prompt);
+    if (exists) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    const entry: MissedQuestion = { skillName, moduleName, question, date: today };
+    const updated = [...state.missedQuestions, entry].slice(-200); // max 200
+
+    set({ missedQuestions: updated });
+    await AsyncStorage.setItem(STORAGE_KEY_MISSED, JSON.stringify(updated));
+  },
+
+  removeMissedQuestion: async (prompt: string) => {
+    const state = get();
+    const updated = state.missedQuestions.filter((mq) => mq.question.prompt !== prompt);
+    set({ missedQuestions: updated });
+    await AsyncStorage.setItem(STORAGE_KEY_MISSED, JSON.stringify(updated));
+  },
+
+  getMissedQuestions: () => {
+    return get().missedQuestions;
   },
 }));

@@ -14,6 +14,28 @@ import { AmbientGlow } from '../../components/AmbientGlow';
 import { colors, spacing, typography, borderRadius } from '../../utils/theme';
 import { UserRoadmap } from '../../utils/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import { t } from '../../i18n';
+
+async function scheduleReminder() {
+  try {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status === 'granted') {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Skilly',
+          body: t('notifications.reminder') || "Don't forget your 5 min/day! 🔥",
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
+          hour: 19,
+          minute: 0,
+        },
+      });
+    }
+  } catch (e) { console.warn('Schedule reminder failed:', e); }
+}
 
 export function RoadmapPreviewScreen() {
   const navigation = useNavigation();
@@ -29,7 +51,11 @@ export function RoadmapPreviewScreen() {
   }, []);
 
   const handleStart = () => {
-    // RootNavigator will auto-redirect since onboarding is complete
+    // Go directly to paywall — notification prompt moved to paywall skip
+    (navigation as any).navigate('OnboardingPaywall');
+  };
+
+  const goToMain = () => {
     (navigation as any).reset({
       index: 0,
       routes: [{ name: 'Main' }],
@@ -39,14 +65,9 @@ export function RoadmapPreviewScreen() {
   const renderDay = ({ item }: { item: UserRoadmap }) => (
     <GlassCard style={styles.dayCard}>
       <View style={styles.dayRow}>
-        <Text style={styles.dayNumber}>Day {item.day_number}</Text>
+        <Text style={styles.dayNumber}>{t('roadmap.day')} {item.day_number}</Text>
         <View style={styles.dayContent}>
           <Text style={styles.challengeTitle}>{item.challenge_title}</Text>
-          {item.node_id && (
-            <View style={styles.nodeTag}>
-              <Text style={styles.nodeTagText}>{item.node_id}</Text>
-            </View>
-          )}
         </View>
       </View>
     </GlassCard>
@@ -57,7 +78,7 @@ export function RoadmapPreviewScreen() {
       <AmbientGlow color={colors.primary} size={250} top="3%" left="50%" opacity={0.08} />
 
       <View style={styles.header}>
-        <Text style={styles.heading}>Your 30-Day Roadmap</Text>
+        <Text style={styles.heading}>{t('roadmap.heading')}</Text>
       </View>
 
       {loading ? (
@@ -75,7 +96,7 @@ export function RoadmapPreviewScreen() {
       )}
 
       <View style={styles.footer}>
-        <Button title="Start Day 1" onPress={handleStart} />
+        <Button title={t('roadmap.startDay1')} onPress={handleStart} />
       </View>
     </SafeAreaView>
   );

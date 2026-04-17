@@ -17,6 +17,7 @@ import { colors, spacing, borderRadius, typography, shadows } from '../../utils/
 import { useCommunityStore } from '../../store/communityStore';
 import { AIFeedback } from '../../utils/types';
 import * as Haptics from 'expo-haptics';
+import { t } from '../../i18n';
 
 interface FeedbackParams {
   feedback: AIFeedback | null;
@@ -101,9 +102,9 @@ export function AIFeedbackScreen() {
         <SafeAreaView style={styles.safe}>
           <View style={styles.loadingContainer}>
             <ActivityIndicator color={colors.primary} size="large" />
-            <Text style={styles.loadingText}>Analyzing your practice...</Text>
+            <Text style={styles.loadingText}>{t('feedback.analyzing')}</Text>
             <Text style={styles.loadingSubText}>
-              Our AI coach is reviewing your session
+              {t('feedback.aiReviewing')}
             </Text>
           </View>
         </SafeAreaView>
@@ -120,13 +121,13 @@ export function AIFeedbackScreen() {
             <View style={styles.errorIcon}>
               <Text style={styles.errorIconText}>!</Text>
             </View>
-            <Text style={styles.errorTitle}>Analysis Failed</Text>
+            <Text style={styles.errorTitle}>{t('feedback.analysisFailed')}</Text>
             <Text style={styles.errorMessage}>
-              {feedback.message || 'Something went wrong. Please try again.'}
+              {feedback.message || t('feedback.defaultError')}
             </Text>
-            <Button title="Retry" onPress={handleRetry} style={{ marginTop: spacing['2xl'] }} />
+            <Button title={t('feedback.retry')} onPress={handleRetry} style={{ marginTop: spacing['2xl'] }} />
             <Button
-              title="Skip"
+              title={t('feedback.skip')}
               variant="ghost"
               onPress={handleSave}
               style={{ marginTop: spacing.md }}
@@ -156,7 +157,7 @@ export function AIFeedbackScreen() {
                 <Text style={styles.checkIcon}>✓</Text>
               </LinearGradient>
             </View>
-            <Text style={styles.headerTitle}>Practice Complete</Text>
+            <Text style={styles.headerTitle}>{t('feedback.practiceComplete')}</Text>
             <Text style={styles.headerMeta}>
               Day {dayNumber} · {skillName} · {duration} min
             </Text>
@@ -184,7 +185,7 @@ export function AIFeedbackScreen() {
                   ]}
                 >
                   <Text style={[styles.feedbackCardTitle, { color: colors.success }]}>
-                    Strengths
+                    {t('feedback.strengths')}
                   </Text>
                   {feedback.strengths.map((item, idx) => (
                     <View key={idx} style={styles.feedbackItem}>
@@ -211,7 +212,7 @@ export function AIFeedbackScreen() {
                   ]}
                 >
                   <Text style={[styles.feedbackCardTitle, { color: colors.primary }]}>
-                    To Improve
+                    {t('feedback.toImprove')}
                   </Text>
                   {feedback.mistakes.map((item, idx) => (
                     <View key={idx} style={styles.feedbackItem}>
@@ -238,7 +239,7 @@ export function AIFeedbackScreen() {
                   ]}
                 >
                   <Text style={[styles.feedbackCardTitle, { color: colors.secondary }]}>
-                    Pro Tip
+                    {t('feedback.proTip')}
                   </Text>
                   <Text style={styles.feedbackText}>{feedback.improvement_tip}</Text>
                 </View>
@@ -260,7 +261,7 @@ export function AIFeedbackScreen() {
                   ]}
                 >
                   <Text style={[styles.feedbackCardTitle, { color: colors.textPrimary }]}>
-                    Keep Going
+                    {t('feedback.keepGoing')}
                   </Text>
                   <Text style={styles.feedbackText}>{feedback.encouragement}</Text>
                 </View>
@@ -271,13 +272,13 @@ export function AIFeedbackScreen() {
           {/* Bottom Buttons */}
           <View style={styles.buttonRow}>
             <Button
-              title="Save"
+              title={t('feedback.save')}
               variant="secondary"
               onPress={handleSave}
               style={styles.buttonHalf}
             />
             <Button
-              title={isSharing ? 'Sharing...' : 'Share'}
+              title={isSharing ? t('feedback.sharing') : t('feedback.share')}
               onPress={handleShare}
               disabled={isSharing}
               style={styles.buttonHalf}

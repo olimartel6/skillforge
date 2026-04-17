@@ -8,30 +8,46 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../utils/theme';
 import * as Haptics from 'expo-haptics';
+import { t } from '../i18n';
 import { DailyChallengeScreen } from '../screens/home/DailyChallengeScreen';
 import { PracticeSessionScreen } from '../screens/home/PracticeSessionScreen';
 import { AIFeedbackScreen } from '../screens/home/AIFeedbackScreen';
+import { AICoachScreen } from '../screens/home/AICoachScreen';
 import { SkillTreeScreen } from '../screens/skilltree/SkillTreeScreen';
+import { ModesScreen } from '../screens/modes/ModesScreen';
 import { FeedScreen } from '../screens/community/FeedScreen';
 import { PostDetailScreen } from '../screens/community/PostDetailScreen';
+import { PublicProfileScreen } from '../screens/community/PublicProfileScreen';
 import { StreakDashboardScreen } from '../screens/stats/StreakDashboardScreen';
 import { BadgesScreen } from '../screens/stats/BadgesScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
+import { PublicProfileScreen as MyPublicProfileScreen } from '../screens/profile/PublicProfileScreen';
+import { CertificateScreen } from '../screens/profile/CertificateScreen';
 import { SettingsScreen } from '../screens/profile/SettingsScreen';
 import { SubscriptionScreen } from '../screens/profile/SubscriptionScreen';
 import { ChangeSkillScreen } from '../screens/profile/ChangeSkillScreen';
 import { GamesHomeScreen } from '../screens/games/GamesHomeScreen';
 import { GameSessionScreen } from '../screens/games/GameSessionScreen';
 import { GameResultScreen } from '../screens/games/GameResultScreen';
+import { ReviewScreen } from '../screens/games/ReviewScreen';
+import { TradingSimScreen } from '../screens/games/TradingSimScreen';
+import { MasterSimScreen } from '../screens/games/MasterSimScreen';
+import { LiveLobbyScreen } from '../screens/live/LiveLobbyScreen';
+import { LiveGameScreen } from '../screens/live/LiveGameScreen';
+import { LiveResultScreen } from '../screens/live/LiveResultScreen';
+import { Challenge1v1Screen } from '../screens/live/Challenge1v1Screen';
+import { FlashcardsScreen } from '../screens/games/FlashcardsScreen';
+import { StoryModeScreen } from '../screens/games/StoryModeScreen';
 
 // Stacks
 const HomeStack = createNativeStackNavigator();
 function HomeNavigator() {
   return (
-    <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+    <HomeStack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
       <HomeStack.Screen name="DailyChallenge" component={DailyChallengeScreen} />
-      <HomeStack.Screen name="PracticeSession" component={PracticeSessionScreen} />
-      <HomeStack.Screen name="AIFeedback" component={AIFeedbackScreen} />
+      <HomeStack.Screen name="PracticeSession" component={PracticeSessionScreen} options={{ animation: 'slide_from_bottom' }} />
+      <HomeStack.Screen name="AIFeedback" component={AIFeedbackScreen} options={{ animation: 'slide_from_bottom' }} />
+      <HomeStack.Screen name="AICoach" component={AICoachScreen} options={{ animation: 'slide_from_bottom' }} />
     </HomeStack.Navigator>
   );
 }
@@ -39,10 +55,19 @@ function HomeNavigator() {
 const GamesStack = createNativeStackNavigator();
 function GamesNavigator() {
   return (
-    <GamesStack.Navigator screenOptions={{ headerShown: false }}>
+    <GamesStack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
       <GamesStack.Screen name="GamesHome" component={GamesHomeScreen} />
-      <GamesStack.Screen name="GameSession" component={GameSessionScreen} />
-      <GamesStack.Screen name="GameResult" component={GameResultScreen} />
+      <GamesStack.Screen name="GameSession" component={GameSessionScreen} options={{ animation: 'slide_from_bottom' }} />
+      <GamesStack.Screen name="GameResult" component={GameResultScreen} options={{ animation: 'fade' }} />
+      <GamesStack.Screen name="ReviewMode" component={ReviewScreen} options={{ animation: 'slide_from_bottom' }} />
+      <GamesStack.Screen name="TradingSim" component={TradingSimScreen} options={{ animation: 'slide_from_bottom' }} />
+      <GamesStack.Screen name="MasterSim" component={MasterSimScreen} options={{ animation: 'slide_from_bottom' }} />
+      <GamesStack.Screen name="Flashcards" component={FlashcardsScreen} options={{ animation: 'slide_from_bottom' }} />
+      <GamesStack.Screen name="StoryMode" component={StoryModeScreen} options={{ animation: 'slide_from_bottom' }} />
+      <GamesStack.Screen name="LiveLobby" component={LiveLobbyScreen} options={{ animation: 'slide_from_bottom' }} />
+      <GamesStack.Screen name="LiveGame" component={LiveGameScreen} options={{ animation: 'fade' }} />
+      <GamesStack.Screen name="LiveResult" component={LiveResultScreen} options={{ animation: 'fade' }} />
+      <GamesStack.Screen name="Challenge1v1" component={Challenge1v1Screen} options={{ animation: 'slide_from_bottom' }} />
     </GamesStack.Navigator>
   );
 }
@@ -50,9 +75,10 @@ function GamesNavigator() {
 const CommunityStack = createNativeStackNavigator();
 function CommunityNavigator() {
   return (
-    <CommunityStack.Navigator screenOptions={{ headerShown: false }}>
+    <CommunityStack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
       <CommunityStack.Screen name="Feed" component={FeedScreen} />
-      <CommunityStack.Screen name="PostDetail" component={PostDetailScreen} />
+      <CommunityStack.Screen name="PostDetail" component={PostDetailScreen} options={{ animation: 'slide_from_bottom' }} />
+      <CommunityStack.Screen name="PublicProfile" component={PublicProfileScreen} options={{ animation: 'slide_from_right' }} />
     </CommunityStack.Navigator>
   );
 }
@@ -60,9 +86,9 @@ function CommunityNavigator() {
 const StatsStack = createNativeStackNavigator();
 function StatsNavigator() {
   return (
-    <StatsStack.Navigator screenOptions={{ headerShown: false }}>
+    <StatsStack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
       <StatsStack.Screen name="StreakDashboard" component={StreakDashboardScreen} />
-      <StatsStack.Screen name="Badges" component={BadgesScreen} />
+      <StatsStack.Screen name="Badges" component={BadgesScreen} options={{ animation: 'slide_from_bottom' }} />
     </StatsStack.Navigator>
   );
 }
@@ -70,11 +96,13 @@ function StatsNavigator() {
 const ProfileStack = createNativeStackNavigator();
 function ProfileNavigator() {
   return (
-    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+    <ProfileStack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
       <ProfileStack.Screen name="Profile" component={ProfileScreen} />
-      <ProfileStack.Screen name="Settings" component={SettingsScreen} />
-      <ProfileStack.Screen name="Subscription" component={SubscriptionScreen} />
-      <ProfileStack.Screen name="ChangeSkill" component={ChangeSkillScreen} />
+      <ProfileStack.Screen name="PublicProfile" component={MyPublicProfileScreen} options={{ animation: 'slide_from_bottom' }} />
+      <ProfileStack.Screen name="Certificate" component={CertificateScreen} options={{ animation: 'slide_from_bottom' }} />
+      <ProfileStack.Screen name="Settings" component={SettingsScreen} options={{ animation: 'slide_from_right' }} />
+      <ProfileStack.Screen name="Subscription" component={SubscriptionScreen} options={{ animation: 'slide_from_bottom' }} />
+      <ProfileStack.Screen name="ChangeSkill" component={ChangeSkillScreen} options={{ animation: 'slide_from_right' }} />
     </ProfileStack.Navigator>
   );
 }
@@ -83,10 +111,19 @@ function ProfileNavigator() {
 const TAB_ICONS: Record<string, { default: string; active: string }> = {
   Home: { default: 'home-outline', active: 'home' },
   Games: { default: 'game-controller-outline', active: 'game-controller' },
-  Tree: { default: 'git-branch-outline', active: 'git-branch' },
+  Modes: { default: 'game-controller-outline', active: 'game-controller' },
   Community: { default: 'people-outline', active: 'people' },
   Stats: { default: 'flame-outline', active: 'flame' },
   Profile: { default: 'person-outline', active: 'person' },
+};
+
+const TAB_LABEL_KEYS: Record<string, string> = {
+  Home: 'tab.home',
+  Games: 'tab.games',
+  Modes: 'tab.modes',
+  Community: 'tab.community',
+  Stats: 'tab.stats',
+  Profile: 'tab.profile',
 };
 
 function TabIcon({ label, active }: { label: string; active: boolean }) {
@@ -177,7 +214,7 @@ function TabIcon({ label, active }: { label: string; active: boolean }) {
 
       {/* Label */}
       <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>
-        {label}
+        {t(TAB_LABEL_KEYS[label] || label)}
       </Text>
     </Animated.View>
   );
@@ -219,7 +256,7 @@ export function TabNavigator() {
         component={HomeNavigator}
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? 'DailyChallenge';
-          const hideOnScreens = ['PracticeSession', 'AIFeedback'];
+          const hideOnScreens = ['PracticeSession', 'AIFeedback', 'AICoach'];
           return {
             tabBarIcon: ({ focused }) => <TabIcon label="Home" active={focused} />,
             tabBarStyle: hideOnScreens.includes(routeName)
@@ -242,7 +279,7 @@ export function TabNavigator() {
         component={GamesNavigator}
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? 'GamesHome';
-          const hideOnScreens = ['GameSession', 'GameResult'];
+          const hideOnScreens = ['GameSession', 'GameResult', 'LiveLobby', 'LiveGame', 'LiveResult', 'Challenge1v1', 'TradingSim', 'MasterSim', 'ReviewMode', 'Flashcards', 'StoryMode'];
           return {
             tabBarIcon: ({ focused }) => <TabIcon label="Games" active={focused} />,
             tabBarStyle: hideOnScreens.includes(routeName)
@@ -261,14 +298,14 @@ export function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="TreeTab"
-        component={SkillTreeScreen}
-        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Tree" active={focused} /> }}
+        name="ModesTab"
+        component={ModesScreen}
+        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Modes" active={focused} /> }}
       />
       <Tab.Screen
         name="CommunityTab"
         component={CommunityNavigator}
-        options={{ tabBarIcon: ({ focused }) => <TabIcon label="Community" active={focused} /> }}
+        options={{ tabBarIcon: ({ focused }) => <TabIcon label={t('tab.community')} active={focused} /> }}
       />
       <Tab.Screen
         name="StatsTab"

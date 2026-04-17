@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, typography, borderRadius } from '../../utils/theme';
 import type { GameQuestion } from '../../utils/gameQuestions';
+import { t } from '../../i18n';
 
 interface GameProps {
   question: GameQuestion;
@@ -20,7 +21,9 @@ export function TrueFalseGame({ question, onAnswer }: GameProps) {
     if (answered) return;
     setSelected(answer);
     setAnswered(true);
-    const correct = answer === question.correctAnswer;
+    // Normalize correctAnswer: handle both English (True/False) and translated (Vrai/Faux, Verdadero/Falso)
+    const normalizedCorrect = ['True', 'Vrai', 'Verdadero'].includes(String(question.correctAnswer)) ? 'True' : 'False';
+    const correct = answer === normalizedCorrect;
 
     const scale = answer === 'True' ? scaleTrue : scaleFalse;
     Animated.sequence([
@@ -31,9 +34,11 @@ export function TrueFalseGame({ question, onAnswer }: GameProps) {
     setTimeout(() => onAnswer(correct), 800);
   };
 
+  const normalizedCorrect = ['True', 'Vrai', 'Verdadero'].includes(String(question.correctAnswer)) ? 'True' : 'False';
+
   const getBtnStyle = (value: string) => {
     if (!answered) return {};
-    if (value === question.correctAnswer) return { borderColor: colors.success, borderWidth: 2 };
+    if (value === normalizedCorrect) return { borderColor: colors.success, borderWidth: 2 };
     if (value === selected) return { borderColor: colors.error, borderWidth: 2 };
     return { opacity: 0.3 };
   };
@@ -58,7 +63,7 @@ export function TrueFalseGame({ question, onAnswer }: GameProps) {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={answered && 'True' === question.correctAnswer
+              colors={answered && normalizedCorrect === 'True'
                 ? [colors.success, colors.successDark]
                 : ['rgba(52, 211, 153, 0.15)', 'rgba(52, 211, 153, 0.05)']}
               style={[styles.btn, getBtnStyle('True')]}
@@ -76,7 +81,7 @@ export function TrueFalseGame({ question, onAnswer }: GameProps) {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={answered && 'False' === question.correctAnswer
+              colors={answered && normalizedCorrect === 'False'
                 ? [colors.success, colors.successDark]
                 : ['rgba(239, 68, 68, 0.15)', 'rgba(239, 68, 68, 0.05)']}
               style={[styles.btn, getBtnStyle('False')]}
